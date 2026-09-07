@@ -1,0 +1,535 @@
+<title>Arquitectura del Design Challenge</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --ink:        #0a0b0d;
+  --primary:    #e43301;
+  --cream:      #fffae6;
+  --white:      #ffffff;
+
+  --surface-brand:         #e43301;
+  --on-surface-brand:      #ffffff;
+  --on-surface-brand-soft: rgba(255, 255, 255, 0.85);
+  --on-surface-brand-ink:  #0a0b0d;
+
+  --primary-900: #b32800;
+  --primary-500: #e84e22;
+  --primary-300: #f0774d;
+  --primary-200: #f5a083;
+
+  --text:       #0a0b0d;
+  --text-muted: #6b6459;
+  --hairline:   #e8e0c2;
+  --panel:      #fffdf3;
+
+  --font-display: "Montserrat", system-ui, sans-serif;
+  --font-mono:    "DM Mono", ui-monospace, monospace;
+
+  --radius-md:   10px;
+  --radius-lg:   20px;
+  --radius-pill: 50px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 16px;
+  line-height: 1.68;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: 880px; margin: 0 auto; padding: 0 24px 96px; }
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin: 0;
+}
+
+/* ---------- portada ---------- */
+.portada {
+  margin-top: 30px;
+  background: var(--surface-brand);
+  color: var(--on-surface-brand);
+  border-radius: var(--radius-lg);
+  padding: 54px 46px;
+}
+.portada .eyebrow { color: var(--on-surface-brand); }
+.portada h1 {
+  font-size: clamp(30px, 5vw, 46px);
+  font-weight: 300;
+  letter-spacing: -0.028em;
+  line-height: 1.08;
+  text-wrap: balance;
+  margin: 16px 0 0;
+  max-width: 18ch;
+}
+.portada h1 b { font-weight: 700; color: var(--on-surface-brand-ink); }
+.portada p { color: var(--on-surface-brand-soft); margin: 18px 0 0; max-width: 60ch; font-weight: 300; }
+
+/* ---------- veredicto ---------- */
+.veredicto {
+  margin-top: 22px;
+  border: 1px solid var(--hairline);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  padding: 26px 30px;
+}
+.veredicto p { margin: 0; }
+.veredicto p + p { margin-top: 12px; }
+.veredicto b { font-weight: 700; }
+
+/* ---------- secciones ---------- */
+section { margin-top: 72px; }
+h2 {
+  font-size: 26px;
+  font-weight: 300;
+  letter-spacing: -0.022em;
+  line-height: 1.2;
+  margin: 12px 0 0;
+  text-wrap: balance;
+}
+h2 b { font-weight: 700; }
+h3 {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 34px 0 10px;
+}
+p { max-width: 68ch; }
+.apoyo { color: var(--text-muted); margin-top: 14px; }
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--panel);
+  border: 1px solid var(--hairline);
+  border-radius: 5px;
+  padding: 1px 6px;
+}
+
+/* ---------- diagrama ---------- */
+.diagrama {
+  margin-top: 30px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  padding: 32px 28px;
+  overflow-x: auto;
+}
+.diagrama-inner { min-width: 560px; }
+.nivel { display: flex; gap: 14px; justify-content: center; flex-wrap: nowrap; }
+.caja {
+  flex: 1 1 0;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-md);
+  background: var(--white);
+  padding: 16px 16px 18px;
+  text-align: center;
+}
+.caja .rol {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  display: block;
+}
+.caja .que { font-weight: 700; font-size: 15px; display: block; margin-top: 7px; }
+.caja .ruta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--primary);
+  display: block;
+  margin-top: 6px;
+  word-break: break-all;
+}
+.caja.marca { background: var(--surface-brand); border-color: var(--surface-brand); }
+.caja.marca .rol { color: var(--on-surface-brand-soft); }
+.caja.marca .que { color: var(--on-surface-brand); }
+.caja.marca .ruta { color: var(--on-surface-brand-ink); }
+.conector {
+  display: block;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  padding: 12px 0;
+  letter-spacing: 0.08em;
+}
+.rama { border-top: 1px solid var(--hairline); margin: 4px 0 16px; }
+
+/* ---------- tablas ---------- */
+.tabla-scroll { overflow-x: auto; margin-top: 22px; }
+table { border-collapse: collapse; width: 100%; min-width: 520px; font-size: 14px; }
+th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--hairline); vertical-align: top; }
+th {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 500;
+  border-bottom: 1px solid var(--ink);
+}
+td.mono { font-family: var(--font-mono); font-size: 12px; white-space: nowrap; }
+td .nota { color: var(--text-muted); display: block; font-size: 13px; margin-top: 3px; }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- fases ---------- */
+.fases { margin-top: 26px; display: flex; flex-direction: column; }
+.fase {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) 108px;
+  gap: 20px;
+  align-items: start;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--hairline);
+}
+.fase:first-child { border-top: 1px solid var(--ink); }
+.fase .n {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.fase h4 { margin: 0 0 6px; font-size: 16px; font-weight: 700; }
+.fase p { margin: 0; font-size: 14px; color: var(--text-muted); max-width: none; }
+.fase .esfuerzo {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: right;
+  letter-spacing: 0.04em;
+}
+@media (max-width: 620px) {
+  .fase { grid-template-columns: 40px minmax(0, 1fr); }
+  .fase .esfuerzo { grid-column: 2; text-align: left; }
+}
+
+/* ---------- decisiones ---------- */
+.decisiones { margin-top: 26px; display: flex; flex-direction: column; gap: 14px; }
+.decision {
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  padding: 22px 26px;
+}
+.decision.bloquea { border-left: 3px solid var(--primary); }
+.decision .tipo {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+.decision h4 { margin: 8px 0 8px; font-size: 16px; font-weight: 700; }
+.decision p { margin: 0; font-size: 14px; color: var(--text-muted); }
+.decision .reco { margin-top: 10px; font-size: 14px; color: var(--text); }
+.decision .reco b { font-weight: 700; }
+
+.pie {
+  margin-top: 72px;
+  border-top: 1px solid var(--hairline);
+  padding-top: 24px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+</style>
+
+<div class="wrap">
+
+  <header class="portada">
+    <p class="eyebrow">Plan técnico · Habisite Design Challenge</p>
+    <h1>Tres superficies, <b>una sola aplicación.</b></h1>
+    <p>Landing pública, panel de participantes y panel de jurado sobre una misma base de datos y un mismo login. Qué construir, en qué orden y qué hay que decidir antes de empezar.</p>
+  </header>
+
+  <div class="veredicto">
+    <p><b>Sí, se puede hacer con las rutas que querés.</b> Verifiqué el dominio: habisite.com resuelve por Cloudflare y Cloudflare es tu DNS autoritativo. Eso te habilita tanto rutas (<code>habisite.com/design-challenge-jurado</code>) como subdominios, sin tocar el WordPress actual.</p>
+    <p>Pero recomiendo <b>subdominio</b>, no rutas. El motivo está abajo, en “Cómo conviven con WordPress”.</p>
+  </div>
+
+  <!-- ============ ARQUITECTURA ============ -->
+  <section>
+    <p class="eyebrow">Arquitectura</p>
+    <h2>Una aplicación con <b>tres puertas.</b></h2>
+    <p class="apoyo">No son tres proyectos. Es un solo código con tres zonas y un control de acceso por rol: quien entra ve su puerta y ninguna otra. Compartir base de datos y sesión es lo que hace que el puntaje del jurado aparezca en el panel del participante sin sincronizar nada a mano.</p>
+
+    <div class="diagrama">
+      <div class="diagrama-inner">
+        <div class="nivel">
+          <div class="caja marca">
+            <span class="rol">Entrada única</span>
+            <span class="que">Cloudflare DNS</span>
+            <span class="ruta">habisite.com</span>
+          </div>
+        </div>
+        <span class="conector">reparte según el nombre ↓</span>
+        <div class="nivel">
+          <div class="caja">
+            <span class="rol">Se queda como está</span>
+            <span class="que">WordPress</span>
+            <span class="ruta">habisite.com</span>
+          </div>
+          <div class="caja">
+            <span class="rol">Nuevo · Next.js</span>
+            <span class="que">App del concurso</span>
+            <span class="ruta">challenge.habisite.com</span>
+          </div>
+        </div>
+        <div class="rama"></div>
+        <div class="nivel">
+          <div class="caja">
+            <span class="rol">Público</span>
+            <span class="que">Landing</span>
+            <span class="ruta">/</span>
+          </div>
+          <div class="caja">
+            <span class="rol">Rol participante</span>
+            <span class="que">Mi propuesta</span>
+            <span class="ruta">/panel</span>
+          </div>
+          <div class="caja">
+            <span class="rol">Rol jurado</span>
+            <span class="que">Evaluación</span>
+            <span class="ruta">/jurado</span>
+          </div>
+        </div>
+        <span class="conector">las tres leen y escriben en ↓</span>
+        <div class="nivel">
+          <div class="caja">
+            <span class="rol">Datos + login + archivos</span>
+            <span class="que">Supabase</span>
+            <span class="ruta">Postgres · Auth · Storage</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WORDPRESS ============ -->
+  <section>
+    <p class="eyebrow">Ruteo</p>
+    <h2>Cómo conviven con <b>WordPress.</b></h2>
+    <p class="apoyo">Hoy WordPress atiende todo: probé <code>/design-challenge-participante</code> y devuelve 404, porque cualquier ruta desconocida cae en él. Hay dos formas de meter la app nueva.</p>
+
+    <div class="tabla-scroll">
+      <table>
+        <thead>
+          <tr><th>Opción</th><th>Cómo se hace</th><th>Costo real</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono">challenge<br>.habisite.com<br><b>← recomendado</b></td>
+            <td>Un registro CNAME en Cloudflare apuntando al hosting de la app. Certificado SSL automático.<span class="nota">Diez minutos de configuración.</span></td>
+            <td>WordPress ni se entera. Deploys independientes: si rompés la app, el sitio sigue en pie.</td>
+          </tr>
+          <tr>
+            <td class="mono">habisite.com/<br>design-challenge-*</td>
+            <td>Una Origin Rule o un Worker en Cloudflare que intercepte ese prefijo y lo mande al hosting de la app en vez de a WordPress.<span class="nota">Es real y funciona, no es un truco.</span></td>
+            <td>Un salto de proxy más, reglas de caché que afinar y cookies que hay que acotar por ruta. Más piezas que se pueden romper, y las rompe alguien que no estaba mirando.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="apoyo">La ventaja de la ruta es percepción de marca, y se puede recuperar después: cuando migren todo el sitio a código, la app pasa a ser <code>habisite.com</code> y el subdominio queda como redirección. Empezar por subdominio no cierra esa puerta.</p>
+  </section>
+
+  <!-- ============ STACK ============ -->
+  <section>
+    <p class="eyebrow">Stack</p>
+    <h2>Qué usamos y <b>por qué.</b></h2>
+
+    <div class="tabla-scroll">
+      <table>
+        <thead>
+          <tr><th>Pieza</th><th>Elección</th><th>Por qué esta y no otra</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono">Aplicación</td>
+            <td><b>Next.js</b></td>
+            <td>La landing necesita ser rápida e indexable; los paneles necesitan sesión y lógica de servidor. Next hace las dos en un solo proyecto y un solo deploy.</td>
+          </tr>
+          <tr>
+            <td class="mono">Login</td>
+            <td><b>Supabase Auth</b></td>
+            <td>Google viene incorporado, que es lo que pediste. Y el usuario queda en la misma base que los proyectos, así que los permisos se escriben una vez.</td>
+          </tr>
+          <tr>
+            <td class="mono">Base de datos</td>
+            <td><b>Postgres</b> (Supabase)</td>
+            <td>Row Level Security: el permiso vive en la tabla, no en el código. Un participante no puede leer la propuesta de otro aunque alguien se equivoque en una pantalla.</td>
+          </tr>
+          <tr>
+            <td class="mono">Archivos</td>
+            <td><b>Supabase Storage</b></td>
+            <td>Láminas y renders pesan. Sube directo del navegador al storage sin pasar por el servidor, con las mismas reglas de permisos que la base.</td>
+          </tr>
+          <tr>
+            <td class="mono">Correos</td>
+            <td><b>Resend</b></td>
+            <td>Avisos de inscripción y de puntaje publicado. Se configura con el dominio propio para no caer en spam.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ DATOS ============ -->
+  <section>
+    <p class="eyebrow">Modelo de datos</p>
+    <h2>Las tablas que <b>sostienen todo.</b></h2>
+    <p class="apoyo">El corazón del sistema es la separación entre propuesta, puntaje y resultado publicado. Los jurados escriben puntajes cuando quieren; el participante no ve nada hasta que un administrador publica.</p>
+
+    <div class="tabla-scroll">
+      <table>
+        <thead>
+          <tr><th>Tabla</th><th>Qué guarda</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="mono">profiles</td><td>Nombre, apellido, correo, universidad, país y <b>rol</b> (participante · jurado · admin). Se crea sola en el primer login.</td></tr>
+          <tr><td class="mono">submissions</td><td>Una propuesta por participante: título, memoria, estado (borrador o entregada) y fecha de entrega.</td></tr>
+          <tr><td class="mono">submission_files</td><td>Los archivos de cada propuesta: láminas, memoria en PDF, renders. Tipo, peso y orden.</td></tr>
+          <tr><td class="mono">criteria</td><td>Los siete criterios con su peso: creatividad 35, narrativa 20, integración 20, sostenibilidad 10, viabilidad 5, presentación 5, entregables 5.</td></tr>
+          <tr><td class="mono">scores</td><td>Un puntaje por criterio, por jurado, por propuesta. Clave única sobre los tres: nadie puntúa dos veces lo mismo.</td></tr>
+          <tr><td class="mono">feedback</td><td>La retroalimentación escrita del jurado, con un interruptor de visibilidad hacia el participante.</td></tr>
+          <tr><td class="mono">results</td><td>Puntaje final calculado y fecha de publicación. Mientras no tenga fecha, no existe para el participante.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Quién puede hacer qué</h3>
+    <div class="tabla-scroll">
+      <table>
+        <thead>
+          <tr><th>Rol</th><th>Puede</th><th>No puede</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono">Participante</td>
+            <td>Ver y editar solo su propuesta, hasta el cierre. Ver su puntaje una vez publicado.</td>
+            <td>Ver otras propuestas. Ver puntajes sin publicar. Editar después del cierre.</td>
+          </tr>
+          <tr>
+            <td class="mono">Jurado</td>
+            <td>Ver todas las propuestas entregadas. Cargar y corregir sus propios puntajes y devoluciones.</td>
+            <td>Modificar propuestas. Ver los puntajes de los otros jurados antes del cierre de evaluación.</td>
+          </tr>
+          <tr>
+            <td class="mono">Admin</td>
+            <td>Todo, más las dos acciones que nadie más tiene: cerrar la evaluación y publicar resultados.</td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="apoyo">Lo de “el jurado no ve puntajes ajenos hasta el cierre” no es capricho técnico: si el segundo jurado ve el 9 que puso el primero, tiende a acercarse a ese número. Evaluar a ciegas y recién después comparar da resultados más honestos.</p>
+  </section>
+
+  <!-- ============ FASES ============ -->
+  <section>
+    <p class="eyebrow">Ejecución</p>
+    <h2>En qué orden lo <b>construimos.</b></h2>
+    <p class="apoyo">Cada fase deja algo utilizable. Si el calendario aprieta, se puede lanzar con la fase 1 y seguir mientras la inscripción está abierta.</p>
+
+    <div class="fases">
+      <div class="fase">
+        <span class="n">01</span>
+        <div>
+          <h4>Landing e inscripción</h4>
+          <p>La página que ya tenemos, conectada a la base: el pre-registro guarda de verdad y dispara el correo de bienvenida. Sale a producción en el subdominio.</p>
+        </div>
+        <span class="esfuerzo">~1 semana</span>
+      </div>
+      <div class="fase">
+        <span class="n">02</span>
+        <div>
+          <h4>Login y panel del participante</h4>
+          <p>Entrar con Google, completar el perfil, crear la propuesta, subir archivos, guardar borrador y entregar. El cierre se aplica en el servidor, no en el botón.</p>
+        </div>
+        <span class="esfuerzo">~2 semanas</span>
+      </div>
+      <div class="fase">
+        <span class="n">03</span>
+        <div>
+          <h4>Panel del jurado</h4>
+          <p>Lista de propuestas entregadas, visor de láminas, carga de puntaje por criterio con el total calculado a la vista, y campo de devolución. Control de avance: cuántas evaluó cada jurado.</p>
+        </div>
+        <span class="esfuerzo">~2 semanas</span>
+      </div>
+      <div class="fase">
+        <span class="n">04</span>
+        <div>
+          <h4>Resultados y avisos</h4>
+          <p>El admin cierra la evaluación, el sistema promedia entre jurados y aplica los pesos. Al publicar, cada participante recibe un correo y ve su puntaje y su devolución en el panel.</p>
+        </div>
+        <span class="esfuerzo">~1 semana</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DECISIONES ============ -->
+  <section>
+    <p class="eyebrow">Antes de escribir código</p>
+    <h2>Cinco cosas que <b>tenés que definir.</b></h2>
+
+    <div class="decisiones">
+
+      <div class="decision bloquea">
+        <span class="tipo">Bloquea todo lo demás</span>
+        <h4>El calendario está vencido</h4>
+        <p>Las fechas publicadas van del 29 de abril al 13 de junio de 2026, y hoy es 3 de septiembre de 2026. Todo el plan cuelga de esto: define si hay que salir corriendo o si hay margen para hacerlo bien.</p>
+        <p class="reco"><b>Necesito:</b> las fechas reales de la edición que van a correr.</p>
+      </div>
+
+      <div class="decision bloquea">
+        <span class="tipo">Bloquea el panel del jurado</span>
+        <h4>¿El jurado ve quién es el autor?</h4>
+        <p>Dijiste que el jurado tiene que “ver de quién es”. Es tu decisión, pero casi todos los concursos de arquitectura evalúan a ciegas: sin nombre ni universidad, para que el prestigio de la facultad no pese en la nota. Cambia cómo se construye la pantalla, así que conviene resolverlo antes.</p>
+        <p class="reco"><b>Recomiendo:</b> anónimo durante la evaluación, con la identidad revelada al cerrar. El sistema igual sabe de quién es cada propuesta.</p>
+      </div>
+
+      <div class="decision">
+        <span class="tipo">Define el storage</span>
+        <h4>Qué se entrega y cuánto pesa</h4>
+        <p>Hace falta la lista exacta de entregables y el límite por archivo. Dos láminas A1 en PDF y una memoria es lo habitual; sin un tope definido, alguien sube un render de 400 MB el último día y tumba la carga de todos.</p>
+        <p class="reco"><b>Recomiendo:</b> formatos y pesos máximos escritos en las bases, validados en el navegador y otra vez en el servidor.</p>
+      </div>
+
+      <div class="decision">
+        <span class="tipo">Define el login</span>
+        <h4>¿Solo Google?</h4>
+        <p>Google cubre a la mayoría de los estudiantes, pero no a todos: hay universidades con correo Microsoft y participantes sin cuenta de Google.</p>
+        <p class="reco"><b>Recomiendo:</b> Google como botón principal y enlace mágico por correo como alternativa. Cuesta poco y evita perder inscripciones.</p>
+      </div>
+
+      <div class="decision">
+        <span class="tipo">Define las bases</span>
+        <h4>Datos personales y derechos sobre las propuestas</h4>
+        <p>Van a guardar datos de estudiantes de varios países y a recibir proyectos originales. Las bases tienen que decir qué se hace con los datos y qué derechos tiene Habisite sobre las propuestas — en especial si se publican en la exposición virtual que promete el premio.</p>
+        <p class="reco"><b>Necesito:</b> el texto de las bases, o luz verde para dejar los enlaces preparados y completarlos después.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <p class="pie">Habisite Design Challenge · Plan técnico · 3 de septiembre de 2026</p>
+
+</div>

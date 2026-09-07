@@ -1,0 +1,207 @@
+@import "tailwindcss";
+
+/* ==========================================================
+   Habisite — sistema de diseño
+
+   Todo lo que define la marca vive en @theme. Tailwind convierte
+   cada token en utilidades: --color-primary habilita bg-primary,
+   --text-titulo habilita text-titulo, --radius-placa habilita
+   rounded-placa.
+
+   Regla del proyecto: ningun componente escribe un valor suelto.
+   Si hace falta un numero nuevo, primero se le pone nombre acá.
+   ========================================================== */
+
+@theme {
+  /* ---------- Color: los tres de la marca ---------- */
+  --color-ink: #0a0b0d;
+  --color-primary: #e43301;
+  --color-cream: #fffae6;
+
+  /* Crema apagado, para bordes sobre fondo blanco:
+     el crema puro contra blanco casi no se ve. */
+  --color-cream-borde: #efe7cb;
+
+  /* ---------- Color: degradé del hero ---------- */
+  --color-hero-1: #e8420a;
+  --color-hero-2: #dd3a06;
+  --color-hero-3: #a92805;
+  --color-hero-4: #7d1e02;
+
+  /* ---------- Color: neutros ---------- */
+  --color-proxi: #b8b8b8;
+  --color-tenue: #8a8a8a;
+
+  /* ---------- Tipografía ---------- */
+  --font-display: "Montserrat", system-ui, -apple-system, sans-serif;
+
+  /* Escala con nombres de rol, no de tamaño: así el componente
+     dice qué es el texto, no cuántos píxeles mide. */
+  --text-rotulo: 13px;      /* versalitas de etiqueta */
+  --text-menu: 15px;        /* navegación, links del pie */
+  --text-cuerpo: 17px;      /* párrafos */
+  --text-micro: 13px;       /* letra chica legal */
+  --text-nombre: 19px;      /* nombre del jurado */
+  --text-subtitulo: 26px;   /* marca en el pie */
+  --text-boton: 18px;
+  --text-marca: clamp(24px, 2.4vw, 32px);
+  --text-dato: clamp(30px, 3.1vw, 40px);      /* premio y fecha */
+  --text-titulo: clamp(30px, 3.5vw, 42px);    /* títulos de sección */
+  --text-titulo-placa: clamp(30px, 3.6vw, 44px);
+  --text-hero: clamp(48px, 6.6vw, 95px);
+
+  --leading-titulo: 1.2;
+  --leading-cuerpo: 1.65;
+  --leading-suelto: 1.7;
+
+  --tracking-rotulo: 0.18em;
+  --tracking-titulo: -0.005em;
+  --tracking-apretado: -0.015em;
+
+  /* ---------- Espaciado con rol ---------- */
+  --spacing-seccion: 7rem;      /* aire entre secciones */
+  --spacing-placa-y: 4.75rem;   /* alto interno de la placa */
+  --spacing-placa-x: 5.375rem;  /* ancho interno de la placa */
+  --spacing-gutter: 3rem;
+
+  /* ---------- Radios ---------- */
+  --radius-placa: 1.5rem;
+  --radius-control: 9999px;  /* botones y campos son píldoras */
+  --radius-sutil: 0.25rem;
+
+  /* ---------- Animaciones ---------- */
+  --animate-subir: subir 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-bajar: bajar 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-aparecer: aparecer 0.6s ease-out both;
+  --animate-deriva: deriva 22s ease-in-out infinite;
+  --animate-latir: latir 2.6s ease-in-out infinite;
+}
+
+/* Alto de la barra fija. Lo usan la barra, el padding del hero y
+   el scroll-padding de los anclas: un valor, tres consumidores. */
+:root {
+  --alto-nav: 78px;
+}
+
+@keyframes subir {
+  from { opacity: 0; transform: translateY(26px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes bajar {
+  from { opacity: 0; transform: translateY(-16px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes aparecer {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* El degradé del hero se desplaza muy lento: da vida sin distraer. */
+@keyframes deriva {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+@keyframes latir {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(228, 51, 1, 0.45); }
+  50%      { box-shadow: 0 0 0 12px rgba(228, 51, 1, 0); }
+}
+
+/* ==========================================================
+   Base
+   ========================================================== */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: var(--alto-nav);
+  }
+
+  body {
+    background-color: #ffffff;
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+/* ==========================================================
+   Utilidades propias
+   ========================================================== */
+
+/* Ancho de contenido y gutter en un solo lugar. */
+@utility contenedor {
+  margin-inline: auto;
+  max-width: 1080px;
+  padding-inline: 2rem;
+}
+@media (width >= 48rem) {
+  .contenedor { padding-inline: var(--spacing-gutter); }
+}
+
+@utility degrade-hero {
+  background-image: linear-gradient(
+    100deg,
+    var(--color-hero-1) 0%,
+    var(--color-hero-2) 40%,
+    var(--color-hero-3) 75%,
+    var(--color-hero-4) 100%
+  );
+  background-size: 180% 180%;
+}
+
+/* Vidrio esmerilado de la barra fija.
+   El velo es crema translúcido, no blanco: sobre el naranja del hero
+   da el tono durazno del diseño, y sobre el blanco del resto de la
+   página deja un matiz cálido. Un solo material para todo el scroll. */
+@utility vidrio {
+  background-color: rgb(255 250 230 / 0.62);
+  /* Solo la propiedad estandar: Lightning CSS agrega el prefijo -webkit-
+     segun los navegadores objetivo. Escribir las dos hacia que se quedara
+     unicamente con la prefijada, y Firefox se quedaba sin desenfoque. */
+  backdrop-filter: blur(20px) saturate(160%);
+}
+
+/* Estado inicial y final del reveal al hacer scroll.
+   Se llama "revelado" y no "visible" porque visible ya es una
+   utilidad de Tailwind (visibility) y la estariamos pisando. */
+@utility reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@utility revelado {
+  opacity: 1;
+  transform: none;
+}
+
+/* ==========================================================
+   Accesibilidad: nada se mueve si el sistema lo pide
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}

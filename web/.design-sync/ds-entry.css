@@ -1,0 +1,31 @@
+/* Entrada de CSS para design-sync (no la usa la app).
+   Compila src/index.css mas un safelist de las familias derivadas de
+   tokens. Razon: Tailwind v4 solo emite las clases que ve en el codigo,
+   y el agente de diseno escribe combinaciones que no existen en este
+   repo. Sin este safelist esas clases resuelven a nada, sin error. */
+
+@import "../src/index.css";
+
+/* --- Color: cada token de marca en cada prefijo que lo consume --- */
+@source inline("{bg,text,border,ring,outline,fill,stroke,decoration,from,via,to}-{ink,primary,cream,cream-borde,hero-1,hero-2,hero-3,hero-4,proxi,tenue,white,black}");
+@source inline("{bg,text,border}-{ink,primary,cream,white,black}/{5,10,15,20,25,30,40,50,60,70,75,80,90,95}");
+@source inline("hover:{bg,text,border}-{ink,primary,cream,white}");
+@source inline("hover:{bg,text,border}-{ink,primary,cream,white}/{10,15,20,30,50}");
+
+/* --- Tipografia: la escala con nombres de rol --- */
+@source inline("text-{rotulo,menu,cuerpo,micro,nombre,subtitulo,boton,marca,dato,titulo,titulo-placa,hero}");
+@source inline("leading-{titulo,cuerpo,suelto}");
+@source inline("tracking-{rotulo,titulo,apretado}");
+@source inline("font-{normal,medium,semibold,bold,black}");
+
+/* --- Espaciado con rol --- */
+@source inline("{p,px,py,pt,pr,pb,pl,m,mx,my,mt,mr,mb,ml,gap,gap-x,gap-y,space-y,space-x}-{seccion,placa-y,placa-x,gutter}");
+
+/* --- Radios --- */
+@source inline("rounded{,-t,-b,-l,-r,-tl,-tr,-bl,-br}-{placa,control,sutil}");
+
+/* --- Animaciones nombradas --- */
+@source inline("animate-{subir,bajar,aparecer,deriva,latir}");
+
+/* --- Utilidades propias del sistema --- */
+@source inline("{contenedor,degrade-hero,vidrio,reveal,revelado}");

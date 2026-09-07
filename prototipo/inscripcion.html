@@ -1,0 +1,450 @@
+<title>Inscripción al Design Challenge</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap">
+<style>
+/* ==========================================================
+   Habisite Design Challenge — pagina de inscripcion
+   Reproduccion del mockup de Figma.
+   Pesos: solo Regular 400, Semibold 600 y Bold 700.
+   ========================================================== */
+:root {
+  /* ---- los tres tokens del sistema ---- */
+  --ink:     #0a0b0d;
+  --primary: #e43301;
+  --cream:   #fffae6;
+  --white:   #ffffff;
+
+  /* Fondo de las secciones claras.
+     Si en Figma es blanco puro, cambiar por var(--white). */
+  --fondo: var(--cream);
+
+  /* ---- degrade del hero: claro a la izquierda, oscuro a la derecha ---- */
+  --hero-1: #e8420a;
+  --hero-2: #dd3a06;
+  --hero-3: #a92805;
+  --hero-4: #7d1e02;
+
+  /* ---- barra superior: el mismo degrade con velo claro ---- */
+  --barra-1: #e5a68b;
+  --barra-2: #d9926f;
+  --barra-3: #c07a57;
+
+  --gris-placa: #d9d9d9;  /* placeholder de fotos del jurado */
+  --gris-proxi: #b8b8b8;  /* "Mas Secciones Proximamente" */
+  --gris-input: #d5d5d5;  /* input del pie */
+  --gris-texto: #8a8a8a;
+
+  --fuente: "Montserrat", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--ink);
+  font-family: var(--fuente);
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.contenedor { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+/* ---------- barra superior ---------- */
+.barra { background: linear-gradient(100deg, var(--barra-1) 0%, var(--barra-2) 45%, var(--barra-3) 100%); }
+.barra-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 26px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.marca {
+  font-size: clamp(28px, 2.8vw, 40px);
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  color: var(--white);
+  text-decoration: none;
+  line-height: 1;
+}
+.barra-nav { display: flex; align-items: center; gap: 34px; }
+.barra-nav a {
+  color: var(--white);
+  text-decoration: none;
+  font-size: 17px;
+  font-weight: 400;
+}
+.barra-nav a:hover { text-decoration: underline; }
+.btn-pill {
+  background: var(--primary);
+  color: var(--white);
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  border: 0;
+  border-radius: 999px;
+  padding: 14px 32px;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-pill:hover { filter: brightness(1.07); }
+
+/* ---------- hero ---------- */
+.hero {
+  background: linear-gradient(100deg, var(--hero-1) 0%, var(--hero-2) 40%, var(--hero-3) 75%, var(--hero-4) 100%);
+  color: var(--white);
+  padding: 110px 0 96px;
+}
+.hero-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 40px;
+  align-items: start;
+}
+.hero h1 {
+  margin: 0;
+  font-size: clamp(48px, 6.6vw, 95px);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+}
+
+.datos { padding-top: 98px; }
+.dato-rotulo {
+  font-size: 17px;
+  font-weight: 400;
+  margin: 0;
+  color: var(--white);
+}
+.dato-valor {
+  font-size: clamp(30px, 3.1vw, 40px);
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 2px 0 26px;
+}
+.btn-linea {
+  display: block;
+  width: fit-content;
+  margin: 8px auto 0;
+  border: 2px solid var(--white);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--white);
+  font-family: inherit;
+  font-size: 24px;
+  font-weight: 700;
+  padding: 12px 40px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn-linea:hover { background: rgba(255, 255, 255, 0.14); }
+
+@media (max-width: 880px) {
+  .hero { padding: 64px 0 60px; }
+  .hero-inner { grid-template-columns: 1fr; gap: 36px; }
+  .datos { padding-top: 0; }
+  .btn-linea { margin: 8px 0 0; }
+}
+
+/* ---------- titulos de seccion ---------- */
+.titulo-seccion {
+  text-align: center;
+  font-size: clamp(30px, 3.5vw, 42px);
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  margin: 0;
+}
+
+/* ---------- jurado ---------- */
+.jurado { padding: 78px 0 0; }
+.jurado-grid {
+  max-width: 700px;
+  margin: 62px auto 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0 67px;
+}
+.jurado-foto {
+  aspect-ratio: 3 / 4;
+  background: var(--gris-placa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.jurado-foto svg { width: 42px; height: 42px; }
+.jurado-nombre { font-size: 20px; font-weight: 700; margin: 14px 0 0; line-height: 1.35; }
+.jurado-meta { font-size: 16px; font-weight: 400; margin: 0; line-height: 1.35; }
+
+@media (max-width: 700px) {
+  .jurado-grid { grid-template-columns: repeat(2, 1fr); gap: 34px; max-width: 430px; }
+}
+@media (max-width: 430px) {
+  .jurado-grid { grid-template-columns: 1fr; max-width: 240px; }
+}
+
+/* ---------- formulario ---------- */
+.inscripcion { padding: 100px 0 0; }
+.form-card {
+  max-width: 640px;
+  margin: 46px auto 0;
+  border: 1px solid #e2e2e2;
+  border-radius: 6px;
+  background: var(--white);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  padding: 24px;
+}
+.campo { margin-bottom: 18px; }
+.campo label { display: block; font-size: 16px; font-weight: 400; margin-bottom: 6px; }
+.campo input,
+.campo textarea {
+  width: 100%;
+  border: 1px solid #d5d5d5;
+  border-radius: 4px;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--ink);
+  background: var(--white);
+}
+.campo textarea { min-height: 78px; resize: vertical; }
+.campo input::placeholder,
+.campo textarea::placeholder { color: var(--gris-texto); }
+.campo input:focus-visible,
+.campo textarea:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.btn-submit {
+  width: 100%;
+  background: #2b2b2b;
+  color: var(--white);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  border: 0;
+  border-radius: 4px;
+  padding: 11px;
+  cursor: pointer;
+}
+.btn-submit:hover { filter: brightness(1.3); }
+
+/* ---------- proximamente ---------- */
+.proximamente {
+  text-align: center;
+  font-size: clamp(30px, 3.5vw, 42px);
+  font-weight: 700;
+  color: var(--gris-proxi);
+  margin: 0;
+  padding: 155px 0 135px;
+}
+
+/* ---------- pie ---------- */
+.pie {
+  background: var(--ink);
+  color: var(--white);
+  padding: 70px 0 34px;
+}
+.pie-grid {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.38fr) minmax(0, 1fr);
+  gap: 0;
+}
+.pie h3 { color: var(--primary); font-weight: 700; margin: 0 0 8px; line-height: 1.15; }
+.pie .h-marca { font-size: clamp(30px, 2.8vw, 40px); letter-spacing: -0.005em; }
+.pie .h-col { font-size: clamp(24px, 2.1vw, 30px); }
+.pie p { font-size: 17px; font-weight: 400; margin: 0; max-width: 420px; }
+.pie .lema { font-weight: 700; margin-top: 20px; }
+.pie ul { list-style: none; margin: 0; padding: 0; }
+.pie li { margin-bottom: 4px; }
+.pie li a { color: var(--white); text-decoration: none; font-size: 20px; font-weight: 700; }
+.pie li a:hover { text-decoration: underline; }
+
+.suscribir { margin-top: 18px; max-width: 375px; }
+.suscribir input {
+  width: 100%;
+  border: 0;
+  border-radius: 4px;
+  padding: 9px 14px;
+  font-family: inherit;
+  font-size: 16px;
+  background: var(--gris-input);
+  color: var(--ink);
+}
+.suscribir input::placeholder { color: #7c7c7c; }
+.suscribir button {
+  margin-top: 12px;
+  background: var(--primary);
+  color: var(--white);
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 700;
+  border: 0;
+  border-radius: 4px;
+  padding: 9px 34px;
+  cursor: pointer;
+}
+.suscribir button:hover { filter: brightness(1.07); }
+
+.copyright {
+  max-width: 1080px;
+  margin: 118px auto 0;
+  padding: 0 24px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--white);
+}
+
+@media (max-width: 880px) {
+  .pie-grid { grid-template-columns: 1fr; gap: 36px; }
+  .copyright { margin-top: 52px; }
+}
+@media (max-width: 640px) {
+  .barra-nav a:not(.btn-pill) { display: none; }
+  .proximamente { padding: 92px 0 82px; }
+}
+</style>
+
+<!-- ============ BARRA ============ -->
+<header class="barra">
+  <div class="barra-inner">
+    <a class="marca" href="#">Habisite</a>
+    <nav class="barra-nav">
+      <a href="#">Test 1</a>
+      <a href="#">Test 2</a>
+      <a href="#">Test 3</a>
+      <a class="btn-pill" href="#inscribirme">Inscribirme</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="hero-inner">
+    <h1>Habisite<br>DESIGN<br>CHALLENGE<br>2026</h1>
+
+    <div class="datos">
+      <p class="dato-rotulo">PREMIO</p>
+      <p class="dato-valor">$100.000 ARS</p>
+
+      <p class="dato-rotulo">FECHA FINAL DE INSCRIPCION</p>
+      <p class="dato-valor">31 DE SEPTIEMBRE</p>
+
+      <a class="btn-linea" href="#inscribirme">Inscribirme</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ JURADO ============ -->
+<section class="jurado">
+  <div class="contenedor">
+    <h2 class="titulo-seccion">Jurado Confirmado</h2>
+
+    <div class="jurado-grid">
+      <article>
+        <div class="jurado-foto">
+          <svg viewBox="0 0 24 24" fill="#1a1a1a" aria-hidden="true">
+            <circle cx="12" cy="7.5" r="3.6"></circle>
+            <path d="M12 13c-4 0-6.6 2.1-6.6 4.6V19h13.2v-1.4C18.6 15.1 16 13 12 13z"></path>
+          </svg>
+        </div>
+        <p class="jurado-nombre">Nombre</p>
+        <p class="jurado-meta">Rol</p>
+        <p class="jurado-meta">Nacionalidad</p>
+      </article>
+
+      <article>
+        <div class="jurado-foto">
+          <svg viewBox="0 0 24 24" fill="#1a1a1a" aria-hidden="true">
+            <circle cx="12" cy="7.5" r="3.6"></circle>
+            <path d="M12 13c-4 0-6.6 2.1-6.6 4.6V19h13.2v-1.4C18.6 15.1 16 13 12 13z"></path>
+          </svg>
+        </div>
+        <p class="jurado-nombre">Nombre</p>
+        <p class="jurado-meta">Rol</p>
+        <p class="jurado-meta">Nacionalidad</p>
+      </article>
+
+      <article>
+        <div class="jurado-foto">
+          <svg viewBox="0 0 24 24" fill="#1a1a1a" aria-hidden="true">
+            <circle cx="12" cy="7.5" r="3.6"></circle>
+            <path d="M12 13c-4 0-6.6 2.1-6.6 4.6V19h13.2v-1.4C18.6 15.1 16 13 12 13z"></path>
+          </svg>
+        </div>
+        <p class="jurado-nombre">Nombre</p>
+        <p class="jurado-meta">Rol</p>
+        <p class="jurado-meta">Nacionalidad</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ INSCRIPCION ============ -->
+<section class="inscripcion" id="inscribirme">
+  <div class="contenedor">
+    <h2 class="titulo-seccion">Inscribirme</h2>
+
+    <form class="form-card" onsubmit="return false;">
+      <div class="campo">
+        <label for="f-name">Name</label>
+        <input id="f-name" type="text" placeholder="Value">
+      </div>
+      <div class="campo">
+        <label for="f-surname">Surname</label>
+        <input id="f-surname" type="text" placeholder="Value">
+      </div>
+      <div class="campo">
+        <label for="f-email">Email</label>
+        <input id="f-email" type="email" placeholder="Value">
+      </div>
+      <div class="campo">
+        <label for="f-message">Message</label>
+        <textarea id="f-message" placeholder="Value"></textarea>
+      </div>
+      <button class="btn-submit" type="submit">Submit</button>
+    </form>
+  </div>
+</section>
+
+<p class="proximamente">Mas Secciones Proximamente...</p>
+
+<!-- ============ PIE ============ -->
+<footer class="pie">
+  <div class="pie-grid">
+    <div>
+      <h3 class="h-marca">Habisite</h3>
+      <p>Creamos y promovemos espacios únicos donde la arquitectura, el arte y la naturaleza se integran para ofrecer experiencias memorables.</p>
+      <p class="lema">Diseña el lugar. Vive la idea.</p>
+    </div>
+
+    <div>
+      <h3 class="h-col">Menu</h3>
+      <ul>
+        <li><a href="#">Inicio</a></li>
+        <li><a href="#">Nosotros</a></li>
+        <li><a href="#">Servicios</a></li>
+        <li><a href="#">Contacto</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h3 class="h-col">Noticias</h3>
+      <p>Para más noticias e inspiración sobre diseño de espacios, dejanos tu correo:</p>
+      <form class="suscribir" onsubmit="return false;">
+        <input type="email" placeholder="Email" aria-label="Email">
+        <button type="submit">Enviar</button>
+      </form>
+    </div>
+  </div>
+
+  <p class="copyright">2026 HabiSite. Todos los derechos reservados.</p>
+</footer>

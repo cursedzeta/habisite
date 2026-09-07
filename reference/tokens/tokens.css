@@ -1,0 +1,76 @@
+/* ============================================================
+   Habisite — identidad visual
+   Fuente: theme PopularFX + Pagelayer (template "architectonics")
+   + gráfico de cronograma de la landing del Design Challenge 2026
+   Actualizado: 2026-09-03 — solo tema claro
+   ============================================================ */
+
+:root {
+  /* ---- Color: marca (confirmado contra los píxeles del logo) ---- */
+  --ink:          #0a0b0d;  /* NEGRO DE MARCA — solo para texto y trazos */
+  --primary:      #e43301;  /* naranja de marca — el "Site" del logotipo */
+  --cream:        #fffae6;  /* crema — el papel de la marca, fondo de página */
+  --white:        #ffffff;
+
+  /* ---- Superficie de marca -------------------------------------
+     El naranja funciona como segundo "papel" de la marca: hero,
+     bloques de cierre y tarjetas destacadas. Sustituye a la placa
+     oscura, que quedaba pesada y fuera de tono en las tarjetas.
+     --ink queda reservado para texto y trazos, nunca como relleno. */
+  --surface-brand:         #e43301;
+  --on-surface-brand:      #ffffff;
+  --on-surface-brand-soft: rgba(255, 255, 255, 0.85);
+  --on-surface-brand-ink:  #0a0b0d;  /* enfasis tipografico sobre naranja */
+  --surface-brand-line:    rgba(255, 255, 255, 0.26);
+
+  /* ---- Escala del naranja (la del gráfico de cronograma) ---- */
+  --primary-900: #b32800;
+  --primary-700: #e43301;  /* = --primary */
+  --primary-500: #e84e22;
+  --primary-300: #f0774d;
+  --primary-200: #f5a083;
+
+  /* ---- Neutros (sesgados hacia el crema, no grises puros) ---- */
+  --text:        #0a0b0d;
+  --text-muted:  #6b6459;
+  --hairline:    #e8e0c2;
+  --gray-900: #171717;
+  --gray-800: #313131;
+  --gray-700: #444444;
+  --gray-400: #9ca3af;
+  --gray-200: #dddddd;
+  --gray-100: #eeeeee;
+
+  /* ---- Tipografía ---- */
+  --font-display: "Montserrat", system-ui, sans-serif;  /* 300 / 400 / 500 / 700 */
+  --font-mono:    "DM Mono", ui-monospace, monospace;   /* etiquetas y datos */
+
+  /* Escala real medida en el sitio (px, por frecuencia de uso) */
+  --text-xs:   11px;
+  --text-sm:   15px;   /* el más usado del sitio */
+  --text-base: 17px;   /* el body real */
+  --text-lg:   20px;
+  --text-xl:   25px;
+  --text-2xl:  30px;
+  --text-3xl:  35px;
+  --text-4xl:  50px;
+  --text-5xl:  60px;
+  --text-6xl:  65px;
+
+  --weight-light:    300;
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  /* ---- Radios (los realmente usados) ---- */
+  --radius-sm:    8px;
+  --radius-md:   10px;
+  --radius-lg:   20px;   /* el dominante: tarjetas y secciones */
+  --radius-pill: 50px;
+  --radius-full: 9999px;
+
+  /* ---- Sombras ---- */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 6px 6px 9px rgba(0, 0, 0, 0.2);
+}

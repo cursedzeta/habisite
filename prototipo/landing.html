@@ -1,0 +1,340 @@
+<title>Diseña el lugar</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* ==========================================================
+   Habisite — prototipo de landing
+   Todos los valores vienen de reference/tokens/tokens.css
+   ========================================================== */
+:root {
+  /* marca */
+  --ink:        #0a0b0d;
+  --primary:    #e43301;
+  --cream:      #fffae6;
+
+  /* roles — tema claro */
+  --ground:      var(--cream);
+  --text:        #0a0b0d;
+  --text-muted:  #6b6459;
+  --accent:      #e43301;
+  --hairline:    #e8e0c2;
+  --surface-brand:   #e43301;
+  --on-surface-brand: #ffffff;
+  --on-surface-brand-soft: rgba(255,255,255,0.85);
+  --surface-brand-line: rgba(255,255,255,0.26);
+
+  /* tipografía */
+  --font-display: "Montserrat", system-ui, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, monospace;
+  --text-sm: 15px;
+  --text-base: 17px;
+  --text-lg: 20px;
+  --text-xl: 25px;
+  --text-3xl: 35px;
+
+  /* radios medidos en el sitio */
+  --radius-md: 10px;
+  --radius-lg: 20px;
+  --radius-pill: 50px;
+
+  --measure: 62ch;
+}
+
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 400;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0;
+}
+
+/* ---------- barra superior ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px 0 0;
+}
+.mark {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  text-decoration: none;
+  line-height: 1;
+}
+.topnav {
+  display: flex;
+  gap: 28px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+.topnav a {
+  color: var(--text-muted);
+  text-decoration: none;
+  padding-bottom: 2px;
+  border-bottom: 1px solid transparent;
+}
+.topnav a:hover, .topnav a:focus-visible { color: var(--text); border-bottom-color: var(--accent); }
+@media (max-width: 640px) { .topnav { display: none; } }
+
+
+/* ---------- placa ---------- */
+.plate {
+  background: var(--surface-brand);
+  color: var(--on-surface-brand);
+  border-radius: var(--radius-lg);
+  padding: 72px 56px;
+}
+@media (max-width: 640px) { .plate { padding: 48px 28px; } }
+
+/* ---------- hero ---------- */
+.hero { margin-top: 32px; }
+.hero .eyebrow, .cierre .eyebrow { color: #fff; }
+.hero h1 {
+  font-size: clamp(38px, 7.2vw, 65px);
+  font-weight: 300;
+  line-height: 1.06;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+  margin: 20px 0 0;
+  max-width: 16ch;
+}
+.hero h1 b { font-weight: 700; color: var(--ink); }
+.hero > p:not(.eyebrow) {
+  max-width: var(--measure);
+  color: var(--on-surface-brand-soft);
+  font-size: var(--text-lg);
+  font-weight: 300;
+  margin: 24px 0 0;
+}
+
+.btn {
+  display: inline-block;
+  margin-top: 36px;
+  padding: 15px 34px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: #fff;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+.btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.hero .btn, .cierre .btn { background: #fff; color: var(--primary); }
+
+/* ---------- enfoque ---------- */
+.enfoque { padding: 96px 0 0; }
+.enfoque > h2 {
+  font-size: clamp(28px, 4vw, var(--text-3xl));
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  text-wrap: balance;
+  max-width: 22ch;
+  margin: 16px 0 0;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1px;
+  margin-top: 52px;
+  background: var(--hairline);
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+}
+.cell { background: var(--ground); padding: 32px 26px 34px; }
+.cell h3 {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 14px 0 10px;
+}
+.cell p:not(.eyebrow) { color: var(--text-muted); font-size: var(--text-sm); margin: 0; }
+.cell .eyebrow { color: var(--text-muted); font-size: 11px; }
+
+/* ---------- testimonio ---------- */
+.quote { padding: 96px 0 0; }
+.quote blockquote {
+  margin: 0;
+  border-left: 2px solid var(--accent);
+  padding-left: 32px;
+  max-width: 58ch;
+}
+.quote p {
+  font-size: clamp(20px, 2.8vw, 25px);
+  font-weight: 300;
+  line-height: 1.45;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+.quote footer {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 22px;
+}
+
+/* ---------- cierre ---------- */
+.cierre { margin: 96px 0 0; }
+.cierre h2 {
+  font-size: clamp(30px, 5vw, 50px);
+  font-weight: 300;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  margin: 18px 0 0;
+}
+.cierre h2 b { font-weight: 700; color: var(--ink); }
+.cierre > p:not(.eyebrow) { color: var(--on-surface-brand-soft); max-width: var(--measure); margin: 20px 0 0; font-weight: 300; }
+.form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 34px;
+  max-width: 500px;
+}
+.form input {
+  flex: 1 1 220px;
+  padding: 15px 22px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--surface-brand-line);
+  background: transparent;
+  color: var(--on-surface-brand);
+  font-family: inherit;
+  font-size: var(--text-sm);
+}
+.form input::placeholder { color: rgba(255,255,255,0.62); }
+.form .btn { margin-top: 0; flex: 0 0 auto; border: 0; cursor: pointer; font-family: inherit; }
+
+/* ---------- pie: identidad aplicada ---------- */
+.pie {
+  margin-top: 96px;
+  border-top: 1px solid var(--hairline);
+  padding: 32px 0 64px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px 44px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.swatches { display: flex; flex-wrap: wrap; gap: 26px; }
+.sw { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
+.sw i {
+  display: block;
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--hairline);
+  margin-bottom: 9px;
+}
+.pie .meta { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); line-height: 1.9; text-align: right; }
+@media (max-width: 640px) { .pie .meta { text-align: left; } }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+</style>
+
+<div class="wrap">
+
+  <header class="topbar">
+    <a class="mark" href="#">Habisite</a>
+    <nav class="topnav">
+      <a href="#enfoque">Enfoque</a>
+      <a href="#proyectos">Proyectos</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+  </header>
+
+  <section class="hero plate">
+    <p class="eyebrow">Estudio de diseño de espacios</p>
+    <h1>Diseña el lugar. <b>Vive la idea.</b></h1>
+    <p>Creamos espacios que combinan diseño, funcionalidad y una conexión auténtica con la naturaleza, garantizando proyectos que superan expectativas.</p>
+    <a class="btn" href="#contacto">Empezar un proyecto</a>
+  </section>
+
+  <section class="enfoque" id="enfoque">
+    <p class="eyebrow">Enfoque</p>
+    <h2>Cada proyecto nace de una idea. En HabiSite la transformamos en un espacio real.</h2>
+
+    <div class="grid">
+      <article class="cell">
+        <p class="eyebrow">Concepto</p>
+        <h3>Diseño conceptual</h3>
+        <p>Diseñamos conceptos innovadores basados en identidad, emociones y estilo de vida, cuidando cada detalle para transformar ideas en propuestas reales.</p>
+      </article>
+      <article class="cell">
+        <p class="eyebrow">Comunicación</p>
+        <h3>Visualización</h3>
+        <p>Creamos visuales, renders y presentaciones de alto impacto para comunicar claramente la esencia de cada proyecto.</p>
+      </article>
+      <article class="cell">
+        <p class="eyebrow">Ejecución</p>
+        <h3>Diseño a medida</h3>
+        <p>Entendemos las necesidades de cada persona y las transformamos en espacios auténticos, modernos y llenos de vida.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="quote" id="proyectos">
+    <blockquote>
+      <p>El equipo de HabiSite transformó completamente la manera en que vivimos nuestro hogar. Cada detalle fue pensado con intención y sensibilidad.</p>
+      <footer>Cliente residencial · Arequipa</footer>
+    </blockquote>
+  </section>
+
+  <section class="cierre plate" id="contacto">
+    <p class="eyebrow">Contacto</p>
+    <h2>Diseñamos el futuro de <b>tus espacios.</b></h2>
+    <p>Para más noticias e inspiración sobre diseño de espacios, déjanos tu correo.</p>
+    <form class="form" onsubmit="return false;">
+      <input type="email" placeholder="tu@correo.com" aria-label="Tu correo electrónico" required>
+      <button class="btn" type="submit">Suscribirme</button>
+    </form>
+  </section>
+
+  <footer class="pie">
+    <div class="swatches">
+      <div class="sw"><i style="background:#0a0b0d"></i>#0a0b0d</div>
+      <div class="sw"><i style="background:#e43301"></i>#e43301</div>
+      <div class="sw"><i style="background:#fffae6"></i>#fffae6</div>
+      <div class="sw"><i style="background:#6b6459"></i>#6b6459</div>
+    </div>
+    <div class="meta">
+      Montserrat 300 · 400 · 700<br>
+      DM Mono 400 · 500<br>
+      radio 20px · 50px
+    </div>
+  </footer>
+
+</div>
+

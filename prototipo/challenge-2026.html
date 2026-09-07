@@ -1,0 +1,753 @@
+<title>Habisite Design Challenge 2026</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* ==========================================================
+   Habisite Design Challenge 2026 — landing de inscripción
+   Valores tomados de reference/tokens/tokens.css. Solo tema claro.
+   ========================================================== */
+:root {
+  --ink:        #0a0b0d;
+  --primary:    #e43301;
+  --cream:      #fffae6;
+  --white:      #ffffff;
+
+  /* Superficie de marca: el naranja como segundo papel de la pagina */
+  --surface-brand:           #e43301;
+  --on-surface-brand:        #ffffff;
+  --on-surface-brand-soft:   rgba(255, 255, 255, 0.85);
+  --on-surface-brand-ink:    #0a0b0d;  /* enfasis tipografico sobre naranja */
+  --surface-brand-line:      rgba(255, 255, 255, 0.26);
+
+  --primary-900: #b32800;
+  --primary-700: #e43301;
+  --primary-500: #e84e22;
+  --primary-300: #f0774d;
+  --primary-200: #f5a083;
+
+  --text:       #0a0b0d;
+  --text-muted: #6b6459;
+  --hairline:   #e8e0c2;
+
+  --font-display: "Montserrat", system-ui, sans-serif;
+  --font-mono:    "DM Mono", ui-monospace, monospace;
+
+  --text-xs:   11px;
+  --text-sm:   15px;
+  --text-base: 17px;
+  --text-lg:   20px;
+  --text-xl:   25px;
+  --text-3xl:  35px;
+
+  --radius-md:   10px;
+  --radius-lg:   20px;
+  --radius-pill: 50px;
+
+  --measure: 62ch;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+.hero .eyebrow, .inscripcion .eyebrow { color: var(--on-surface-brand); }
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin: 0;
+}
+
+h2.titulo {
+  font-size: clamp(28px, 4.4vw, var(--text-3xl));
+  font-weight: 300;
+  letter-spacing: -0.022em;
+  line-height: 1.18;
+  text-wrap: balance;
+  max-width: 24ch;
+  margin: 14px 0 0;
+}
+h2.titulo b { font-weight: 700; }
+
+.seccion { padding: 92px 0 0; }
+
+.btn {
+  display: inline-block;
+  padding: 15px 34px;
+  border-radius: var(--radius-pill);
+  background: var(--primary);
+  color: var(--white);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  border: 0;
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+.btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.btn.chico { padding: 11px 24px; font-size: 13px; }
+/* Sobre el naranja el boton se invierte: naranja sobre naranja no existe. */
+.hero .btn, .inscripcion .btn { background: var(--white); color: var(--primary); }
+
+/* ---------- barra superior ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 26px 0 0;
+}
+.mark {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  text-decoration: none;
+  line-height: 1;
+}
+.topnav { display: flex; gap: 26px; font-size: var(--text-sm); font-weight: 500; }
+.topnav a {
+  color: var(--text-muted);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+}
+.topnav a:hover { color: var(--text); border-bottom-color: var(--primary); }
+.topright { display: flex; align-items: center; gap: 26px; }
+@media (max-width: 820px) { .topnav { display: none; } }
+
+/* ---------- hero ---------- */
+.hero {
+  margin-top: 30px;
+  background: var(--surface-brand);
+  color: var(--on-surface-brand);
+  border-radius: var(--radius-lg);
+  padding: 76px 56px 0;
+  overflow: hidden;
+}
+.hero h1 {
+  font-size: clamp(38px, 6.6vw, 60px);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: -0.028em;
+  text-wrap: balance;
+  max-width: 17ch;
+  margin: 20px 0 0;
+}
+.hero h1 b { font-weight: 700; color: var(--on-surface-brand-ink); }
+.hero .lead {
+  max-width: var(--measure);
+  color: var(--on-surface-brand-soft);
+  font-size: var(--text-lg);
+  font-weight: 300;
+  margin: 24px 0 0;
+}
+.hero .acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; margin-top: 36px; }
+.hero .nota { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--on-surface-brand-soft); }
+
+.datos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1px;
+  margin-top: 64px;
+  background: var(--surface-brand-line);
+  border-top: 1px solid var(--surface-brand-line);
+}
+.datos div { background: var(--surface-brand); padding: 26px 4px 40px; }
+.datos dt {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--on-surface-brand-soft);
+}
+.datos dd {
+  margin: 8px 0 0;
+  font-size: var(--text-lg);
+  font-weight: 500;
+  color: var(--on-surface-brand);
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 640px) { .hero { padding: 48px 26px 0; } .datos { margin-top: 44px; } }
+
+/* ---------- objetivo ---------- */
+.objetivo-cuerpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 56px;
+  margin-top: 40px;
+  align-items: start;
+}
+@media (max-width: 860px) { .objetivo-cuerpo { grid-template-columns: 1fr; gap: 36px; } }
+.objetivo-cuerpo .general {
+  font-size: var(--text-xl);
+  font-weight: 300;
+  line-height: 1.4;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+.lista-esp { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 18px; }
+.lista-esp li {
+  position: relative;
+  padding-left: 22px;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+.lista-esp li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+
+/* ---------- participar ---------- */
+.dos-col {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1px;
+  margin-top: 44px;
+  background: var(--hairline);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.dos-col > div { background: var(--cream); padding: 34px 30px 38px; }
+.dos-col h3 {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  margin: 12px 0 16px;
+  letter-spacing: -0.01em;
+}
+.dos-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.dos-col li { font-size: var(--text-sm); color: var(--text-muted); padding-left: 20px; position: relative; }
+.dos-col li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 9px;
+  width: 10px;
+  height: 2px;
+  background: var(--primary);
+}
+
+/* ---------- cronograma ---------- */
+.crono-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 16px; justify-content: space-between; }
+.badge {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-pill);
+  padding: 7px 16px;
+}
+.crono-scroll { overflow-x: auto; margin-top: 44px; padding-bottom: 6px; }
+.gantt { min-width: 620px; }
+.fila {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  align-items: center;
+  gap: 0;
+}
+.fila .rotulo { padding: 9px 20px 9px 0; border-right: 1px solid var(--ink); }
+.fila .rotulo .nombre { font-size: 13px; font-weight: 500; line-height: 1.3; display: block; }
+.fila .rotulo .fecha {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.pista { position: relative; height: 40px; }
+.barra {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 20px;
+  border-radius: var(--radius-pill);
+}
+.punto {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2.5px solid var(--cream);
+  transform: translate(-50%, -50%);
+}
+.eje { display: grid; grid-template-columns: 190px minmax(0, 1fr); margin-top: 4px; }
+.eje .hueco { border-right: 1px solid var(--ink); height: 26px; }
+.eje .meses { position: relative; height: 26px; border-top: 1px solid var(--ink); }
+.eje .mes {
+  position: absolute;
+  top: 7px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ---------- criterios ---------- */
+.criterios { margin-top: 44px; display: flex; flex-direction: column; }
+.criterio {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 76px;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--hairline);
+}
+.criterio:first-child { border-top: 1px solid var(--hairline); }
+.criterio .nom { font-size: var(--text-sm); font-weight: 500; }
+.criterio .medida { display: block; height: 6px; border-radius: var(--radius-pill); background: var(--primary); margin-top: 9px; }
+.criterio .peso {
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  font-weight: 500;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- premios ---------- */
+.premios { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 44px; align-items: start; }
+.premio { border: 1px solid var(--hairline); border-radius: var(--radius-lg); padding: 30px 26px 32px; }
+.premio.destacado { background: var(--surface-brand); color: var(--on-surface-brand); border-color: var(--surface-brand); }
+.premio .puesto {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+.premio.destacado .puesto { color: var(--on-surface-brand); }
+.premio h3 { font-size: var(--text-lg); font-weight: 700; margin: 12px 0 16px; }
+.premio ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 11px; }
+.premio li { font-size: 14px; color: var(--text-muted); padding-left: 18px; position: relative; }
+.premio.destacado li { color: var(--on-surface-brand-soft); }
+.premio.destacado li::before { background: var(--on-surface-brand-ink); }
+.premio li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 8px;
+  height: 2px;
+  background: var(--primary);
+}
+.certificados {
+  margin-top: 20px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-lg);
+  padding: 26px 28px;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+.certificados b { color: var(--text); font-weight: 700; }
+
+/* ---------- inscripción ---------- */
+.inscripcion {
+  margin-top: 92px;
+  background: var(--surface-brand);
+  color: var(--on-surface-brand);
+  border-radius: var(--radius-lg);
+  padding: 68px 56px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 56px;
+  align-items: start;
+}
+@media (max-width: 860px) { .inscripcion { grid-template-columns: 1fr; gap: 40px; padding: 48px 26px; } }
+.inscripcion h2 {
+  font-size: clamp(28px, 4.4vw, var(--text-3xl));
+  font-weight: 300;
+  letter-spacing: -0.022em;
+  line-height: 1.15;
+  margin: 14px 0 0;
+}
+.inscripcion h2 b { font-weight: 700; color: var(--on-surface-brand-ink); }
+.inscripcion .apoyo { color: var(--on-surface-brand-soft); font-size: var(--text-sm); margin: 18px 0 0; }
+
+.campos { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.campo { display: flex; flex-direction: column; gap: 7px; }
+.campo.ancho { grid-column: 1 / -1; }
+.campo label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--on-surface-brand-soft);
+}
+.campo input[type="text"], .campo input[type="email"] {
+  padding: 13px 20px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--surface-brand-line);
+  background: transparent;
+  color: var(--on-surface-brand);
+  font-family: inherit;
+  font-size: var(--text-sm);
+}
+.campo input::placeholder { color: rgba(255, 255, 255, 0.62); }
+.campo input:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.terminos {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 13px;
+  color: var(--on-surface-brand-soft);
+  line-height: 1.5;
+}
+.terminos input { margin-top: 3px; accent-color: var(--on-surface-brand-ink); width: 16px; height: 16px; flex: 0 0 auto; }
+.enviar { grid-column: 1 / -1; margin-top: 6px; }
+.exito {
+  border: 1px solid var(--surface-brand-line);
+  border-radius: var(--radius-lg);
+  padding: 28px 26px;
+  color: var(--on-surface-brand);
+  font-size: var(--text-sm);
+}
+.exito .ok {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--on-surface-brand-ink);
+  display: block;
+  margin-bottom: 10px;
+}
+
+/* ---------- pie ---------- */
+.pie {
+  margin-top: 72px;
+  border-top: 1px solid var(--hairline);
+  padding: 30px 0 64px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 40px;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="wrap">
+
+  <header class="topbar">
+    <a class="mark" href="#">Habisite</a>
+    <div class="topright">
+      <nav class="topnav">
+        <a href="#objetivo">Objetivo</a>
+        <a href="#participar">Participantes</a>
+        <a href="#cronograma">Cronograma</a>
+        <a href="#premios">Premios</a>
+      </nav>
+      <a class="btn chico" href="#inscripcion">Inscribirme</a>
+    </div>
+  </header>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero">
+    <p class="eyebrow">Concurso internacional de arquitectura</p>
+    <h1>Explora, diseña. <b>Inspira nuevos espacios.</b></h1>
+    <p class="lead">Una experiencia internacional de innovación y diseño que reúne talento multidisciplinario para imaginar nuevas formas de habitar el espacio.</p>
+    <div class="acciones">
+      <a class="btn" href="#inscripcion">Inscribirme</a>
+      <span class="nota">Postulación individual · Latinoamérica</span>
+    </div>
+
+    <dl class="datos">
+      <div>
+        <dt>Cierre de inscripciones</dt>
+        <dd>24 mayo 2026</dd>
+      </div>
+      <div>
+        <dt>Período del reto</dt>
+        <dd>25 may – 7 jun</dd>
+      </div>
+      <div>
+        <dt>Anuncio de ganadores</dt>
+        <dd>13 junio 2026</dd>
+      </div>
+    </dl>
+  </section>
+
+  <!-- ===== OBJETIVO ===== -->
+  <section class="seccion" id="objetivo">
+    <p class="eyebrow">El reto</p>
+    <h2 class="titulo">Impulsar la creatividad y el pensamiento crítico de <b>arquitectos jóvenes.</b></h2>
+
+    <div class="objetivo-cuerpo">
+      <p class="general">Un desafío internacional que promueve la innovación y la visión integral del diseño, conectando talento emergente con desarrolladores y plataformas de difusión profesional.</p>
+      <ul class="lista-esp">
+        <li>Promover el desarrollo territorial a través de arquitectura con impacto social, económico y ambiental.</li>
+        <li>Integrar miradas desde la arquitectura, el diseño, el turismo, la ingeniería y la comunicación sensorial.</li>
+        <li>Visibilizar talento emergente conectándolo con desarrolladores y plataformas profesionales.</li>
+        <li>Promover la reflexión sobre el proceso arquitectónico: concepto, experiencia, técnica y presentación.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== PARTICIPAR ===== -->
+  <section class="seccion" id="participar">
+    <p class="eyebrow">Participantes</p>
+    <h2 class="titulo">¿Quién puede <b>participar?</b></h2>
+
+    <div class="dos-col">
+      <div>
+        <p class="eyebrow">Elegibilidad</p>
+        <h3>Requisitos</h3>
+        <ul>
+          <li>Estudiantes de últimos años o egresados de Latinoamérica.</li>
+          <li>Participación individual, con libertad creativa y enfoque multidisciplinario.</li>
+          <li>Abierto a todas las carreras y perfiles interesados en el diseño, la tecnología o el desarrollo sostenible.</li>
+          <li>Una única propuesta original por participante, creada especialmente para este desafío.</li>
+        </ul>
+      </div>
+      <div>
+        <p class="eyebrow">Qué te llevás</p>
+        <h3>Más allá del premio</h3>
+        <ul>
+          <li>Exposición internacional: presentás tu propuesta ante un jurado de expertos.</li>
+          <li>Certificado avalado por IMB para tu perfil de LinkedIn.</li>
+          <li>Acceso a una red de arquitectos, diseñadores e instituciones académicas.</li>
+          <li>Una propuesta destacada para tu portafolio o presentación personal.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CRONOGRAMA ===== -->
+  <section class="seccion" id="cronograma">
+    <div class="crono-head">
+      <div>
+        <p class="eyebrow">Cronograma</p>
+        <h2 class="titulo">De la convocatoria al <b>anuncio.</b></h2>
+      </div>
+      <span class="badge">Fechas tentativas</span>
+    </div>
+
+    <div class="crono-scroll">
+      <div class="gantt">
+
+        <div class="fila">
+          <div class="rotulo"><span class="nombre">Lanzamiento de convocatoria</span><span class="fecha">29 abr</span></div>
+          <div class="pista"><span class="punto" style="left:14.5%; background:#b32800"></span></div>
+        </div>
+
+        <div class="fila">
+          <div class="rotulo"><span class="nombre">Cierre de inscripciones</span><span class="fecha">29 abr – 24 may</span></div>
+          <div class="pista"><span class="barra" style="left:14.5%; width:40.3%; background:#e43301"></span></div>
+        </div>
+
+        <div class="fila">
+          <div class="rotulo"><span class="nombre">Inicio del reto</span><span class="fecha">25 may</span></div>
+          <div class="pista"><span class="punto" style="left:56.5%; background:#f0774d"></span></div>
+        </div>
+
+        <div class="fila">
+          <div class="rotulo"><span class="nombre">Período del reto</span><span class="fecha">25 may – 6 jun</span></div>
+          <div class="pista"><span class="barra" style="left:56.5%; width:19.4%; background:#f5a083"></span></div>
+        </div>
+
+        <div class="fila">
+          <div class="rotulo"><span class="nombre">Fin del reto</span><span class="fecha">7 jun</span></div>
+          <div class="pista"><span class="punto" style="left:77.4%; background:#e84e22"></span></div>
+        </div>
+
+        <div class="fila">
+          <div class="rotulo"><span class="nombre">Evaluación del jurado</span><span class="fecha">8 – 12 jun</span></div>
+          <div class="pista"><span class="barra" style="left:79.0%; width:6.5%; background:#e84e22"></span></div>
+        </div>
+
+        <div class="fila">
+          <div class="rotulo"><span class="nombre">Anuncio de ganadores</span><span class="fecha">13 jun</span></div>
+          <div class="pista"><span class="punto" style="left:87.1%; background:#b32800"></span></div>
+        </div>
+
+        <div class="eje">
+          <div class="hueco"></div>
+          <div class="meses">
+            <span class="mes" style="left:2%">Abril</span>
+            <span class="mes" style="left:19%">Mayo</span>
+            <span class="mes" style="left:69%">Junio</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CRITERIOS ===== -->
+  <section class="seccion" id="criterios">
+    <p class="eyebrow">Evaluación</p>
+    <h2 class="titulo">Cómo se puntúa <b>cada propuesta.</b></h2>
+
+    <div class="criterios">
+      <div class="criterio">
+        <div><span class="nom">Creatividad y originalidad</span><span class="medida" style="width:100%"></span></div>
+        <span class="peso">35%</span>
+      </div>
+      <div class="criterio">
+        <div><span class="nom">Narrativa arquitectónica y experiencia</span><span class="medida" style="width:57.1%"></span></div>
+        <span class="peso">20%</span>
+      </div>
+      <div class="criterio">
+        <div><span class="nom">Integración espacial con el entorno</span><span class="medida" style="width:57.1%"></span></div>
+        <span class="peso">20%</span>
+      </div>
+      <div class="criterio">
+        <div><span class="nom">Sostenibilidad</span><span class="medida" style="width:28.6%"></span></div>
+        <span class="peso">10%</span>
+      </div>
+      <div class="criterio">
+        <div><span class="nom">Viabilidad técnica</span><span class="medida" style="width:14.3%"></span></div>
+        <span class="peso">5%</span>
+      </div>
+      <div class="criterio">
+        <div><span class="nom">Calidad de presentación</span><span class="medida" style="width:14.3%"></span></div>
+        <span class="peso">5%</span>
+      </div>
+      <div class="criterio">
+        <div><span class="nom">Cumplimiento de entregables</span><span class="medida" style="width:14.3%"></span></div>
+        <span class="peso">5%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PREMIOS ===== -->
+  <section class="seccion" id="premios">
+    <p class="eyebrow">Reconocimiento</p>
+    <h2 class="titulo">Premios y <b>beneficios.</b></h2>
+
+    <div class="premios">
+      <article class="premio destacado">
+        <span class="puesto">Primer lugar</span>
+        <h3>Premio mayor</h3>
+        <ul>
+          <li>Premio en efectivo</li>
+          <li>Pasantía remunerada con la empresa organizadora</li>
+          <li>Certificado profesional avalado por IMB</li>
+          <li>Participación gratuita en futuros eventos o talleres</li>
+          <li>Publicación en la exposición virtual</li>
+        </ul>
+      </article>
+      <article class="premio">
+        <span class="puesto">Segundo lugar</span>
+        <h3>Premio en efectivo</h3>
+        <ul>
+          <li>Beneficios profesionales y certificaciones</li>
+          <li>Publicación en la exposición virtual</li>
+        </ul>
+      </article>
+      <article class="premio">
+        <span class="puesto">Tercer lugar</span>
+        <h3>Beneficios profesionales</h3>
+        <ul>
+          <li>Certificaciones oficiales</li>
+          <li>Publicación en la exposición virtual</li>
+        </ul>
+      </article>
+    </div>
+
+    <p class="certificados"><b>Certificados oficiales para todos.</b> Reconocimiento académico y profesional para cada participante que culmine el desafío, con insignias digitales y certificación para el perfil de LinkedIn.</p>
+  </section>
+
+  <!-- ===== INSCRIPCIÓN ===== -->
+  <section class="inscripcion" id="inscripcion">
+    <div>
+      <p class="eyebrow">Únete al concurso</p>
+      <h2>Pre-registro <b>Design Challenge 2026.</b></h2>
+      <p class="apoyo">Completá tus datos y unite al grupo oficial del concurso. Te avisamos cuando se publiquen las bases y la documentación técnica.</p>
+    </div>
+
+    <form class="campos" id="formulario" novalidate>
+      <div class="campo">
+        <label for="nombre">Nombre</label>
+        <input type="text" id="nombre" name="nombre" placeholder="Juan Carlos" required>
+      </div>
+      <div class="campo">
+        <label for="apellido">Apellido</label>
+        <input type="text" id="apellido" name="apellido" placeholder="Pérez García" required>
+      </div>
+      <div class="campo ancho">
+        <label for="email">Correo electrónico</label>
+        <input type="email" id="email" name="email" placeholder="tu@email.com" required>
+      </div>
+      <div class="campo ancho">
+        <label for="universidad">Universidad o institución</label>
+        <input type="text" id="universidad" name="universidad" placeholder="Ej: UBA, FADU, IED..." required>
+      </div>
+      <label class="terminos">
+        <input type="checkbox" id="terminos" required>
+        <span>Acepto las bases del concurso y el tratamiento de mis datos para recibir información del Habisite Design Challenge 2026.</span>
+      </label>
+      <div class="enviar">
+        <button class="btn" type="submit">Pre-registrarme</button>
+      </div>
+    </form>
+  </section>
+
+  <footer class="pie">
+    <span>Habisite Design Challenge 2026</span>
+    <span>Diseña el lugar. Vive la idea.</span>
+  </footer>
+
+</div>
+
+<script>
+  (function () {
+    var form = document.getElementById('formulario');
+    if (!form) return;
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      var nombre = document.getElementById('nombre');
+      var email = document.getElementById('email');
+      var terminos = document.getElementById('terminos');
+
+      // Validación mínima antes de confirmar.
+      if (!nombre.value.trim()) { nombre.focus(); return; }
+      if (!email.checkValidity()) { email.focus(); return; }
+      if (!terminos.checked) { terminos.focus(); return; }
+
+      var panel = document.createElement('div');
+      panel.className = 'exito';
+      panel.setAttribute('role', 'status');
+      panel.innerHTML = '<span class="ok">Pre-registro recibido</span>' +
+        'Listo, ' + nombre.value.trim().split(' ')[0] +
+        '. Te enviamos el enlace al grupo oficial del concurso a <strong>' +
+        email.value.trim() + '</strong>.';
+
+      form.replaceWith(panel);
+    });
+  })();
+</script>
