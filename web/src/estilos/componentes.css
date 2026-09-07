@@ -1,0 +1,172 @@
+/* Estilos de componentes Habisite. Las clases llevan prefijo hs- y consumen
+   unicamente tokens de marca. Copia literal de habisite/components/hs-components.css */
+
+/* --- Button --- */
+.hs-btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-2);font:var(--type-button);letter-spacing:.06em;text-transform:uppercase;border-radius:var(--radius-pill);border:1px solid transparent;cursor:pointer;transition:var(--transition-control);text-decoration:none;white-space:nowrap}
+.hs-btn--md{padding:14px 26px}
+.hs-btn--sm{padding:10px 18px;font-size:var(--size-label)}
+.hs-btn--lg{padding:18px 34px;font-size:var(--size-body)}
+.hs-btn--primary{background:var(--control-fill);color:var(--control-fill-text)}
+.hs-btn--primary:hover{background:var(--orange-hover)}
+.hs-btn--primary:active{background:var(--orange-press);transform:translateY(1px)}
+.hs-btn--ink{background:var(--control-fill-inverse);color:var(--control-fill-inverse-text)}
+.hs-btn--ink:hover{background:#1B1D21}
+.hs-btn--ink:active{transform:translateY(1px)}
+.hs-btn--outline{background:transparent;color:var(--control-outline-text);border-color:var(--line-strong)}
+.hs-btn--outline:hover{background:var(--ink);color:var(--cream)}
+.hs-btn--outline:active{transform:translateY(1px)}
+.hs-btn--ghost{background:transparent;color:var(--text-body);border-color:transparent}
+.hs-btn--ghost:hover{background:var(--surface-inset)}
+.hs-btn--on-brand{background:var(--white);color:var(--ink)}
+.hs-btn--on-brand:hover{background:var(--cream)}
+.hs-btn--on-brand-outline{background:transparent;color:var(--white);border-color:var(--line-on-brand)}
+.hs-btn--on-brand-outline:hover{background:var(--white);color:var(--ink);border-color:var(--white)}
+.hs-btn[disabled],.hs-btn--disabled{opacity:.38;pointer-events:none}
+.hs-btn--block{width:100%}
+
+/* --- IconButton --- */
+.hs-iconbtn{display:inline-flex;align-items:center;justify-content:center;border-radius:var(--radius-pill);border:1px solid transparent;cursor:pointer;background:transparent;color:var(--text-body);transition:var(--transition-control)}
+.hs-iconbtn--md{width:44px;height:44px}
+.hs-iconbtn--sm{width:36px;height:36px}
+.hs-iconbtn--outline{border-color:var(--line-hairline)}
+.hs-iconbtn--outline:hover{border-color:var(--line-strong)}
+.hs-iconbtn--solid{background:var(--ink);color:var(--cream)}
+.hs-iconbtn--solid:hover{background:#1B1D21}
+.hs-iconbtn--ghost:hover{background:var(--surface-inset)}
+.hs-iconbtn--on-brand{color:var(--white);border-color:var(--line-on-brand)}
+.hs-iconbtn--on-brand:hover{background:var(--white);color:var(--orange)}
+.hs-iconbtn:active{transform:translateY(1px)}
+
+/* --- Icon --- */
+.hs-icon{display:inline-block;background-color:currentColor;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;-webkit-mask-size:contain;mask-size:contain;flex:none}
+
+/* --- Plate / Card --- */
+.hs-plate{border-radius:var(--radius-plate);position:relative}
+.hs-plate--white{background:var(--surface-card)}
+.hs-plate--cream{background:var(--surface-detail)}
+.hs-plate--brand{background:var(--surface-brand);color:var(--text-on-brand)}
+.hs-plate--ink{background:var(--surface-footer);color:var(--text-on-ink)}
+.hs-plate--outline{background:transparent;border:1px solid var(--line-hairline)}
+.hs-plate--clip{overflow:hidden}
+.hs-card{display:flex;flex-direction:column;border-radius:var(--radius-card);overflow:hidden;background:var(--surface-card);transition:transform var(--dur-base) var(--ease-standard)}
+.hs-card--outline{border:1px solid var(--line-hairline)}
+.hs-card--cream{background:var(--surface-detail)}
+.hs-card--interactive{cursor:pointer}
+.hs-card--interactive:hover{transform:translateY(-3px)}
+.hs-card__media{aspect-ratio:4/3;background:var(--surface-inset);overflow:hidden}
+.hs-card__media>img{width:100%;height:100%;object-fit:cover;display:block}
+.hs-card__body{display:flex;flex-direction:column;gap:var(--space-2);padding:var(--space-5)}
+.hs-card__title{font:var(--weight-semibold) var(--size-title-3)/var(--leading-tight) var(--font-core);letter-spacing:var(--tracking-title)}
+.hs-card__text{font:var(--type-body);color:var(--text-muted)}
+
+/* --- Badge / Tag --- */
+.hs-badge{display:inline-flex;align-items:center;gap:6px;border-radius:var(--radius-pill);font:var(--weight-semibold) var(--size-label-sm)/1 var(--font-core);text-transform:uppercase;letter-spacing:var(--tracking-label);padding:7px 12px 6px}
+.hs-badge--brand{background:var(--orange);color:var(--white)}
+.hs-badge--ink{background:var(--ink);color:var(--cream)}
+.hs-badge--cream{background:var(--cream);color:var(--ink)}
+.hs-badge--outline{border:1px solid var(--line-hairline);color:var(--text-muted)}
+.hs-badge--on-brand{background:var(--white);color:var(--orange)}
+.hs-tag{display:inline-flex;align-items:center;gap:var(--space-2);border-radius:var(--radius-pill);border:1px solid var(--line-hairline);background:transparent;color:var(--text-body);font:var(--weight-regular) var(--size-body-sm)/1 var(--font-core);padding:9px 16px;cursor:pointer;transition:var(--transition-control)}
+.hs-tag:hover{border-color:var(--line-strong)}
+.hs-tag--selected{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+.hs-tag--static{cursor:default}
+
+/* --- Label / Eyebrow --- */
+.hs-eyebrow{font:var(--weight-semibold) var(--size-label)/1 var(--font-core);text-transform:uppercase;letter-spacing:var(--tracking-label);color:var(--text-muted);display:inline-flex;align-items:center;gap:var(--space-3)}
+.hs-eyebrow--rule::before{content:"";width:40px;height:1px;background:currentColor;display:block;opacity:.5}
+.hs-eyebrow--brand{color:var(--orange)}
+.hs-eyebrow--on-brand{color:var(--white)}
+.hs-eyebrow--on-ink{color:var(--white-72)}
+
+/* --- Divider --- */
+.hs-divider{border:0;height:1px;background:var(--line-hairline);width:100%}
+.hs-divider--strong{background:var(--line-strong)}
+.hs-divider--on-ink{background:var(--line-on-ink)}
+.hs-divider--on-brand{background:var(--line-on-brand)}
+
+/* --- Fields --- */
+.hs-field{display:flex;flex-direction:column;gap:var(--space-2)}
+.hs-field__label{font:var(--weight-semibold) var(--size-label)/1 var(--font-core);text-transform:uppercase;letter-spacing:var(--tracking-label);color:var(--text-muted)}
+.hs-field__hint{font:var(--weight-regular) var(--size-body-sm)/1.4 var(--font-core);color:var(--text-muted)}
+.hs-field__error{font:var(--weight-semibold) var(--size-body-sm)/1.4 var(--font-core);color:var(--orange)}
+.hs-input{font:var(--weight-regular) var(--size-body)/1 var(--font-core);color:var(--text-body);background:var(--white);border:1px solid var(--line-hairline);border-radius:var(--radius-pill);padding:15px 22px;width:100%;transition:var(--transition-control)}
+.hs-input::placeholder{color:var(--ink-40)}
+.hs-input:hover{border-color:var(--ink-24)}
+.hs-input:focus{outline:none;border-color:var(--ink)}
+.hs-input--invalid{border-color:var(--orange)}
+.hs-input--on-brand{background:transparent;border-color:var(--line-on-brand);color:var(--white)}
+.hs-input--on-brand::placeholder{color:var(--white-72)}
+.hs-input--on-brand:focus{border-color:var(--white)}
+.hs-textarea{border-radius:var(--radius-plate-sm);min-height:132px;resize:vertical;line-height:var(--leading-body)}
+.hs-select{appearance:none;background-image:none;padding-right:46px;cursor:pointer}
+.hs-select-wrap{position:relative;display:block}
+.hs-select-wrap>.hs-icon{position:absolute;right:20px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text-muted)}
+
+/* --- Checkbox / Radio / Switch --- */
+.hs-check{display:inline-flex;align-items:flex-start;gap:var(--space-3);cursor:pointer;font:var(--type-body);color:var(--text-body)}
+.hs-check input{position:absolute;opacity:0;width:0;height:0}
+.hs-check__box{width:22px;height:22px;border:1px solid var(--line-strong);border-radius:6px;flex:none;display:grid;place-items:center;margin-top:2px;transition:var(--transition-control);color:transparent}
+.hs-check__box--round{border-radius:var(--radius-pill)}
+.hs-check input:checked+.hs-check__box{background:var(--orange);border-color:var(--orange);color:var(--white)}
+.hs-check input:focus-visible+.hs-check__box{outline:2px solid var(--focus-ring);outline-offset:3px}
+.hs-check--on-brand .hs-check__box{border-color:var(--white)}
+.hs-check--on-brand{color:var(--white)}
+.hs-check--on-brand input:checked+.hs-check__box{background:var(--white);border-color:var(--white);color:var(--orange)}
+.hs-check__dot{width:9px;height:9px;border-radius:var(--radius-pill);background:currentColor}
+.hs-switch{display:inline-flex;align-items:center;gap:var(--space-3);cursor:pointer;font:var(--type-body)}
+.hs-switch input{position:absolute;opacity:0;width:0;height:0}
+.hs-switch__track{width:48px;height:26px;border-radius:var(--radius-pill);background:var(--ink-12);position:relative;transition:var(--transition-control);flex:none}
+.hs-switch__track::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:var(--radius-pill);background:var(--white);transition:transform var(--dur-fast) var(--ease-standard)}
+.hs-switch input:checked+.hs-switch__track{background:var(--orange)}
+.hs-switch input:checked+.hs-switch__track::after{transform:translateX(22px)}
+
+/* --- Navbar --- */
+.hs-nav{display:flex;align-items:center;justify-content:space-between;gap:var(--space-6);padding:var(--space-5) var(--space-6);background:var(--white)}
+.hs-nav--on-brand{background:transparent}
+.hs-nav__wordmark{font:var(--weight-bold) 20px/1 var(--font-core);letter-spacing:.02em;text-transform:lowercase;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+.hs-nav__links{display:flex;align-items:center;gap:var(--space-6);list-style:none;margin:0;padding:0}
+.hs-nav__link{font:var(--weight-semibold) var(--size-label)/1 var(--font-core);text-transform:uppercase;letter-spacing:var(--tracking-label);color:inherit;border:0;opacity:.6;transition:opacity var(--dur-fast) var(--ease-standard);cursor:pointer;background:none;padding:0}
+.hs-nav__link:hover,.hs-nav__link--active{opacity:1}
+
+/* --- Footer --- */
+.hs-footer{background:var(--surface-footer);color:var(--text-on-ink);padding:var(--space-9) var(--space-6) var(--space-6);display:flex;flex-direction:column;gap:var(--space-8)}
+.hs-footer__cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:var(--space-7)}
+.hs-footer__col{display:flex;flex-direction:column;gap:var(--space-3)}
+.hs-footer__link{color:var(--text-on-ink-muted);font:var(--type-body);border:0;transition:color var(--dur-fast) var(--ease-standard)}
+.hs-footer__link:hover{color:var(--cream)}
+
+/* --- Dialog --- */
+.hs-scrim{position:fixed;inset:0;background:var(--overlay-scrim);backdrop-filter:var(--blur-veil);display:grid;place-items:center;padding:var(--space-5);z-index:50}
+.hs-dialog{background:var(--white);border-radius:var(--radius-plate);max-width:520px;width:100%;padding:var(--space-7);display:flex;flex-direction:column;gap:var(--space-5)}
+.hs-dialog__title{font:var(--weight-regular) var(--size-title-2)/var(--leading-title) var(--font-core);letter-spacing:var(--tracking-title)}
+.hs-dialog__actions{display:flex;gap:var(--space-3);justify-content:flex-end}
+
+/* --- Toast --- */
+.hs-toast{display:inline-flex;align-items:center;gap:var(--space-3);background:var(--ink);color:var(--cream);border-radius:var(--radius-pill);padding:14px 22px;font:var(--weight-semibold) var(--size-body-sm)/1 var(--font-core)}
+.hs-toast--brand{background:var(--orange);color:var(--white)}
+
+/* --- Tooltip --- */
+.hs-tooltip{position:relative;display:inline-flex}
+.hs-tooltip__bubble{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%);background:var(--ink);color:var(--cream);border-radius:var(--radius-pill);padding:8px 14px;font:var(--weight-semibold) var(--size-label-sm)/1 var(--font-core);letter-spacing:.04em;white-space:nowrap;opacity:0;transition:opacity var(--dur-fast) var(--ease-standard);pointer-events:none}
+.hs-tooltip:hover .hs-tooltip__bubble{opacity:1}
+
+/* --- Tabs --- */
+.hs-tabs{display:flex;gap:var(--space-5);border-bottom:1px solid var(--line-hairline)}
+.hs-tab{background:none;border:0;border-bottom:2px solid transparent;padding:0 4px 14px;margin-bottom:-1px;font:var(--weight-semibold) var(--size-label)/1 var(--font-core);text-transform:uppercase;letter-spacing:var(--tracking-label);color:var(--text-muted);cursor:pointer;transition:var(--transition-control)}
+.hs-tab:hover{color:var(--text-body)}
+.hs-tab--active{color:var(--ink);border-bottom-color:var(--orange)}
+
+/* --- Section header --- */
+.hs-section-head{display:flex;flex-direction:column;gap:var(--space-4)}
+.hs-section-head__title{font:var(--weight-regular) var(--size-title-1)/var(--leading-title) var(--font-core);letter-spacing:var(--tracking-title)}
+.hs-section-head__title em{font-style:normal;color:var(--orange)}
+.hs-section-head--on-brand .hs-section-head__title em{color:var(--ink)}
+
+/* --- Footer: bloque de marca ---
+   ESTO NO VENIA EN EL SISTEMA. El componente Footer original renderiza la
+   marca y el lema, pero hs-components.css no trae clases para ese bloque
+   (el CSS de pagina solo centra los ">span" directos). Agregado para que
+   el bloque quede alineado con el resto del pie. */
+.hs-footer__brand{display:flex;flex-direction:column;gap:var(--space-3)}
+.hs-footer__brand b{font:var(--weight-bold) 22px/1 var(--font-core);letter-spacing:-.02em;color:var(--cream)}
+.hs-footer__brand span{font:var(--type-body);color:var(--text-on-ink-muted);max-width:46ch}

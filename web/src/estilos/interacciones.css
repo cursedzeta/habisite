@@ -1,0 +1,136 @@
+/* ==========================================================
+   Modificaciones nuestras sobre el diseño exportado.
+   pagina.css se mantiene como copia literal de Claude Design;
+   todo lo que cambiamos vive acá, para poder distinguir siempre
+   qué vino del diseño y qué agregamos nosotros.
+   ========================================================== */
+
+:root{
+  /* El mismo naranja de marca, aclarado. Reemplaza a la tinta
+     que cerraba el degradé del hero. */
+  --orange-light:#FF8A5C;
+  --orange-glow:#FFB694;
+
+  /* Alto util de la barra fija, para el scroll de los anclas. */
+  --alto-nav:96px;
+}
+
+/* ==========================================================
+   Escala general al 90%
+
+   El zoom NO va en body: la barra es position:fixed y, dentro de
+   un ancestro con zoom, left:0/right:0 se resuelven escalados y
+   la barra queda cubriendo solo el 90% del ancho. Por eso el
+   contenido va en un envoltorio propio y la barra escala su
+   contenido interno por separado.
+   ========================================================== */
+.escala{zoom:.9}
+.topbar .hs-nav{zoom:.9}
+
+/* Los anclas no quedan tapados por la barra fija. Usamos
+   scroll-margin en vez de restar pixeles a mano: es lo unico
+   que sigue siendo correcto con el zoom de por medio. */
+section[id]{scroll-margin-top:var(--alto-nav)}
+html{scroll-behavior:smooth}
+
+/* ==========================================================
+   Hero: fuera el oscuro, entra el naranja claro
+   ========================================================== */
+.hero{
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(
+    158deg,
+    var(--orange-light) 0%,
+    var(--orange-hover) 32%,
+    var(--orange) 66%,
+    var(--orange-press) 100%
+  );
+}
+
+/* Degradé suave en movimiento. Es ambiental: una mancha de naranja
+   claro que deriva despacio, sin depender del cursor. */
+.hero::after{
+  content:"";
+  position:absolute;
+  inset:-25%;
+  z-index:0;
+  pointer-events:none;
+  opacity:.5;
+  mix-blend-mode:screen;
+  background:radial-gradient(
+    46% 52% at 34% 38%,
+    var(--orange-glow) 0%,
+    color-mix(in srgb, var(--orange-light) 62%, transparent) 38%,
+    transparent 68%
+  );
+  animation:deriva-hero 22s var(--ease-standard) infinite alternate;
+  will-change:transform;
+}
+
+@keyframes deriva-hero{
+  from{transform:translate3d(-7%,-5%,0) scale(1)}
+  to{transform:translate3d(8%,6%,0) scale(1.18)}
+}
+
+/* El contenido va por encima del resplandor */
+.hero__in{position:relative;z-index:1}
+
+/* ==========================================================
+   Barra sobre el hero: invisible, todo en blanco
+   ========================================================== */
+/* pagina.css declara backdrop-filter y -webkit-backdrop-filter juntas, y
+   Lightning CSS se queda solo con la prefijada: Firefox pierde el vidrio.
+   La redeclaramos sola para que el compilador agregue el prefijo el mismo. */
+.topbar{
+  backdrop-filter:saturate(150%) blur(16px);
+  transition:background-color var(--dur-base) var(--ease-standard),
+             backdrop-filter var(--dur-base) var(--ease-standard);
+}
+
+.topbar--sobre-hero{
+  background:transparent;
+  backdrop-filter:none;
+}
+
+/* El wordmark y los links heredan color de .hs-nav */
+.topbar--sobre-hero .hs-nav{color:var(--white)}
+.topbar--sobre-hero .hs-nav__link{opacity:.82}
+.topbar--sobre-hero .hs-nav__link:hover{opacity:1}
+
+/* El boton se invierte: blanco con la palabra en naranja */
+.topbar--sobre-hero .hs-btn{
+  background:var(--white);
+  color:var(--orange);
+  border-color:var(--white);
+}
+.topbar--sobre-hero .hs-btn:hover{
+  background:var(--cream);
+  color:var(--orange-press);
+}
+
+/* ==========================================================
+   Pie: arreglo de una omision del sistema
+
+   .hs-footer__link declara border:0 pero no background. Todos los
+   demas controles del sistema (.hs-nav__link, .hs-nav__wordmark,
+   .hs-tab, .hs-iconbtn) si lo declaran. Como el link del pie es un
+   <button>, sin eso aparece el fondo gris por defecto del navegador
+   detras de cada texto.
+   ========================================================== */
+.hs-footer__link{
+  background:none;
+  padding:0;
+  text-align:left;
+  cursor:pointer;
+  font-family:inherit;
+}
+
+/* ==========================================================
+   Accesibilidad
+   ========================================================== */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  /* La mancha se queda quieta, pero no desaparece: es parte del fondo. */
+  .hero::after{animation:none}
+}
