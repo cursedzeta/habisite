@@ -1,0 +1,5 @@
+# La landing se indexa; los paneles de prototipo no.
+User-agent: *
+Allow: /
+Disallow: /panel
+Disallow: /jurado
