@@ -80,25 +80,34 @@ html{scroll-behavior:smooth}
    `font:`, asi que alcanza con redeclarar el peso despues. */
 .hero__h1{font-weight:var(--weight-bold)}
 
-/* Hero a dos columnas, calcado del Figma.
+/* Hero a dos columnas, medido sobre el Figma (nodo 18:485, frame 1920).
 
-   El marco del Figma mide 1440 y el contenido 1080 centrado (margen 180).
-   La columna derecha va de x=868 a x=1260, o sea 392px de ancho y 688 para
-   la izquierda: de ahi sale la proporcion 1.755 / 1. Traducido a fr en vez
-   de posiciones absolutas, para que aguante cualquier ancho de pantalla. */
+   Columna izquierda  (18:576): 697 de ancho, arranca en x=413
+   Columna derecha    (18:577): 299 de ancho, termina en x=1537
+   Separacion entre ambas: 128px
+
+   La derecha se dimensiona por su contenido y no por una fraccion: en el
+   Figma mide 299 porque eso es exactamente lo que ocupa "24 MAYO 2026" a
+   40px. Con `auto` la columna sigue al texto si la fecha cambia. */
 .hero__grid{
   display:grid;
-  grid-template-columns:minmax(0,1.755fr) minmax(0,1fr);
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:128px;
   align-items:start;
   width:100%;
 }
 
-/* En el Figma el bloque arranca en y=309, bastante debajo del titular.
-   Todo el bloque se alinea a la derecha: rotulos, valores y boton comparten
-   el mismo borde derecho. */
-.hero__datos{padding-top:var(--space-9);text-align:right}
+/* En el Figma el bloque derecho arranca 32px mas abajo que el izquierdo
+   (y=220 contra y=188). No es casual: es lo que lo deja opticamente a la
+   altura del titular.
 
-/* Rotulo y valor van pegados (gap 0 en el Figma); entre grupos hay 16px. */
+   Y va centrado, no alineado a un borde: los cinco elementos comparten
+   centro en x=149.5, la mitad exacta de los 299 del grupo. */
+.hero__datos{
+  padding-top:32px;
+  text-align:center;
+}
+
 .hero__rotulo{
   font:400 16px/20px var(--font-core);
   color:var(--white);
@@ -107,37 +116,38 @@ html{scroll-behavior:smooth}
 .hero__valor{
   font:700 40px/49px var(--font-core);
   color:var(--white);
-  margin:0 0 var(--space-4);
+  margin:0;
 }
-.hero__valor:last-of-type{margin-bottom:0}
+/* El rotulo se pega a su valor; entre grupos hay aire. */
+.hero__valor + .hero__rotulo{margin-top:8px}
 
-/* Boton: 248x59 con borde blanco, pegado al borde derecho como el resto
-   del bloque. Texto 32px sin mayusculas: .hs-btn las fuerza y el Figma
-   no las tiene. */
+/* Boton: 223x53, radio 15, borde blanco de 1px, relleno transparente.
+   Texto de 32px sin mayusculas — .hs-btn las fuerza y el Figma no las tiene. */
 .hero__boton.hs-btn{
-  display:flex;
-  width:248px;
-  height:59px;
-  margin:var(--space-4) 0 0 auto;
-  padding:10px;
+  display:inline-flex;
+  min-width:223px;
+  margin:8px auto 0;
+  padding:9px 16px;
   border:1px solid var(--white);
+  border-radius:var(--radius-pill);
   background:transparent;
   color:var(--white);
   font:700 32px/39px var(--font-core);
   letter-spacing:0;
   text-transform:none;
-  border-radius:var(--radius-pill);
 }
 .hero__boton.hs-btn:hover{background:var(--white);color:var(--orange)}
 
+@media (max-width:1100px){
+  .hero__grid{gap:var(--space-8)}
+}
 @media (max-width:900px){
   .hero__grid{grid-template-columns:1fr;gap:var(--space-7)}
-  .hero__datos{padding-top:0;text-align:left}
-  .hero__boton.hs-btn{margin-left:0;margin-right:auto}
+  .hero__datos{padding-top:0}
 }
 @media (max-width:520px){
   .hero__valor{font-size:32px;line-height:40px}
-  .hero__boton.hs-btn{width:100%;font-size:24px}
+  .hero__boton.hs-btn{width:100%;min-width:0;font-size:24px}
 }
 
 /* ==========================================================
