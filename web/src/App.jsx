@@ -50,13 +50,19 @@ function Hero({ refHero }) {
   return (
     <section ref={refHero} className="hero" data-screen-label="Hero">
       <div className="page hero__in">
-        <h1 className="hero__h1">
-          Habisite
-          <br />
-          Design
-          <br />
-          Challenge <span>2026</span>
-        </h1>
+        <div className="hero__titulo">
+          <h1 className="hero__h1">
+            Habisite
+            <br />
+            Design
+            <br />
+            Challenge <span>2026</span>
+          </h1>
+          <span className="prize">
+            <Badge tone="ink">Premio mayor</Badge>
+            <b>USD 5.000</b>
+          </span>
+        </div>
         <p className="hero__sub">
           Un reto abierto al talento emergente de América Latina para imaginar nuevas formas de
           habitar el espacio.
@@ -74,10 +80,6 @@ function Hero({ refHero }) {
           >
             Inscribirme
           </Button>
-          <span className="prize">
-            <Badge tone="ink">Premio mayor</Badge>
-            <b>USD 5.000</b>
-          </span>
         </div>
         <dl className="facts">
           {FACTS.map((f) => (

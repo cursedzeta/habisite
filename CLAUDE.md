@@ -4,6 +4,8 @@ Este archivo es la fuente de verdad para cualquiera que agarre el repo: personas
 o sesiones de Claude Code. Si algo cambia y contradice lo de acá, **actualizá
 este archivo en el mismo commit.**
 
+Última actualización: 8 de septiembre de 2026.
+
 ---
 
 ## 1. Qué es esto
@@ -17,7 +19,7 @@ proyectos:
 
 | Superficie | Quién entra | Para qué |
 |---|---|---|
-| **Landing de inscripción** | Público | Se pre-registra y cae en el grupo de WhatsApp del concurso |
+| **Landing del concurso** | Público | Se pre-registra y cae en el grupo de WhatsApp |
 | **Panel de concursantes** | Inscriptos, login con Google | Suben su propuesta |
 | **Panel de jurado** | Jurados, invitados uno por uno | Ven propuestas, puntúan y dejan devolución |
 
@@ -26,72 +28,56 @@ recibe un aviso cuando se publica. **Ese es el motivo de que sea una sola app
 con una sola base**: si fueran tres proyectos separados, pasar el puntaje del
 jurado al participante sería trabajo real en vez de una consulta.
 
-El sitio institucional (`habisite.com`) sigue en WordPress y se migrará a código
-más adelante. No es parte de este trabajo.
+A futuro, el sitio institucional (`habisite.com`, hoy en WordPress) también se
+migra a código y se aloja en este mismo proyecto de Railway.
 
 ---
 
 ## 2. Estado actual
 
+**En producción:**
+
+- **https://challenge.habisite.com** — la landing del concurso, desplegada y
+  con certificado válido. Ver §5 para cómo está montada.
+
 **Hecho:**
 
-- `web/` — la landing de inscripción funciona. React 19 + Vite 8 + Tailwind 4.
-- El sistema de diseño: 42 tokens y 6 primitivas reutilizables. Ver `web/DESIGN.md`.
+- `web/` — React 19 + Vite 8. **Sin Tailwind** (ver §9).
+- El sistema de diseño, exportado desde Claude Design y portado a código.
 
 **No existe todavía:**
 
 - `api/` — el backend del concurso.
 - `contrato/openapi.yaml` — la frontera entre front y back.
 - Los paneles de concursantes y de jurado.
+- El sitio institucional migrado.
 
 **Reparto de trabajo:** Tomás hace el front (`web/`). Su compañero hace el back
 (`api/`), incluido el login con Google.
 
 ---
 
-## 3. Infraestructura (verificado, no supuesto)
-
-- **Cloudflare es el DNS autoritativo** de `habisite.com`
-  (`leonard.ns.cloudflare.com`, `annalise.ns.cloudflare.com`).
-- **El WordPress NO está en Railway.** Está hosteado en otro lado y Cloudflare
-  tapa el origen. Falta averiguar dónde se paga ese hosting.
-- **Railway**, proyecto `Habisite` (`9245f5aa-8566-48a7-b4f3-8b01d560498c`),
-  workspace *GrowthIMBAR's Projects*:
-
-  | Servicio | Qué es |
-  |---|---|
-  | `Habisite` | API Java sobre Tomcat, en `api.habisite.com`. **No la tocamos.** |
-  | `attractive-playfulness` | Integración con WhatsApp. **No la tocamos.** |
-  | `Postgres` | Base existente |
-
-**Dos cosas que alguien debería atender:**
-
-- **Solo existe el entorno `production`.** No hay staging: hoy cualquier deploy
-  va directo a lo que está en vivo. Conviene clonar el entorno antes de meter
-  servicios nuevos.
-- **Hay un volumen huérfano** (`postgres-volume`, 1.1 GB, *detached*). No está
-  conectado a nada y genera costo. No borrarlo sin preguntar: puede ser la única
-  copia de datos viejos.
-
-### Dominios
-
-La app va a vivir en **`challenge.habisite.com`** — un CNAME en Cloudflare
-apuntando a Railway. **El patrón ya está probado**: `api.habisite.com` es
-exactamente eso.
-
-La URL vieja, `habisite.com/habisite-design-challenge-2026/`, redirige con un
-**301 desde Cloudflare** para que ningún link difundido se rompa.
-
----
-
-## 4. Estructura del repo
+## 3. Estructura del repo
 
 `github.com/cursedzeta/habisite`, rama `main`.
 
 ```
 habisite/
-├─ web/            front (Tomás) — React + Vite + Tailwind
-├─ api/            back (compañero) — no existe todavía
+├─ web/            front — React + Vite. ESTO es lo que está desplegado.
+│  ├─ src/
+│  │  ├─ App.jsx           la landing entera
+│  │  ├─ index.css         importa los 4 CSS en orden
+│  │  ├─ ds/               el sistema de diseño (13 componentes)
+│  │  │  ├─ base.jsx       Icon · Button · IconButton · Badge · Eyebrow · Card · SectionHeader
+│  │  │  ├─ formulario.jsx Field · Input · Select · Checkbox
+│  │  │  └─ navegacion.jsx Navbar · Footer
+│  │  └─ estilos/
+│  │     ├─ tokens.css        colores, tipografía, espaciado, radios
+│  │     ├─ componentes.css   los estilos hs-* del sistema
+│  │     ├─ pagina.css        estilos de la landing
+│  │     └─ interacciones.css NUESTRAS modificaciones (ver §9)
+│  └─ package.json
+├─ api/            back — no existe todavía
 ├─ contrato/
 │  └─ openapi.yaml la frontera entre los dos — no existe todavía
 ├─ reference/      identidad extraída del WordPress viejo
@@ -99,21 +85,98 @@ habisite/
 └─ plan/           plan técnico inicial (ver §8, tiene partes vencidas)
 ```
 
-**Un solo repo, dos servicios de Railway.** Railway soporta monorepos: cada
-servicio apunta al mismo repo de GitHub con su propio *Root Directory*
-(`web/` y `api/`). Con *watch paths*, tocar el front no redespliega el back.
+**Un solo repo, un servicio de Railway por carpeta.** Railway soporta monorepos:
+cada servicio apunta al mismo repo con su propio *Root Directory*. El front ya
+está así (`web/`); el back va a ser igual con `api/`.
 
-**`contrato/openapi.yaml` es la pieza clave del reparto.** Con el back en Java
-no se pueden compartir tipos de TypeScript. El contrato lo escribe el back
-primero; de ahí el front genera sus tipos y puede programar pantallas contra
-datos de prueba sin esperar que la API exista. **Sin esa carpeta, uno de los dos
-vive bloqueado esperando al otro.**
+**`contrato/openapi.yaml` es la pieza clave del reparto.** Con el back en Java no
+se pueden compartir tipos de TypeScript. El contrato lo escribe el back primero;
+de ahí el front genera sus tipos y puede programar pantallas contra datos de
+prueba sin esperar que la API exista. **Sin esa carpeta, uno de los dos vive
+bloqueado esperando al otro.**
 
 ---
 
-## 5. Lo que tiene que hacer el back
+## 4. Infraestructura
 
-### 5.1 Primero de todo: el contrato de autenticación
+- **Cloudflare es el DNS autoritativo** de `habisite.com`
+  (`leonard.ns.cloudflare.com`, `annalise.ns.cloudflare.com`).
+- **`habisite.com` sigue en WordPress**, hosteado fuera de Railway. Cloudflare
+  tapa el origen. Falta averiguar dónde se paga ese hosting.
+
+### Railway
+
+Proyecto **`habisite-plataforma`** (`2ddeacf4-f570-4ea9-afc7-8428393fbaf4`),
+workspace *GrowthIMBAR's Projects*, único entorno `production`.
+
+| Servicio | Root | Dominio |
+|---|---|---|
+| `challenge-web` | `web/` | challenge.habisite.com |
+
+Espacio previsto para `api/`, la base y el sitio institucional migrado.
+
+### El proyecto viejo (borrado)
+
+Existía un proyecto `Habisite` con una API Java en `api.habisite.com`, una
+integración con WhatsApp y un Postgres de 1.1 GB. **Se borró el 8/9/2026 con
+autorización explícita**: la base tenía contactos viejos que se descartaron.
+
+- El código de esos servicios está en **`Valebongi/Habisite`** (no en este repo).
+- Las variables de entorno (credenciales SMTP, `DATABASE_URL`, `ADMIN_SEED_PASS`)
+  quedaron respaldadas **fuera del repo**, en `C:\Users\zenga\IMB\respaldo-railway\`.
+  No están en git y no deben commitearse.
+
+---
+
+## 5. Despliegue
+
+El servicio se redespliega solo con cada push a `main` que toque `web/`
+(*watch path* `web/**`, así los commits del back no redespliegan el front).
+
+**Cómo está montado.** `web/` es una SPA estática: `vite build` produce `dist/`,
+pero Railway necesita un proceso escuchando en un puerto. Por eso existe:
+
+```json
+"start": "serve -s dist -l tcp://0.0.0.0:${PORT:-3000}"
+```
+
+El `-s` hace que cualquier ruta desconocida caiga en `index.html`, que hoy no
+hace falta pero sí cuando los paneles tengan rutas.
+
+**Si creás un servicio nuevo, fijá el Root Directory ANTES del primer deploy.**
+Railway lanza un build automático al crear el servicio, y sin root configurado
+construye desde la raíz del repo —donde no hay `package.json`— y falla.
+
+### Dominios en Cloudflare
+
+Para agregar un dominio a un servicio de Railway hacen falta **dos** registros
+(el CNAME solo no alcanza: sin el TXT, Railway devuelve 404 en vez de enrutar):
+
+| Tipo | Nombre | Valor | Proxy |
+|---|---|---|---|
+| CNAME | `challenge` | el que da Railway | **Proxied (naranja)** |
+| TXT | `_railway-verify.challenge` | el que da Railway | — |
+
+Y **SSL/TLS en modo `Full`** (*SSL/TLS → Overview*). Ni `Flexible` (bucle
+infinito de redirecciones) ni `Full (Strict)` (error 526 en cada renovación
+de certificado).
+
+Dos cosas normales que parecen errores:
+
+- Railway muestra el CNAME como `REQUIRES_UPDATE` para siempre. Es porque la
+  nube naranja se lo tapa. Lo que vale es `Verified: yes`.
+- El certificado tarda entre minutos y una hora.
+
+⚠️ **Si el certificado se traba, NO borres y vuelvas a agregar el dominio.**
+Let's Encrypt permite 5 certificados por dominio por semana; pasarse deja el
+dominio bloqueado 7 días. El truco correcto es poner el CNAME en gris (*DNS
+only*), esperar a que Railway emita, y volver a naranja.
+
+---
+
+## 6. Lo que tiene que hacer el back
+
+### 6.1 Primero de todo: el contrato de autenticación
 
 Es lo que más bloquea al front. Antes que cualquier otra cosa, definir en
 `contrato/openapi.yaml`:
@@ -125,7 +188,7 @@ Es lo que más bloquea al front. Antes que cualquier otra cosa, definir en
 
 Sin eso el front no puede construir ni la primera pantalla de los paneles.
 
-### 5.2 Modelo de datos
+### 6.2 Modelo de datos
 
 El corazón del sistema es la separación entre **propuesta**, **puntaje** y
 **resultado publicado**. Los jurados cargan puntajes cuando quieren; el
@@ -141,7 +204,7 @@ participante no ve nada hasta que un administrador publica.
 | `feedback` | Devolución escrita del jurado, con interruptor de visibilidad hacia el participante. |
 | `results` | Puntaje final calculado y fecha de publicación. **Mientras no tenga fecha, no existe para el participante.** |
 
-**Criterios de evaluación y pesos** (salen de las bases publicadas):
+**Criterios de evaluación y pesos:**
 
 | Criterio | Peso |
 |---|---|
@@ -155,7 +218,7 @@ participante no ve nada hasta que un administrador publica.
 
 Puntaje final = suma ponderada de los criterios, promediada entre jurados.
 
-### 5.3 Permisos
+### 6.3 Permisos
 
 | Rol | Puede | No puede |
 |---|---|---|
@@ -170,92 +233,112 @@ Dos reglas que no son capricho técnico:
 - **Un jurado no ve los puntajes de los otros hasta el cierre.** Si el segundo
   jurado ve el 9 que puso el primero, tiende a acercarse a ese número.
 
-### 5.4 Avisos
+### 6.4 Avisos
 
 Cuando el admin publica resultados: el sistema promedia, aplica los pesos, y
 cada participante recibe un correo y ve su puntaje y su devolución en el panel.
 
 ---
 
-## 6. Decisiones tomadas — no volver a discutirlas
+## 7. Decisiones tomadas — no volver a discutirlas
 
 - **El jurado VE quién es el autor** de cada propuesta. Se planteó evaluar a
-  ciegas y **se decidió que no**. La pantalla del jurado muestra nombre,
-  universidad y nacionalidad junto a cada propuesta.
-- **El backend del concurso es nuevo**, no va dentro del repo Java que ya corre
-  en `api.habisite.com`.
+  ciegas y **se decidió que no**.
+- **El backend del concurso es nuevo**, no reutiliza el repo Java viejo.
 - **El login es con Google** y lo resuelve el back.
-- **Un solo repo** con `web/` y `api/`, dos servicios de Railway.
-- **Subdominio, no ruta**: `challenge.habisite.com`, con 301 desde la URL vieja.
+- **Un solo repo** con `web/` y `api/`, un servicio de Railway por carpeta.
+- **Subdominio, no ruta**: `challenge.habisite.com`.
 - **El formulario de la landing redirige al grupo de WhatsApp**, que es donde se
-  comparte el resto de la información del concurso y los enlaces a los paneles.
+  comparte el resto de la información y los enlaces a los paneles.
+- **El proyecto viejo de Railway se borró**, con su base de datos.
 
 ---
 
-## 7. Pendientes que bloquean
+## 8. Pendientes que bloquean
 
-1. **Las fechas reales del concurso.** Las publicadas (29 abril – 13 junio 2026)
-   están vencidas. Sin esto no se puede cerrar el cronograma.
-2. **El enlace del grupo de WhatsApp.** Está como `REEMPLAZAR_CON_EL_LINK_REAL`
-   en `web/src/datos.js`. Mientras diga eso, el formulario avisa en pantalla en
-   vez de abrir una URL rota.
-3. **Los entregables y sus pesos máximos.** Hay que escribirlos en las bases y
-   validarlos en el navegador y otra vez en el servidor. Sin un tope, alguien
-   sube un render de 400 MB el último día.
-4. **El texto de las bases**: qué se hace con los datos personales y qué derechos
-   tiene Habisite sobre las propuestas, sobre todo si se publican en la
-   exposición virtual que promete el premio.
-5. **El monto del primer premio.** El WordPress dice "1 USD" (claramente un
-   marcador de posición) y el Figma dice "$100.000 ARS". Hay que definir cuál es.
+1. **Las fechas reales del concurso.** Las que muestra la landing (24 mayo –
+   13 junio 2026) vienen del diseño y **no están confirmadas**.
+2. **El enlace del grupo de WhatsApp.**
+3. **Los montos de los premios.** La landing dice USD 5.000 / 2.000 / 1.000,
+   pero salieron del diseño generado, no de una fuente oficial.
+4. **Los entregables y sus pesos máximos**, validados en el navegador y otra vez
+   en el servidor. Sin un tope, alguien sube un render de 400 MB el último día.
+5. **El texto de las bases**: qué se hace con los datos personales y qué derechos
+   tiene Habisite sobre las propuestas.
+6. **El link del menú de WordPress** apuntando a `challenge.habisite.com`, más
+   una Redirect Rule 301 desde `habisite.com/habisite-design-challenge-2026/`.
 
 ---
 
-## 8. Trampas conocidas
+## 9. El sistema de diseño
 
-- **`plan/arquitectura.html` tiene partes vencidas.** Fue escrito antes de
-  algunas decisiones: propone Supabase (superado por el back Java propio) y
-  lista lo del jurado anónimo como pregunta abierta (ya cerrada, ver §6). El
-  resto sigue vigente.
-- **"31 DE SEPTIEMBRE" no existe.** Septiembre tiene 30 días. Está así en el
-  Figma y se reprodujo tal cual en `web/src/datos.js`. Corregir antes de publicar.
-- **Las imágenes del WordPress viejo son en su mayoría stock** de la plantilla
-  `architectonics` (`project01-05`, `team01-03`, `blog01-04`, `about01-03`...).
-  No son material real de Habisite. En `reference/assets/images/` quedaron solo
-  las que parecen propias.
-- **Los cuatro valores del degradé del hero están estimados a ojo** desde un
-  screenshot de Figma (`--color-hero-1` a `-4` en `web/src/index.css`). Pendiente
-  confirmarlos contra los hex reales.
+**No usamos Tailwind.** Se usó al principio y se sacó: el diseño definitivo se
+generó en Claude Design y trae su propio CSS con clases `hs-*` y custom
+properties. Mezclarlo con el preflight de Tailwind alteraba la reproducción.
 
----
+### La identidad
 
-## 9. Convenciones del código
+Tres colores y una tipografía:
+
+| Token | Valor | Papel |
+|---|---|---|
+| `--ink` | `#0A0B0D` | Texto y trazos. Fondo del pie. |
+| `--orange` | `#E43301` | La superficie de marca: hero e inscripción. |
+| `--cream` | `#FFFAE6` | Detalle, nunca el papel. |
+
+**Montserrat, solo tres pesos**: Regular 400, Semibold 600, Bold 700.
+
+El naranja tiene luminancia media: blanco y tinta dan ambos ≈4.4:1 sobre él.
+Por eso, sobre naranja, **nunca un botón naranja** — se usa `variant="ink"` o
+la inversión blanca. El token `--control-fill-inverse` existe justamente para
+que esa regla no dependa de que alguien la recuerde.
+
+### Los cuatro CSS y su orden
+
+`index.css` los importa en este orden, y el orden importa:
+
+1. `tokens.css` — los valores
+2. `componentes.css` — los estilos `hs-*`
+3. `pagina.css` — la landing
+4. `interacciones.css` — **lo nuestro**
+
+**Los tres primeros son copia literal de lo que exportó Claude Design.
+Todo lo que modificamos va en `interacciones.css`**, que carga último y por eso
+puede pisar al resto. Esa separación es deliberada: permite comparar contra el
+diseño original sin adivinar qué tocamos nosotros. Mantenerla.
+
+Hoy `interacciones.css` contiene: la escala al 90%, el degradé del hero sin el
+negro original, la deriva ambiental, la barra transparente sobre el hero, y tres
+arreglos de omisiones del sistema (fondo del `<button>` del pie, color de las
+`<option>` del select, y el `backdrop-filter` sin prefijo).
 
 ### Idioma
 
-**El código está en español**: nombres de componentes, props, variables,
-comentarios y commits. `Boton`, `Campo`, `Placa`, `variante`, `tamano`,
-`datos.js`. Mantenerlo — mezclar idiomas es peor que cualquiera de los dos.
+**El código va en español**: props, variables, comentarios y commits.
 
-### Front (`web/`)
+**Excepción deliberada:** los 13 componentes de `src/ds/` conservan sus nombres
+en inglés (`Button`, `Card`, `Field`) porque son los del sistema exportado, y
+así el port se puede verificar contra el original. No renombrarlos sin motivo.
+
+### Reglas
 
 - **Ningún componente escribe un valor suelto.** Si hace falta un número nuevo,
-  primero se le pone nombre en el bloque `@theme` de `src/index.css`. Los tokens
-  se nombran **por rol, no por tamaño**: `text-cuerpo`, no `text-17`.
-- **`src/ui/` es vocabulario reutilizable; `src/components/` son secciones de
-  esta página.** Las pantallas nuevas consumen `ui/` y traen sus propias
-  secciones. Importar siempre desde `../ui`, nunca del archivo suelto.
-- **El contenido vive en `src/datos.js`**, no en el marcado. Cambiar una fecha no
-  debe obligar a editar un componente.
-- **Montserrat, solo tres pesos**: Regular 400, Semibold 600, Bold 700.
-- **Nunca un botón naranja sobre superficie naranja** — desaparece. Sobre naranja
-  van las variantes `claro` o `contorno`. Es el error más fácil de cometer con
-  esta paleta.
+  se le pone nombre en `tokens.css` primero.
+- **El radio de todos los controles** —botones, campos, badges— sale de
+  `--radius-pill` en `tokens.css`. Es un solo valor a propósito: el sistema
+  quiere una sola forma para todo lo interactivo.
 - Todo movimiento respeta `prefers-reduced-motion`.
 
-El sistema completo está documentado en **`web/DESIGN.md`**: paleta con su papel,
-escala tipográfica, primitivas con sus variantes y las reglas de contraste.
+### Una trampa del compilador
 
-### Comandos
+Lightning CSS **descarta la propiedad estándar cuando el fuente declara la
+prefijada y la estándar juntas**, y se queda solo con `-webkit-`. Eso dejó a
+Firefox sin `backdrop-filter` dos veces. Declarar siempre **solo la estándar**:
+el compilador agrega el prefijo por su cuenta.
+
+---
+
+## 10. Comandos
 
 ```bash
 cd web
@@ -263,4 +346,5 @@ npm install
 npm run dev      # http://localhost:5173  (strictPort: falla si está ocupado)
 npm run build
 npm run lint
+npm start        # sirve dist/ como en producción
 ```

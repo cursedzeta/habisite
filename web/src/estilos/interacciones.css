@@ -76,6 +76,28 @@ html{scroll-behavior:smooth}
 /* El contenido va por encima del resplandor */
 .hero__in{position:relative;z-index:1}
 
+/* Titular en Bold. El diseño lo traia en Regular dentro del shorthand
+   `font:`, asi que alcanza con redeclarar el peso despues. */
+.hero__h1{font-weight:var(--weight-bold)}
+
+/* El titular corta a las 16ch y deja mucho aire a la derecha:
+   ahi va el sello del premio. */
+.hero__titulo{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:var(--space-7);
+  width:100%;
+  margin-top:var(--space-5);
+}
+.hero__titulo .hero__h1{margin-top:0}
+.hero__titulo .prize{flex:none;margin-top:var(--space-2)}
+
+@media (max-width:820px){
+  .hero__titulo{flex-direction:column;gap:var(--space-5)}
+  .hero__titulo .prize{margin-top:0}
+}
+
 /* ==========================================================
    Barra sobre el hero: invisible, todo en blanco
    ========================================================== */
@@ -107,6 +129,20 @@ html{scroll-behavior:smooth}
 .topbar--sobre-hero .hs-btn:hover{
   background:var(--cream);
   color:var(--orange-press);
+}
+
+/* ==========================================================
+   Select: las opciones del desplegable
+
+   .hs-input--on-brand pinta el <select> de blanco para que se lea
+   sobre el naranja, y las <option> heredan ese color. Pero el
+   desplegable lo dibuja el sistema operativo sobre fondo blanco,
+   asi que quedaba blanco sobre blanco. Las opciones necesitan su
+   propio color, independiente del control.
+   ========================================================== */
+.hs-select option{
+  color:var(--ink);
+  background:var(--white);
 }
 
 /* ==========================================================
