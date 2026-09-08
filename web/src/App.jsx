@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import {
   Button,
-  Badge,
   Card,
   Eyebrow,
   SectionHeader,
@@ -31,7 +30,6 @@ const JURY = [
 ]
 
 const FACTS = [
-  ['Cierre de inscripciones', '24 mayo 2026'],
   ['Período del reto', '25 mayo – 7 junio'],
   ['Anuncio de ganadores', '13 junio 2026'],
   ['Modalidad', 'Individual · en línea'],
@@ -50,37 +48,41 @@ function Hero({ refHero }) {
   return (
     <section ref={refHero} className="hero" data-screen-label="Hero">
       <div className="page hero__in">
-        <div className="hero__titulo">
-          <h1 className="hero__h1">
-            Habisite
-            <br />
-            Design
-            <br />
-            Challenge <span>2026</span>
-          </h1>
-          <span className="prize">
-            <Badge tone="ink">Premio mayor</Badge>
-            <b>USD 5.000</b>
-          </span>
+        <div className="hero__grid">
+          <div>
+            <h1 className="hero__h1">
+              Habisite
+              <br />
+              Design
+              <br />
+              Challenge <span>2026</span>
+            </h1>
+            <p className="hero__sub">
+              Un reto abierto al talento emergente de América Latina para imaginar nuevas formas de
+              habitar el espacio.
+            </p>
+          </div>
+
+          <div className="hero__datos">
+            <p className="hero__rotulo">PREMIO</p>
+            <p className="hero__valor">USD 5.000</p>
+
+            <p className="hero__rotulo">FECHA FINAL DE INSCRIPCION</p>
+            <p className="hero__valor">24 MAYO 2026</p>
+
+            <Button
+              href="#inscripcion"
+              className="hero__boton"
+              onClick={(e) => {
+                e.preventDefault()
+                go('inscripcion')
+              }}
+            >
+              Inscribirme
+            </Button>
+          </div>
         </div>
-        <p className="hero__sub">
-          Un reto abierto al talento emergente de América Latina para imaginar nuevas formas de
-          habitar el espacio.
-        </p>
-        <div className="hero__cta">
-          <Button
-            variant="ink"
-            size="lg"
-            href="#inscripcion"
-            onClick={(e) => {
-              e.preventDefault()
-              go('inscripcion')
-            }}
-            icon="arrow-right"
-          >
-            Inscribirme
-          </Button>
-        </div>
+
         <dl className="facts">
           {FACTS.map((f) => (
             <div key={f[0]}>
