@@ -4,7 +4,7 @@ Este archivo es la fuente de verdad para cualquiera que agarre el repo: personas
 o sesiones de Claude Code. Si algo cambia y contradice lo de acá, **actualizá
 este archivo en el mismo commit.**
 
-Última actualización: 8 de septiembre de 2026.
+Última actualización: 8 de septiembre de 2026 (requerimientos de los paneles).
 
 ---
 
@@ -20,13 +20,16 @@ proyectos:
 | Superficie | Quién entra | Para qué |
 |---|---|---|
 | **Landing del concurso** | Público | Se pre-registra y cae en el grupo de WhatsApp |
-| **Panel de concursantes** | Inscriptos, login con Google | Suben su propuesta |
-| **Panel de jurado** | Jurados, invitados uno por uno | Ven propuestas, puntúan y dejan devolución |
+| **Panel de concursantes** | Inscriptos, login con Google | Su equipo sube un PDF |
+| **Panel de jurado** | Jurados, invitados uno por uno | Puntúan y dejan devolución |
 
-El puntaje final del jurado tiene que impactar de vuelta en el concursante, que
+La devolución del jurado tiene que impactar de vuelta en el concursante, que
 recibe un aviso cuando se publica. **Ese es el motivo de que sea una sola app
-con una sola base**: si fueran tres proyectos separados, pasar el puntaje del
+con una sola base**: si fueran tres proyectos separados, pasar la devolución del
 jurado al participante sería trabajo real en vez de una consulta.
+
+**El puntaje del jurado nunca sale de adentro del sistema**: ordena y define el
+podio, pero el concursante solo ve la devolución escrita.
 
 A futuro, el sitio institucional (`habisite.com`, hoy en WordPress) también se
 migra a código y se aloja en este mismo proyecto de Railway.
@@ -82,8 +85,15 @@ habisite/
 │  └─ openapi.yaml la frontera entre los dos — no existe todavía
 ├─ reference/      identidad extraída del WordPress viejo
 ├─ prototipo/      prototipos HTML previos, superados por web/
-└─ plan/           plan técnico inicial (ver §8, tiene partes vencidas)
+├─ plan/           plan técnico inicial (ver §8, tiene partes vencidas)
+├─ req-concursantes.md
+└─ req-jurado.md   ← LOS DOS MANDAN SOBRE §6 DE ESTE ARCHIVO
 ```
+
+**Leé `req-concursantes.md` y `req-jurado.md` antes que la §6.** Son la
+definición vigente de los dos paneles, tomada con Tomás el 8/9/2026. Donde
+contradigan a la §6, ganan ellos: la §6 quedó escrita antes y todavía conserva
+partes superadas, señaladas más abajo.
 
 **Un solo repo, un servicio de Railway por carpeta.** Railway soporta monorepos:
 cada servicio apunta al mismo repo con su propio *Root Directory*. El front ya
@@ -197,14 +207,16 @@ participante no ve nada hasta que un administrador publica.
 | Tabla | Qué guarda |
 |---|---|
 | `profiles` | Nombre, apellido, correo, universidad, país y **rol** (`participante` · `jurado` · `admin`). Se crea sola en el primer login. |
-| `submissions` | Una propuesta por participante: título, memoria, estado (`borrador` / `entregada`), fecha de entrega. |
-| `submission_files` | Archivos de cada propuesta: láminas, memoria, renders. Tipo, peso y orden. |
-| `criteria` | Los siete criterios con su peso (ver abajo). |
-| `scores` | Un puntaje por criterio, por jurado, por propuesta. **Clave única sobre los tres.** |
-| `feedback` | Devolución escrita del jurado, con interruptor de visibilidad hacia el participante. |
-| `results` | Puntaje final calculado y fecha de publicación. **Mientras no tenga fecha, no existe para el participante.** |
+| `submissions` | Una propuesta **por equipo**: título, memoria, estado (`borrador` / `entregada`), fecha de entrega. |
+| `submission_members` | Los integrantes del equipo y las invitaciones pendientes. **Máximo 5** (provisorio, va como constante de configuración). |
+| `submission_file` | **Un único PDF** por propuesta. Ya no hay láminas, memoria y renders por separado. |
+| `criteria` | Los criterios con su peso. **Todavía sin confirmar** — ver `req-jurado.md` §3.2. Por eso van en base de datos y la pantalla de puntuación se genera desde acá, nunca contra campos fijos. |
+| `scores` | Un puntaje por criterio, por jurado, por propuesta. **Clave única sobre los tres.** **El puntaje es interno**: sirve para ordenar y sacar el podio, y el concursante nunca lo ve. |
+| `feedback` | Devolución escrita del jurado, con interruptor de visibilidad hacia el participante. **Es lo único que el concursante recibe.** |
+| `results` | Posición y fecha de publicación. **Mientras no tenga fecha, no existe para el participante.** |
 
-**Criterios de evaluación y pesos:**
+**Criterios de evaluación y pesos** — ⚠️ **sin confirmar**, salieron de las bases
+del sitio viejo y el equipo todavía no habló con la gente del jurado:
 
 | Criterio | Peso |
 |---|---|
@@ -222,8 +234,8 @@ Puntaje final = suma ponderada de los criterios, promediada entre jurados.
 
 | Rol | Puede | No puede |
 |---|---|---|
-| `participante` | Ver y editar **solo su** propuesta, hasta el cierre. Ver su puntaje una vez publicado. | Ver otras propuestas. Ver puntajes sin publicar. Editar después del cierre. |
-| `jurado` | Ver todas las propuestas entregadas. Cargar y corregir **sus propios** puntajes y devoluciones. | Modificar propuestas. Ver puntajes de otros jurados antes del cierre. |
+| `participante` | Ver y editar la propuesta **de su equipo**, hasta el cierre. Ver su **devolución** una vez publicada, y si entró al podio. | Ver otras propuestas. Ver **ningún puntaje, nunca**. Editar después del cierre. |
+| `jurado` | Cargar y corregir **sus propios** puntajes y devoluciones. | Modificar propuestas. Ver puntajes de otros jurados antes del cierre. |
 | `admin` | Todo, más las dos acciones que nadie más tiene: **cerrar evaluación** y **publicar resultados**. | — |
 
 Dos reglas que no son capricho técnico:
@@ -235,15 +247,15 @@ Dos reglas que no son capricho técnico:
 
 ### 6.4 Avisos
 
-Cuando el admin publica resultados: el sistema promedia, aplica los pesos, y
-cada participante recibe un correo y ve su puntaje y su devolución en el panel.
+Cuando el admin publica: el sistema promedia y aplica los pesos **por dentro**
+para ordenar. Cada participante recibe un correo y ve **su devolución** en el
+panel — nunca un puntaje. A los tres primeros se les avisa por el panel y por
+los medios oficiales del concurso (el grupo de WhatsApp).
 
 ---
 
 ## 7. Decisiones tomadas — no volver a discutirlas
 
-- **El jurado VE quién es el autor** de cada propuesta. Se planteó evaluar a
-  ciegas y **se decidió que no**.
 - **El backend del concurso es nuevo**, no reutiliza el repo Java viejo.
 - **El login es con Google** y lo resuelve el back.
 - **Un solo repo** con `web/` y `api/`, un servicio de Railway por carpeta.
@@ -251,6 +263,15 @@ cada participante recibe un correo y ve su puntaje y su devolución en el panel.
 - **El formulario de la landing redirige al grupo de WhatsApp**, que es donde se
   comparte el resto de la información y los enlaces a los paneles.
 - **El proyecto viejo de Railway se borró**, con su base de datos.
+- **Una propuesta es de un equipo**, no de una persona: hasta 5 miembros
+  invitados por correo.
+- **Se entrega un único PDF**, con visor y zoom en el panel.
+- **El concursante nunca ve un puntaje.** El jurado sí puntúa, pero es interno.
+
+⚠️ **Lo que el jurado ve del autor volvió a estar en duda.** Estuvo un tiempo
+acá como decidido a favor de mostrarlo; el equipo lo reabrió el 8/9. Ver
+`req-jurado.md` §3.3 — junto con otras dos definiciones pendientes de ese panel
+que **no hay que implementar** hasta que se cierren.
 
 ---
 
@@ -267,6 +288,12 @@ cada participante recibe un correo y ve su puntaje y su devolución en el panel.
    tiene Habisite sobre las propuestas.
 6. **El link del menú de WordPress** apuntando a `challenge.habisite.com`, más
    una Redirect Rule 301 desde `habisite.com/habisite-design-challenge-2026/`.
+7. **Los términos y condiciones del concurso.** El correo de invitación al
+   equipo tiene que enlazarlos, así que sin ese texto no se puede cerrar el
+   flujo de invitación.
+8. **Tres definiciones del panel de jurado** que el equipo tiene que cerrar:
+   si cada jurado ve todas las propuestas, cuáles son los criterios, y si ve la
+   autoría. Detalle y consecuencias en `req-jurado.md` §3.
 
 ---
 
