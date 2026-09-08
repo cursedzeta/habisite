@@ -5,15 +5,6 @@ import { Button } from '../ds'
    Piezas compartidas por los dos paneles del prototipo.
    ========================================================== */
 
-/* Aviso fijo: que nadie confunda esto con la aplicacion real. */
-export function CintaPrototipo() {
-  return (
-    <div className="pnl-cinta">
-      Prototipo — datos inventados, sin backend. Nada de lo que hagas acá se guarda.
-    </div>
-  )
-}
-
 /* Acceso simulado. El login real lo resuelve el backend con Google
    (req-*.md punto 1); acá solo se representa la pantalla. */
 export function Acceso({ rol, onEntrar }) {
@@ -36,30 +27,13 @@ export function Acceso({ rol, onEntrar }) {
   )
 }
 
-export function Encabezado({ titulo, persona, rol }) {
-  return (
-    <header className="pnl-top">
-      <div className="pnl-top__in">
-        <div>
-          <span className="hs-eyebrow hs-eyebrow--brand">{titulo}</span>
-          <b className="pnl-top__marca">Habisite</b>
-        </div>
-        <div className="pnl-top__quien">
-          <span>{persona}</span>
-          <span className="pnl-rol">{rol}</span>
-        </div>
-      </div>
-    </header>
-  )
-}
-
 /* Visor de PDF con zoom (req-concursantes.md, punto 6).
 
    El prototipo dibuja una lamina falsa en vez de renderizar un PDF real:
    alcanza para probar la interaccion del zoom sin traer pdf.js, que pesa
    mas que toda esta app junta. Cuando haya archivos de verdad, se cambia
    el contenido de .pnl-hoja y los controles quedan igual. */
-export function VisorPdf({ nombre, paginas = 4 }) {
+export function VisorPdf({ nombre, paginas = 4, grande = false }) {
   const [zoom, setZoom] = useState(1)
   const [pagina, setPagina] = useState(1)
 
@@ -67,7 +41,7 @@ export function VisorPdf({ nombre, paginas = 4 }) {
   const alejar = () => setZoom((z) => Math.max(0.5, +(z - 0.25).toFixed(2)))
 
   return (
-    <div className="pnl-visor">
+    <div className={`pnl-visor ${grande ? 'pnl-visor--grande' : ''}`}>
       <div className="pnl-visor__barra">
         <span className="pnl-visor__nombre">{nombre}</span>
         <div className="pnl-visor__ctrl">
