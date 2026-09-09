@@ -1,0 +1,36 @@
+# ── Secretos ──────────────────────────────────────────────
+# El .env lleva el client secret de Google y la clave de firma
+# de sesión. Nunca al repo.
+.env
+.env.*
+!.env.example
+
+# Lo que baja de la consola de Google al crear el cliente
+client_secret*.json
+
+# ── Dependencias y compilados ─────────────────────────────
+node_modules/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# ── Logs ──────────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# ── Sistema y editor ──────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# -- Seguimiento interno ---------------------------------------
+# Tareas para el Gantt de Gestion Growth. Es gestion del trabajo,
+# no documentacion del proyecto: no va al repo.
+backendGonzalo/docs/tareas-gantt.md
+# Preguntas acumuladas para la contraparte, antes de mandarlas.
+backendGonzalo/docs/dudas-para-sol.md

@@ -1,0 +1,1086 @@
+openapi: 3.0.0
+paths:
+  /salud:
+    get:
+      operationId: SaludController_estado
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      summary: Health check
+      tags:
+        - Salud
+  /edicion:
+    get:
+      description: Lo mismo que viaja adentro de `GET /yo`. Está suelto por si hace
+        falta refrescarlo.
+      operationId: EdicionController_obtener
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      summary: Configuración y estado del concurso
+      tags: &a1
+        - Edición
+  /admin/edicion:
+    put:
+      operationId: EdicionController_actualizar
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActualizarEdicionDto"
+      responses:
+        "200":
+          description: ""
+      summary: Cambia fechas y topes del concurso
+      tags: *a1
+  /admin/edicion/estado:
+    put:
+      description: "Pasar a `preseleccion` cierra las entregas: los borradores con
+        archivo pasan a entregados."
+      operationId: EdicionController_cambiarEstado
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CambiarEstadoDto"
+      responses:
+        "200":
+          description: La edición con su estado nuevo
+      summary: Mueve el concurso de etapa
+      tags: *a1
+  /yo:
+    get:
+      description: "La primera llamada de todas las pantallas: de `rol` sale a qué
+        panel entra, y `edicion` evita tener que pedir la configuración aparte."
+      operationId: PerfilesController_yo
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/YoDto"
+        "401":
+          description: Sin sesión, o la sesión venció
+      summary: Quién está logueado, con qué rol y en qué estado está el concurso
+      tags: &a2
+        - Perfil
+  /inscripcion:
+    post:
+      description: Habilita la cuenta en el acto. Nadie puede entrar con una cuenta de
+        Google que no se haya inscripto acá antes.
+      operationId: PerfilesController_inscribir
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InscripcionDto"
+      responses:
+        "409":
+          description: Ese correo ya está inscripto
+      summary: Alta desde el formulario del concurso
+      tags: *a2
+  /auth/google:
+    get:
+      description: "Redirige a Google (302). No es una llamada de fetch: el navegador
+        tiene que navegar acá. `retorno` es la ruta del front a la que volver
+        después de entrar."
+      operationId: AuthController_ingresar
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      summary: Arranca el ingreso con Google
+      tags: &a3
+        - Autenticación
+  /auth/salir:
+    post:
+      operationId: AuthController_salir
+      parameters: []
+      responses:
+        "204":
+          description: ""
+      summary: Cierra la sesión
+      tags: *a3
+  /mi-equipo:
+    get:
+      description: Devuelve `null` si todavía no armó ni se sumó a ninguno.
+      operationId: EquiposController_mio
+      parameters: []
+      responses:
+        "200":
+          description: El equipo, o null
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EquipoDto"
+      summary: El equipo de quien pregunta
+      tags: &a4
+        - Equipos
+    post:
+      description: Se puede crear vacío y sumar gente después. Crea también la
+        propuesta en borrador.
+      operationId: EquiposController_crear
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CrearEquipoDto"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EquipoDto"
+      summary: Arma un equipo
+      tags: *a4
+  /mi-equipo/invitaciones:
+    post:
+      description: Solo el líder. Devuelve el enlace de cada invitación, que es el que
+        va en el correo.
+      operationId: EquiposController_invitar
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvitarDto"
+      responses:
+        "201":
+          description: ""
+      summary: Invita integrantes por correo
+      tags: *a4
+  /mi-equipo/enlace:
+    put:
+      description: Solo el líder. Sirve si el enlace circuló más de la cuenta.
+      operationId: EquiposController_regenerar
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      summary: Genera un enlace nuevo e invalida el anterior
+      tags: *a4
+    delete:
+      operationId: EquiposController_apagarEnlace
+      parameters: []
+      responses:
+        "204":
+          description: ""
+      summary: Apaga el enlace cuando el equipo está completo
+      tags: *a4
+  /equipos/sumarme/{token}:
+    post:
+      description: "El camino sin fricción: sirve con cualquier cuenta de Google, sin
+        que ningún correo tenga que coincidir. Registra la aceptación de las
+        bases con fecha e IP."
+      operationId: EquiposController_sumarme
+      parameters:
+        - name: token
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AceptarInvitacionDto"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EquipoDto"
+      summary: Se suma a un equipo con el enlace compartido
+      tags: *a4
+  /mi-equipo/miembros/yo:
+    delete:
+      description: "Los demás siguen con la propuesta. Después del cierre ya no se
+        puede: la lista de autores queda firme."
+      operationId: EquiposController_baja
+      parameters: []
+      responses:
+        "204":
+          description: ""
+      summary: Se da de baja del equipo
+      tags: *a4
+  /mi-propuesta:
+    get:
+      description: Devuelve `null` si todavía no armó equipo. `editable` dice si se
+        puede tocar.
+      operationId: PropuestasController_mia
+      parameters: []
+      responses:
+        "200":
+          description: La propuesta, o null
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PropuestaDto"
+      summary: La propuesta del equipo de quien pregunta
+      tags: &a5
+        - Propuesta
+    put:
+      operationId: PropuestasController_actualizar
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActualizarPropuestaDto"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PropuestaDto"
+      summary: Guarda el título y la memoria
+      tags: *a5
+  /mi-propuesta/archivo:
+    put:
+      description: "Un solo PDF por propuesta: subir de nuevo reemplaza el anterior.
+        Se valida el tamaño, que sea realmente un PDF, que no tenga contraseña y
+        la cantidad de páginas."
+      operationId: PropuestasController_subir
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - archivo
+              properties:
+                archivo:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PropuestaDto"
+      summary: Sube o reemplaza el PDF
+      tags: *a5
+    get:
+      description: Soporta `Range`, así el visor carga de a pedazos en vez de bajar
+        todo de una.
+      operationId: PropuestasController_verArchivo
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      summary: Descarga el PDF propio, para previsualizarlo
+      tags: *a5
+  /mi-propuesta/entregar:
+    post:
+      description: "Uno de los dos caminos a entregada. El otro es automático: al
+        vencer el plazo, todo borrador que tenga archivo pasa a entregado
+        igual."
+      operationId: PropuestasController_entregar
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PropuestaDto"
+      summary: Confirma la entrega
+      tags: *a5
+  /criterios:
+    get:
+      description: "La pantalla de puntuación tiene que generarse desde acá: los
+        criterios no están confirmados y van a cambiar. Nada de siete campos
+        incrustados."
+      operationId: EvaluacionController_criterios
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CriterioDto"
+      summary: Los criterios de evaluación con sus pesos
+      tags: &a6
+        - Evaluación
+  /jurado/propuestas:
+    get:
+      description: En preselección son las de su tercio; en la final, todos los
+        finalistas. `criteriosPuntuados` sobre `criteriosTotales` arma el «3 de
+        7».
+      operationId: EvaluacionController_listado
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PropuestaJuradoDto"
+      summary: Las propuestas que le tocan a este jurado
+      tags: *a6
+  /jurado/avance:
+    get:
+      operationId: EvaluacionController_avance
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AvanceDto"
+      summary: Cuántas le faltan a este jurado
+      tags: *a6
+  /jurado/propuestas/{id}/archivo:
+    get:
+      description: "Soporta `Range`: el visor abre en cuanto tiene el índice, sin
+        bajar los 30 MB primero. Es lo que evita que el jurado tenga que
+        descargarse todo."
+      operationId: EvaluacionController_archivo
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+      summary: El PDF de una propuesta, para leerlo en la plataforma
+      tags: *a6
+  /jurado/propuestas/{id}/puntajes:
+    get:
+      description: "Hasta que la evaluación cierra, cada jurado ve solo los suyos: si
+        el segundo ve el 9 que puso el primero, tiende a acercarse a ese
+        número."
+      operationId: EvaluacionController_puntajes
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+      summary: Los puntajes cargados de una propuesta
+      tags: *a6
+    put:
+      description: Se puede mandar parcial y completar después.
+      operationId: EvaluacionController_guardarPuntajes
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GuardarPuntajesDto"
+      responses:
+        "200":
+          description: ""
+      summary: "Vuelta 2: puntúa los criterios"
+      tags: *a6
+  /jurado/propuestas/{id}/preseleccion:
+    put:
+      description: "Acá no se pone nota: el jurado solo decide qué pasa de ronda."
+      operationId: EvaluacionController_preseleccionar
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PreseleccionarDto"
+      responses:
+        "200":
+          description: ""
+      summary: "Vuelta 1: marca si la propuesta pasa a la final"
+      tags: *a6
+  /jurado/propuestas/{id}/devolucion:
+    get:
+      operationId: EvaluacionController_verDevolucion
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+      summary: La devolución que escribió este jurado
+      tags: *a6
+    put:
+      description: "Opcional, y es una nota interna: el concursante no la ve."
+      operationId: EvaluacionController_guardarDevolucion
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DevolucionDto"
+      responses:
+        "200":
+          description: ""
+      summary: Escribe la devolución
+      tags: *a6
+  /admin/reparto:
+    post:
+      description: "Guarda la semilla: si alguien cuestiona el sorteo, se vuelve a
+        correr y da idéntico."
+      operationId: EvaluacionController_repartir
+      parameters: []
+      responses:
+        "201":
+          description: ""
+      summary: Reparte las propuestas entre los jurados, al azar
+      tags: *a6
+  /mi-resultado:
+    get:
+      description: "Lo ÚNICO que el concursante sabe del final. No hay puntaje, ni
+        posición fuera del podio, ni devolución: «no deben ver puntaje ni nota o
+        tipo de valor». Mientras no se publique, `publicado` es false y no hay
+        nada más que mostrar."
+      operationId: ResultadosController_mio
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  publicado:
+                    type: boolean
+                  gano:
+                    type: boolean
+                  posicion:
+                    type: number
+                    nullable: true
+                    description: 1, 2 o 3. Null si no entró.
+      summary: Si el equipo de quien pregunta entró al podio
+      tags: &a7
+        - Resultados
+  /admin/resultados:
+    get:
+      description: "Interno: es lo que va al acta. Nunca se le muestra a un concursante."
+      operationId: ResultadosController_ranking
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      summary: El ranking completo, con puntajes y nombres
+      tags: *a7
+  /admin/resultados/calcular:
+    post:
+      description: Promedio ponderado por criterio, promediado entre jurados. Descarta
+        a los jurados que dejaron criterios sin completar. Se puede correr las
+        veces que haga falta.
+      operationId: ResultadosController_calcular
+      parameters: []
+      responses:
+        "201":
+          description: ""
+      summary: Calcula y congela el ranking
+      tags: *a7
+  /admin/resultados/publicar:
+    post:
+      description: "Escribe una fecha y nada más: no recalcula ni mueve puntajes. Se
+        bloquea si hay evaluaciones sin terminar, salvo que se mande `forzar`."
+      operationId: ResultadosController_publicar
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublicarDto"
+      responses:
+        "201":
+          description: ""
+      summary: Publica el podio
+      tags: *a7
+info:
+  title: Habisite Design Challenge 2026 — API
+  description: >-
+    API del concurso. Tres roles y tres superficies: la inscripción pública, el
+    panel
+
+    de concursantes y el panel de jurado.
+
+
+    ## Sesión
+
+
+    Se entra con Google. El navegador tiene que **navegar** a `GET /auth/google`
+
+    (un enlace, no un fetch); de ahí en más la sesión viaja en una cookie
+    `HttpOnly`
+
+    que el navegador manda sola.
+
+
+    Todas las llamadas tienen que ir con `credentials: "include"`, o la cookie
+    no viaja.
+
+
+    ## Nadie entra sin estar inscripto
+
+
+    Los perfiles no nacen del login: nacen del formulario de inscripción o de
+    una
+
+    invitación. Una cuenta de Google que no figure recibe `403`.
+
+
+    ## Forma de los errores
+
+
+    ```json
+
+    { "estado": 404, "mensaje": "No existe esa propuesta", "ruta": "/…", "hora":
+    "…" }
+
+    ```
+
+
+    Con `detalles: string[]` cuando la validación rechaza campos, un renglón por
+    campo.
+  version: "1.0"
+  contact: {}
+tags:
+  - name: Autenticación
+    description: Entrar y salir
+  - name: Perfil
+    description: Quién soy e inscripción
+  - name: Equipos
+    description: Armar equipo, invitar, darse de baja
+  - name: Propuesta
+    description: El PDF y su entrega
+  - name: Evaluación
+    description: Lo que usa el panel del jurado
+  - name: Resultados
+    description: Podio y ranking interno
+  - name: Edición
+    description: Configuración y etapas del concurso
+servers: []
+components:
+  securitySchemes:
+    cookie:
+      type: apiKey
+      in: cookie
+      name: sesion
+  schemas:
+    ActualizarEdicionDto:
+      type: object
+      properties:
+        nombre:
+          type: string
+        cierreEntregas:
+          type: string
+          description: Con zona horaria explícita. Sin ella, el cierre cae a otra hora de
+            la anunciada.
+          example: 2026-10-15T23:59:59-03:00
+        cierreEvaluacion:
+          type: string
+          example: 2026-10-30T23:59:59-03:00
+        margenGraciaMinutos:
+          type: number
+          minimum: 0
+          maximum: 1440
+          example: 15
+        cupoPreseleccion:
+          type: number
+          description: Cuántas preselecciona cada jurado en la vuelta 1
+        maxIntegrantes:
+          type: number
+          example: 5
+        maxBytes:
+          type: number
+          example: 31457280
+        maxPaginas:
+          type: number
+    CambiarEstadoDto:
+      type: object
+      properties:
+        estado:
+          type: string
+          enum:
+            - inscripcion
+            - entregas
+            - preseleccion
+            - final
+            - cerrada
+            - publicada
+          description: El paso a `preseleccion` cierra las entregas y pasa a entregadas
+            los borradores con archivo.
+      required:
+        - estado
+    EdicionResumenDto:
+      type: object
+      properties:
+        estado:
+          type: string
+          enum:
+            - inscripcion
+            - entregas
+            - preseleccion
+            - final
+            - cerrada
+            - publicada
+        cierreEntregas:
+          type: object
+          nullable: true
+          example: 2026-10-15T23:59:59-03:00
+        margenGraciaMinutos:
+          type: number
+          description: Minutos de gracia después del cierre
+          example: 15
+        entregasAbiertas:
+          type: boolean
+          description: Lo único que el front necesita mirar para decidir si muestra el
+            botón de entregar. Ya tiene en cuenta el margen de gracia.
+        maxBytes:
+          type: number
+          example: 31457280
+          description: Tope del PDF en bytes
+        maxIntegrantes:
+          type: object
+          nullable: true
+          example: 5
+        maxPaginas:
+          type: object
+          nullable: true
+        zonaHoraria:
+          type: string
+          example: America/Argentina/Buenos_Aires
+      required:
+        - estado
+        - cierreEntregas
+        - margenGraciaMinutos
+        - entregasAbiertas
+        - maxBytes
+        - maxIntegrantes
+        - maxPaginas
+        - zonaHoraria
+    YoDto:
+      type: object
+      properties:
+        id:
+          type: string
+        correo:
+          type: string
+        nombre:
+          type: string
+        apellido:
+          type: string
+        institucion:
+          type: object
+          nullable: true
+        pais:
+          type: object
+          nullable: true
+        rol:
+          type: string
+          enum:
+            - participante
+            - jurado
+            - admin
+          description: Decide a qué panel entra.
+        edicion:
+          $ref: "#/components/schemas/EdicionResumenDto"
+      required:
+        - id
+        - correo
+        - nombre
+        - apellido
+        - institucion
+        - pais
+        - rol
+        - edicion
+    InscripcionDto:
+      type: object
+      properties:
+        correo:
+          type: string
+          description: "El correo de Google con el que va a entrar. Tiene que ser
+            exactamente ese: si después ingresa con otra cuenta, queda afuera."
+          example: ana@gmail.com
+        nombre:
+          type: string
+          example: Ana
+        apellido:
+          type: string
+          example: Duarte
+        institucion:
+          type: string
+          description: "Universidad o lugar de trabajo: puede haber profesionales jóvenes."
+          example: FADU-UBA
+        tipoInstitucion:
+          type: string
+          enum:
+            - universidad
+            - trabajo
+            - independiente
+        pais:
+          type: string
+          example: AR
+          description: Código ISO de dos letras
+        tokenEquipo:
+          type: string
+          description: Token del enlace de invitación de un equipo. Si viene, además de
+            inscribirse queda como integrante de ese equipo.
+      required:
+        - correo
+        - nombre
+        - apellido
+        - institucion
+        - tipoInstitucion
+        - pais
+    MiembroDto:
+      type: object
+      properties:
+        perfilId:
+          type: string
+        nombre:
+          type: string
+        apellido:
+          type: string
+        correo:
+          type: string
+        institucion:
+          type: object
+          nullable: true
+        estado:
+          type: string
+          enum:
+            - invitado
+            - aceptado
+          description: "`invitado` todavía no aceptó: figura en la lista pero no cuenta
+            como autor."
+        esLider:
+          type: boolean
+      required:
+        - perfilId
+        - nombre
+        - apellido
+        - correo
+        - institucion
+        - estado
+        - esLider
+    EquipoDto:
+      type: object
+      properties:
+        id:
+          type: string
+        nombre:
+          type: object
+          nullable: true
+        miembros:
+          type: array
+          items:
+            $ref: "#/components/schemas/MiembroDto"
+        enlaceInvitacion:
+          type: object
+          nullable: true
+          description: El enlace para compartir. Solo lo ve el líder; a los demás les
+            llega `null`.
+        invitacionActiva:
+          type: boolean
+        soyLider:
+          type: boolean
+          description: Si quien pregunta es el líder del equipo.
+        maxIntegrantes:
+          type: object
+          nullable: true
+          description: Tope de integrantes, o `null` si no hay.
+      required:
+        - id
+        - nombre
+        - miembros
+        - enlaceInvitacion
+        - invitacionActiva
+        - soyLider
+        - maxIntegrantes
+    CrearEquipoDto:
+      type: object
+      properties:
+        nombre:
+          type: string
+          description: Se puede poner después.
+          example: Estudio Norte
+    InvitarDto:
+      type: object
+      properties:
+        correos:
+          description: "Un correo por integrante. Ojo: tiene que ser el de su cuenta de
+            Google, porque si no coincide la invitación queda muerta."
+          example:
+            - tomas@gmail.com
+            - sol@gmail.com
+          type: array
+          items:
+            type: string
+      required:
+        - correos
+    AceptarInvitacionDto:
+      type: object
+      properties:
+        terminosVersion:
+          type: string
+          description: Versión de las bases que la persona aceptó. Queda guardada con la
+            fecha y la IP.
+          example: 2026-09-01
+      required:
+        - terminosVersion
+    ArchivoResumenDto:
+      type: object
+      properties:
+        nombreOriginal:
+          type: string
+        bytes:
+          type: number
+          description: Tamaño en bytes
+        paginas:
+          type: object
+          nullable: true
+        subidoEn:
+          type: string
+      required:
+        - nombreOriginal
+        - bytes
+        - paginas
+        - subidoEn
+    PropuestaDto:
+      type: object
+      properties:
+        id:
+          type: string
+        titulo:
+          type: string
+        memoria:
+          type: object
+          nullable: true
+        estado:
+          type: string
+          enum:
+            - borrador
+            - entregada
+            - descalificada
+        formaEntrega:
+          type: string
+          enum:
+            - confirmada
+            - automatica
+          nullable: true
+          description: "`automatica` = el equipo no confirmó y la entregó el sistema al
+            vencer el plazo."
+        entregadaEn:
+          type: object
+          nullable: true
+        archivo:
+          nullable: true
+          description: Los metadatos del PDF. El contenido se pide aparte, por su propia
+            ruta.
+          type: object
+          allOf:
+            - $ref: "#/components/schemas/ArchivoResumenDto"
+        editable:
+          type: boolean
+          description: Si todavía se puede editar. Ya tiene en cuenta el margen de gracia.
+      required:
+        - id
+        - titulo
+        - memoria
+        - estado
+        - formaEntrega
+        - entregadaEn
+        - archivo
+        - editable
+    ActualizarPropuestaDto:
+      type: object
+      properties:
+        titulo:
+          type: string
+          example: Refugio en la ladera
+        memoria:
+          type: string
+          description: Memoria descriptiva, si va aparte del PDF.
+      required:
+        - titulo
+    CriterioDto:
+      type: object
+      properties:
+        id:
+          type: string
+        codigo:
+          type: string
+          example: creatividad
+        nombre:
+          type: string
+          example: Creatividad y originalidad
+        descripcion:
+          type: object
+          nullable: true
+        peso:
+          type: number
+          example: 0.35
+          description: Los pesos suman 1
+        orden:
+          type: number
+      required:
+        - id
+        - codigo
+        - nombre
+        - descripcion
+        - peso
+        - orden
+    PropuestaJuradoDto:
+      type: object
+      properties:
+        id:
+          type: string
+        titulo:
+          type: string
+        tieneArchivo:
+          type: boolean
+        finalista:
+          type: boolean
+        preseleccionada:
+          type: object
+          nullable: true
+          description: "Vuelta 1: si este jurado la eligió."
+        criteriosPuntuados:
+          type: number
+          description: Cuántos de los criterios ya puntuó este jurado.
+        criteriosTotales:
+          type: number
+          description: "Total de criterios activos: con esto se arma «3 de 7»."
+        equipo:
+          type: object
+          nullable: true
+          description: Null si la evaluación es a ciegas. Sin cerrar todavía.
+        autores:
+          nullable: true
+          description: Null si es a ciegas.
+          type: array
+          items:
+            type: string
+      required:
+        - id
+        - titulo
+        - tieneArchivo
+        - finalista
+        - preseleccionada
+        - criteriosPuntuados
+        - criteriosTotales
+        - equipo
+        - autores
+    AvanceDto:
+      type: object
+      properties:
+        vuelta:
+          type: string
+          enum:
+            - preseleccion
+            - final
+        asignadas:
+          type: number
+        revisadas:
+          type: number
+        completas:
+          type: number
+      required:
+        - vuelta
+        - asignadas
+        - revisadas
+        - completas
+    PreseleccionarDto:
+      type: object
+      properties:
+        elegida:
+          type: boolean
+          description: true la manda a la vuelta 2.
+      required:
+        - elegida
+    PuntajeItemDto:
+      type: object
+      properties:
+        criterioId:
+          type: string
+        valor:
+          type: number
+          minimum: 1
+          maximum: 10
+          description: La escala todavía no está confirmada con el jurado.
+      required:
+        - criterioId
+        - valor
+    GuardarPuntajesDto:
+      type: object
+      properties:
+        puntajes:
+          description: "Se puede mandar parcial: el jurado deja a medias y sigue otro día."
+          type: array
+          items:
+            $ref: "#/components/schemas/PuntajeItemDto"
+      required:
+        - puntajes
+    DevolucionDto:
+      type: object
+      properties:
+        texto:
+          type: string
+          description: Nota interna del jurado, opcional. El concursante no la ve.
+      required:
+        - texto
+    PublicarDto:
+      type: object
+      properties:
+        forzar:
+          type: boolean
+          description: Publica aunque haya evaluaciones sin terminar. Es una decisión
+            deliberada.
