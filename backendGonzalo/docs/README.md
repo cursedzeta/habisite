@@ -17,6 +17,7 @@ dónde*, no *cuál es la clave*.
 | [05 · Inscripción por grupo](05-inscripcion-por-grupo.md) | Equipos, invitación por correo, términos y bajas | Diseñado |
 | [06 · Evaluación en dos vueltas](06-evaluacion-en-dos-vueltas.md) | Reparto por tercios, preselección y final | Implementado |
 | [07 · La API para el front](07-api-para-el-front.md) | **Para Tomás**: los 34 endpoints, qué pantalla usa cada uno y qué puede cambiar | Al día |
+| [08 · La base de datos local](08-base-de-datos-local.md) | Postgres 18 nativo, el reseteo de contraseña y las migraciones | Andando |
 
 ## Estado del código
 
@@ -28,9 +29,11 @@ dónde*, no *cuál es la clave*.
 - **09.09 · Fase C · los siete módulos.** `auth`, `perfiles`, `edicion`,
   `equipos`, `propuestas`, `evaluacion` y `resultados`. **34 endpoints**, con el
   contrato generado en `contrato/openapi.yaml`.
-- **Pendiente.** Correr las migraciones —bloqueado por la contraseña de
-  `postgres`— y el envío de correos, que necesita verificar el dominio
-  remitente.
+- **10.09 · La base local anda.** `habisite_challenge` creada en el Postgres 18
+  nativo, migraciones aplicadas y API comprobada contra datos reales.
+  Ver [08](08-base-de-datos-local.md).
+- **Pendiente.** El envío de correos, que necesita verificar el dominio
+  remitente; y el despliegue en Railway.
 
 ## Decisiones ya cerradas
 

@@ -311,6 +311,11 @@ devolviendo un renglón por campo, y los `500` sin filtrar detalles internos.
 `contrato/openapi.yaml` está generado: **34 operaciones y 21 esquemas**. Tomás
 ya puede sacar sus tipos.
 
-**Falta correr las migraciones.** Están escritas pero no aplicadas: la base
-`habisite_challenge` todavía no existe en el Postgres 18 local. Hasta entonces
-todo lo que toca datos responde `500` — el andamiaje anda, los datos no.
+**10.09 · la base local anda.** `habisite_challenge` creada en el Postgres 18
+nativo, las dos migraciones aplicadas y la API comprobada contra datos reales:
+alta de inscripción, choque de correo repetido con `409`, `GET /yo` con rol y
+edición, y los siete criterios sumando 1. Cero `500` en el log.
+Ver [08 · La base de datos local](08-base-de-datos-local.md).
+
+**Falta el despliegue** —el servicio de la API y el de Postgres en Railway— y el
+envío de correos, que necesita verificar el dominio remitente.
