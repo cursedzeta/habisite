@@ -18,6 +18,7 @@ dónde*, no *cuál es la clave*.
 | [06 · Evaluación en dos vueltas](06-evaluacion-en-dos-vueltas.md) | Reparto por tercios, preselección y final | Implementado |
 | [07 · La API para el front](07-api-para-el-front.md) | **Para Tomás**: los 34 endpoints, qué pantalla usa cada uno y qué puede cambiar | Al día |
 | [08 · La base de datos local](08-base-de-datos-local.md) | Postgres 18 nativo, el reseteo de contraseña y las migraciones | Andando |
+| [09 · El embudo de inscripción](09-embudo-de-inscripcion.md) | Formularios de cada canal → grupo de WhatsApp, bifurcaciones y alertas | **Borrador para discutir** |
 
 ## Estado del código
 
