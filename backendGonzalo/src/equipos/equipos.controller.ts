@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Req, Res } from '@nestjs/common';
 import { ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
 import { UsuarioActual } from '../comun/autorizacion/usuario-actual.decorador.js';
 import type { UsuarioSesion } from '../comun/autorizacion/usuario-sesion.js';
 import { AceptarInvitacionDto, CrearEquipoDto, EquipoDto, InvitarDto } from './dto/equipos.dto.js';
@@ -17,8 +17,13 @@ export class EquiposController {
     description: 'Devuelve `null` si todavía no armó ni se sumó a ninguno.',
   })
   @ApiOkResponse({ type: EquipoDto, description: 'El equipo, o null' })
-  mio(@UsuarioActual() usuario: UsuarioSesion) {
-    return this.equipos.mio(usuario.id);
+  // Se responde con `@Res` a propósito: si el handler devolviera `null` suelto,
+  // Nest manda un cuerpo VACÍO y el `await r.json()` del front explota. Y este
+  // es el estado inicial de todo el panel, así que reventaría en la primera
+  // pantalla. Con `res.json()` viaja el literal `null`, que es lo que promete
+  // el contrato.
+  async mio(@UsuarioActual() usuario: UsuarioSesion, @Res() respuesta: Response) {
+    respuesta.json(await this.equipos.mio(usuario.id));
   }
 
   @Post('mi-equipo')

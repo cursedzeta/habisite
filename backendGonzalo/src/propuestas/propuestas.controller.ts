@@ -31,8 +31,10 @@ export class PropuestasController {
     description: 'Devuelve `null` si todavía no armó equipo. `editable` dice si se puede tocar.',
   })
   @ApiOkResponse({ type: PropuestaDto, description: 'La propuesta, o null' })
-  mia(@UsuarioActual() usuario: UsuarioSesion) {
-    return this.propuestas.mia(usuario.id);
+  // Con `@Res` por lo mismo que `GET /mi-equipo`: un `null` devuelto suelto
+  // sale como cuerpo vacío y le rompe el `r.json()` al front.
+  async mia(@UsuarioActual() usuario: UsuarioSesion, @Res() respuesta: Response) {
+    respuesta.json(await this.propuestas.mia(usuario.id));
   }
 
   @Put()
