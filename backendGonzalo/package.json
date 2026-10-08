@@ -6,6 +6,9 @@
   "private": true,
   "license": "UNLICENSED",
   "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "build": "nest build",
     "deploy": "nest deploy",
@@ -23,8 +26,8 @@
     "pruebas:preparar": "node --env-file=.env pruebas/preparar.mjs",
     "pruebas:api": "node --env-file=.env pruebas/api-de-pruebas.mjs",
     "pruebas:recorrido": "node --env-file=.env pruebas/recorrido.mjs",
-    "migrar": "node --env-file=.env src/migrador/migrar.ts",
-    "contrato": "node --env-file=.env dist/generar-contrato.js"
+    "migrar": "node --env-file-if-exists=.env src/migrador/migrar.ts",
+    "contrato": "node --env-file-if-exists=.env dist/generar-contrato.js"
   },
   "dependencies": {
     "@nestjs/common": "^12.0.1",
