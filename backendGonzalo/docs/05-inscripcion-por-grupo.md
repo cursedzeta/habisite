@@ -109,6 +109,12 @@ Con el token, el enlace del correo identifica la invitación por sí solo: quien
 lo abre y se autentica con Google queda vinculado a esa fila, sin importar con
 qué cuenta entró.
 
+> **Esto hoy no funciona así (revisado el 08.10).** El login rechaza con `403`
+> toda cuenta que no esté en la lista blanca, así que el que entra con otra
+> cuenta queda frenado **antes** de llegar a aceptar. Para que el token cumpla
+> lo que promete hace falta el ajuste del login descripto en
+> [Aceptar una invitación por correo](#aceptar-una-invitación-por-correo--definido-0810).
+
 ## Términos y condiciones
 
 Se guardan **por persona, no por equipo** — cada integrante acepta los suyos.
@@ -118,7 +124,27 @@ día que cambien las bases no hay forma de saber qué aceptó cada uno.
 El líder acepta los términos al completar el formulario inicial; los invitados,
 al abrir el enlace.
 
+**La versión la pone el servidor, no el cliente** (definido el 08.10). Hoy
+`terminosVersion` viaja en el body, así que cualquiera puede mandar el valor
+que quiera. Pasa a leerse de la edición:
+
+```sql
+alter table edicion
+  add column terminos_version text,
+  add column terminos_url     text;
+```
+
+Cuando cambian las bases se actualiza esa fila, sin tocar código. Aplica a
+`POST /inscripcion`, `POST /equipos/sumarme/{token}` y
+`POST /invitacion/{token}/aceptar`. El texto de las bases tiene que estar
+publicado en algún lado (una página `/bases` o un PDF); eso queda fuera del
+backend.
+
 ## El formulario, con la menor fricción posible
+
+> **Superado el 08.10 por el [doc 09](09-embudo-de-inscripcion.md).** El
+> formulario de la landing **no lleva los correos del equipo**: el equipo se
+> arma después, desde el panel. Lo de abajo queda como registro.
 
 El motivo número uno por el que alguien abandona una inscripción es no tener a
 mano los datos de los demás. Por eso, dos decisiones:
@@ -155,9 +181,10 @@ desenfocado, se cargan correos con un botón `+` para sumar varios de una vez, y
 *Confirmar* dispara un correo a cada dirección. Sirve para invitar a alguien
 puntual. Está definido en `req-concursantes.md` §3.
 
-Su punto débil: **el correo tipeado tiene que ser el de la cuenta de Google del
-invitado**. Si no coincide, esa invitación queda muerta y nadie entiende por
-qué. Conviene avisarlo en la card, no después.
+Su punto débil era que **el correo tipeado tenía que ser el de la cuenta de
+Google del invitado**. Con el ajuste del login del 08.10 deja de serlo: el
+token del correo alcanza, entre con la cuenta que entre. El correo que llega
+es el C4 del [doc 10](10-correos.md).
 
 ### Con un enlace del equipo
 
@@ -201,6 +228,42 @@ no se agregan autores después de entregar.
 
 En los dos casos, **sumar gente se cierra junto con las entregas**: no se
 agregan autores después de entregar.
+
+## Aceptar una invitación por correo · definido 08.10
+
+Hoy la card genera enlaces `/invitacion/{token}`, pero **no existe ningún
+endpoint que los acepte**. Se completa así:
+
+| Qué | Para qué |
+|---|---|
+| `GET /invitacion/{token}` · público | Quién invita y a qué equipo, para que la pantalla diga «Ana te invitó a Estudio Norte» antes de pedir el login |
+| `GET /auth/google?invitacion={token}` | El login lleva el token firmado en el `state` de OAuth |
+| `POST /invitacion/{token}/aceptar` · con sesión | Lo suma como aceptado y guarda los términos con fecha, versión (de `edicion`) e IP |
+
+### El ajuste del login
+
+```mermaid
+flowchart TB
+    v["Vuelve de Google"] --> s{"¿Hay perfil con<br/>ese google_sub o correo?"}
+    s -->|"sí"| ok["Entra como siempre"]
+    s -->|"no"| t{"¿El state trae un<br/>token de invitación válido?"}
+    t -->|"no"| no["403 · sin-acceso"]
+    t -->|"sí"| m["Vincula esa cuenta de Google<br/>a la fila invitada"]
+    m --> ok
+```
+
+Si la invitación era para `juan@gmail.com` y Juan entra con
+`juan@facultad.edu`, el perfil reservado se queda con la cuenta con la que
+entró. El token solo vale mientras la invitación esté en `invitado` y la
+edición esté en `inscripcion` o `entregas`.
+
+### El arreglo de la reinvitación
+
+`invitar()` hace `on conflict do nothing` pero devuelve un token nuevo que
+nunca se guardó: el correo saldría con un enlace muerto. Pasa a **reusar el
+token existente** si la invitación sigue pendiente.
+
+Del lado del front hace falta la pantalla `/invitacion/{token}`.
 
 ## Cuando alguien se da de baja
 

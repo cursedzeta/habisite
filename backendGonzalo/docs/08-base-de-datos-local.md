@@ -2,6 +2,11 @@
 
 Cómo quedó armado el entorno de desarrollo, y las trampas que aparecieron.
 
+> **Hay dos PC con entornos distintos.** La primera usa Postgres nativo (lo
+> que describe la mayor parte de este documento). La segunda, armada el
+> 08.10, usa **Docker**: ver [la sección de abajo](#la-segunda-pc-postgres-en-docker--0810).
+> El `.env` no viaja por git: cada PC tiene el suyo.
+
 ## Postgres nativo, no Docker
 
 La máquina ya tenía **PostgreSQL 18 corriendo como servicio de Windows**
@@ -104,3 +109,41 @@ nueva.
 - `GET /criterios` devuelve los siete con los pesos sumando 1.
 - Las rutas de admin, jurado y concursante responden `200`.
 - Cero errores `500` en el log.
+
+
+## La segunda PC: Postgres en Docker · 08.10
+
+En esta PC no había Postgres, pero sí Docker Desktop. Se eligió el contenedor
+porque no necesita permisos de administrador y se borra y se rehace en
+segundos. Los datos de conexión son los mismos que trae `.env.example`, así
+que el `DATABASE_URL` funciona sin tocarlo.
+
+```bash
+docker run -d --name habisite-postgres --restart unless-stopped   -e POSTGRES_USER=habisite -e POSTGRES_PASSWORD=habisite   -e POSTGRES_DB=habisite_challenge   -p 5432:5432 -v habisite-pgdata:/var/lib/postgresql postgres:18
+```
+
+| | |
+|---|---|
+| Contenedor | `habisite-postgres` · Postgres 18.6 |
+| Volumen | `habisite-pgdata` (los datos sobreviven a reiniciar el contenedor) |
+| Base / usuario / contraseña | `habisite_challenge` / `habisite` / `habisite` · solo local |
+
+**El volumen va en `/var/lib/postgresql`, no en `/var/lib/postgresql/data`.**
+La imagen de Postgres 18 cambió dónde guarda los datos; montarlo en la ruta
+vieja hace que el contenedor no arranque.
+
+**Docker Desktop tiene que estar abierto.** Con `--restart unless-stopped`, el
+contenedor arranca solo cuando arranca Docker.
+
+En PowerShell, `npm` está bloqueado por la política de ejecución de scripts:
+hay que usar **`npm.cmd`** (`npm.cmd run migrar`, etc.).
+
+### Comprobado el 08.10
+
+- Las dos migraciones aplicadas: 13 tablas, los dos admins, los pesos sumando
+  `1.000`.
+- `npm run build` sin errores.
+- El recorrido de `pruebas/`: **62 comprobaciones OK, 0 fallidas**.
+
+Para empezar de cero: `docker rm -f habisite-postgres && docker volume rm habisite-pgdata`
+y volver a correr el `docker run` y las migraciones.

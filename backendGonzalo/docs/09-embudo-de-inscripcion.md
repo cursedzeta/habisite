@@ -35,10 +35,16 @@ comparte el resto de la información y los enlaces a los paneles.
 - **Quien completa todo ve la pantalla de gracias y pasa solo a WhatsApp**
   después de unos segundos, con un botón por si el navegador frena la
   redirección.
-- **Los correos salen de `challenge.habisite.com`**, así la reputación del
-  remitente no se mezcla con la del correo del estudio.
+- **Los correos salen de `habisitechallenge@habisite.com`** (cambiado el
+  08.10). `habisite.com` ya estaba verificado en Resend (región São Paulo) y
+  nada más manda desde ahí, así que no hace falta el subdominio. Esa dirección
+  ya existe en Cloudflare Email Routing, así que **las respuestas llegan**: se
+  reenvían a la casilla configurada ahí. Se agregó `_dmarc` con `p=none`.
 - **El formulario lleva Cloudflare Turnstile**, más un límite de pedidos por
-  IP en la API.
+  IP en la API. Widget «Habisite Challenge · inscripción», modo gestionado,
+  hosts `challenge.habisite.com` y `localhost`. La clave de sitio es pública y
+  va en el front: `0x4AAAAAAFRVKhCUdvWNByhd`. La secreta vive solo en el
+  `.env` y en Railway.
 - **Las plantillas se hacen de cero**, con la identidad de Habisite:
   confirmación, alerta y recordatorio.
 - **El grupo de WhatsApp todavía no está definido.** El enlace vive en una
@@ -124,7 +130,7 @@ flowchart TB
     q -->|"Solo correo<br/>(± teléfono)"| b1["Pantalla de gracias<br/>con el botón al grupo"]
     q -->|"Solo correo<br/>(± teléfono)"| b2["Resend · ALERTA a la persona<br/>'Tu inscripción quedó incompleta,<br/>sumate al grupo oficial'"]
     b2 --> b3{"¿Hizo clic<br/>en 2 días?"}
-    b3 -->|"sí"| b4["Se cancela<br/>el recordatorio"]
+    b3 -->|"sí"| b4["El recordatorio<br/>ya no sale"]
     b3 -->|"no"| b5["Resend · UN recordatorio<br/>y no se manda nada más"]
 
     %% ── Camino D ─────────────────────────────
@@ -169,42 +175,67 @@ sequenceDiagram
     F->>API: POST /inscripcion { correo, origen: "linkedin" }
     API->>API: Guarda el perfil · marca "incompleto"
     API->>R: Envía la alerta (ya)
-    API->>R: Programa el recordatorio (scheduledAt = +2 días)
-    Note over API: Guarda el id del recordatorio programado
+    Note over API: Guarda recordatorio_para = ahora + 2 días
     API-->>F: OK → pantalla de gracias + botón
     R->>P: ALERTA · «Tu inscripción quedó incompleta: sumate al grupo»
 
     alt Hace clic antes de los 2 días
         P->>API: /r/{token}
-        API->>R: Cancela el recordatorio programado
+        Note over API: Marca el clic · el recordatorio ya no sale
         API->>W: Redirige al grupo
     else No hace clic
+        Note over API: La tarea de cada 30 min lo encuentra vencido<br/>y marca recordatorio_enviado_en
+        API->>R: Envía el recordatorio
         R->>P: RECORDATORIO · el único
         Note over P,R: Fin. No se le manda nada más.
     end
 ```
 
-### El recordatorio lo programa Resend, no un cron nuestro
+### El recordatorio lo maneja la API · cambiado el 08.10
 
-Resend permite **programar un correo para más adelante** (`scheduledAt`) y
-**cancelarlo** antes de que salga. Eso alcanza para todo el recordatorio:
+La idea original era programarlo en Resend (`scheduledAt`) y cancelarlo si la
+persona hacía clic. **Se probó el 08.10 y no se puede:** la clave de Resend es
+de *Sending access* y cancelar devuelve `401 restricted_api_key`. Una clave
+*Full access* lo resolvería, pero si se filtra da el control de toda la
+cuenta. Se descartó.
 
-1. Cuando entra la inscripción, se manda la alerta y **en el mismo momento**
-   se programa el recordatorio para dentro de 2 días.
-2. Se guarda el `id` de ese correo programado.
-3. Si la persona hace clic antes, se cancela con ese `id`.
-4. Si no hace clic, sale solo. Como nunca se programa un segundo, **no puede
-   haber más de un recordatorio**, ni por un error de código.
+En su lugar:
 
-Así no hace falta ningún proceso nuestro corriendo cada tanto. Tampoco se
-pierden recordatorios si la API se reinicia o se cae, porque los guarda Resend.
+1. Cuando entra la inscripción incompleta, se manda la alerta y se guarda
+   `recordatorio_para = ahora + 2 días`.
+2. El clic en `/r/{token}` guarda `clic_en`.
+3. **Una tarea de la API corre cada 30 minutos** (configurable con
+   `TAREA_INTERVALO_MINUTOS`) y busca los vencidos que no
+   hicieron clic ni completaron la inscripción.
+4. Antes de mandar, **marca el envío en la misma consulta**:
+
+   ```sql
+   update perfiles
+      set recordatorio_enviado_en = now()
+    where id = $1 and recordatorio_enviado_en is null
+   returning id;
+   ```
+
+   Si la fila ya estaba marcada no devuelve nada y no se manda. **No puede
+   salir más de un recordatorio**, ni con dos tareas corriendo a la vez.
+
+Si la API estuvo caída, al volver manda los atrasados.
+
+**Por qué cada 30 y no cada 15 (08.10):** el recordatorio puede salir hasta
+media hora tarde, que nadie nota. El cierre de entregas sigue siendo exacto,
+porque lo que bloquea las ediciones es el `CierreGuard` en cada pedido, no la
+tarea; ella solo pasa los borradores a `entregada` y manda el C9, y guarda como
+fecha la del cierre, no la hora en que corrió. **Requisito en Railway:** la API
+tiene que estar siempre prendida, así que *App Sleeping* debe quedar apagado. Esta misma tarea es la
+que hace falta para pasar los borradores a entregados al cierre (doc 04), que
+hoy no existe: la usan las dos cosas.
 
 ### Por qué el enlace pasa primero por nuestra API
 
 El enlace de los correos es `/r/{token}`: pasa por la API y recién de ahí va a
 WhatsApp.
 
-1. **Es lo que cancela el recordatorio.** WhatsApp no avisa quién entró al
+1. **Es lo que frena el recordatorio.** WhatsApp no avisa quién entró al
    grupo, así que el clic es la única señal que tenemos.
 2. **Podemos cambiar el grupo sin reenviar nada.** Si el grupo se llena (el
    tope es 1024 personas) o hay que regenerar el enlace, se cambia una
@@ -229,11 +260,13 @@ pero hoy pide todos los campos y no manda ningún correo.
 | No se sabe de dónde vino | Columna `origen` en `perfiles` |
 | No se sabe si está completo | Se calcula: le falta nombre, apellido, tipo, institución o país |
 | Correo repetido → `409` | Correo repetido → completa lo que faltaba, o responde igual que siempre |
-| No manda nada | Confirmación o alerta, más el recordatorio programado, por Resend |
-| — | Guarda el `id` del recordatorio y el token del enlace `/r/{token}` |
-| — | `GET /r/{token}`: cuenta el clic, cancela el recordatorio y redirige al grupo |
+| No manda nada | Confirmación o alerta por Resend; el recordatorio lo manda la tarea periódica |
+| — | Columnas `recordatorio_para`, `recordatorio_enviado_en`, `clic_en` y el token de `/r/{token}` |
+| — | `GET /r/{token}`: guarda el clic y redirige al grupo |
+| — | Tarea cada 30 minutos (`@nestjs/schedule`): recordatorios vencidos y cierre de entregas |
 
 | No hay aceptación de bases en la inscripción | Columnas `terminos_en`, `terminos_version`, `terminos_ip` también en `perfiles` |
+| La versión de las bases la manda el cliente | La pone el servidor, desde `edicion.terminos_version`. El enlace sale de `edicion.terminos_url` (doc 05) |
 | — | Validación del token de Turnstile y límite de pedidos por IP |
 | — | `GET /yo` avisa si el perfil está incompleto; el panel pide completarlo antes de seguir |
 
@@ -245,5 +278,5 @@ pero hoy pide todos los campos y no manda ningún correo.
    el enlace va en una variable.
 2. **El texto de las bases** y su versión. El tilde es obligatorio, así que
    hace falta un enlace a algo, aunque sea una versión preliminar.
-3. **Verificar `challenge.habisite.com` en Resend**: hay que cargar sus
-   registros (SPF, DKIM y MX de retorno) en Cloudflare.
+3. ~~Verificar el dominio en Resend.~~ Resuelto el 08.10: se usa
+   `habisite.com`, que ya estaba verificado.

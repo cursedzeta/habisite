@@ -17,8 +17,10 @@ dónde*, no *cuál es la clave*.
 | [05 · Inscripción por grupo](05-inscripcion-por-grupo.md) | Equipos, invitación por correo, términos y bajas | Diseñado |
 | [06 · Evaluación en dos vueltas](06-evaluacion-en-dos-vueltas.md) | Reparto por tercios, preselección y final | Implementado |
 | [07 · La API para el front](07-api-para-el-front.md) | **Para Tomás**: los 34 endpoints, qué pantalla usa cada uno y qué puede cambiar | Al día |
-| [08 · La base de datos local](08-base-de-datos-local.md) | Postgres 18 nativo, el reseteo de contraseña y las migraciones | Andando |
+| [08 · La base de datos local](08-base-de-datos-local.md) | Postgres 18 nativo en una PC, en Docker en la otra; el reseteo de contraseña y las migraciones | Andando en las dos |
 | [09 · El embudo de inscripción](09-embudo-de-inscripcion.md) | Formularios de cada canal → grupo de WhatsApp, bifurcaciones y alertas | **Borrador para discutir** |
+| [10 · Los correos](10-correos.md) | Catálogo de los correos de Resend: qué los dispara, a quién y qué llevan | **Borrador para discutir** |
+| [11 · El formulario · para Tomás](11-formulario-para-el-front.md) | **Para Tomás**: campos, validaciones, envío, respuestas y textos del formulario de inscripción | Contrato acordado, endpoint sin implementar |
 
 ## Estado del código
 
