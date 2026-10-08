@@ -7,8 +7,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import type { Response } from 'express';
+import { fechaLegible } from '../comun/fechas.js';
+import { CorreoService } from '../correo/correo.service.js';
+import { Enlaces } from '../correo/enlaces.js';
 import { EdicionRepository } from '../edicion/edicion.repository.js';
 import { EquiposRepository } from '../equipos/equipos.repository.js';
+import { PerfilesService } from '../perfiles/perfiles.service.js';
 import { ArchivoService } from './archivo.service.js';
 import type { PropuestaDto } from './dto/propuestas.dto.js';
 import type { Propuesta } from './propuesta.entity.js';
@@ -21,6 +25,9 @@ export class PropuestasService {
     private readonly equipos: EquiposRepository,
     private readonly edicion: EdicionRepository,
     private readonly archivos: ArchivoService,
+    private readonly perfiles: PerfilesService,
+    private readonly correos: CorreoService,
+    private readonly enlaces: Enlaces,
   ) {}
 
   async mia(perfilId: string): Promise<PropuestaDto | null> {
@@ -46,7 +53,10 @@ export class PropuestasService {
     const validado = await this.archivos.validar(rutaTemporal, tamano, maxBytes, maxPaginas);
     await this.propuestas.guardarArchivo(propuesta.id, nombreOriginal, validado);
 
-    return this.aDto((await this.propuestas.porId(propuesta.id))!);
+    const actualizada = (await this.propuestas.porId(propuesta.id))!;
+    // Ya estaba entregada: el comprobante anterior quedó viejo, sale uno nuevo.
+    if (propuesta.estado === 'entregada') await this.avisarEntrega(actualizada, true);
+    return this.aDto(actualizada);
   }
 
   async entregar(perfilId: string): Promise<PropuestaDto> {
@@ -57,6 +67,7 @@ export class PropuestasService {
     }
     if (propuesta.estado === 'borrador') {
       await this.propuestas.entregar(propuesta.id);
+      await this.avisarEntrega((await this.propuestas.porId(propuesta.id))!, false);
     }
     return this.aDto((await this.propuestas.porId(propuesta.id))!);
   }
@@ -129,7 +140,36 @@ export class PropuestasService {
     return equipo ? this.propuestas.porEquipo(equipo.id) : null;
   }
 
+  /**
+   * C8, el comprobante, a todos los integrantes que aceptaron. La clave lleva
+   * la hora de subida del archivo: si reemplazan el PDF, el comprobante nuevo
+   * sale; si apretan «entregar» dos veces, no.
+   */
+  private async avisarEntrega(propuesta: Propuesta, reemplazo: boolean): Promise<void> {
+    if (!propuesta.archivo) return;
+    const { zonaHoraria } = await this.edicion.obtener();
+    const momento = reemplazo ? propuesta.archivo.subidoEn : (propuesta.entregadaEn ?? new Date());
+    const version = propuesta.archivo.subidoEn.getTime();
+
+    for (const m of await this.equipos.aceptados(propuesta.equipoId)) {
+      await this.correos.encolar(
+        'c8',
+        m.correo,
+        {
+          titulo: propuesta.titulo,
+          archivo: propuesta.archivo.nombreOriginal,
+          fecha: fechaLegible(momento, zonaHoraria),
+          reemplazo,
+          enlacePanel: this.enlaces.panel(),
+        },
+        { clave: `c8:${propuesta.id}:${version}:${m.perfilId}`, perfilId: m.perfilId },
+      );
+    }
+  }
+
   private async exigirEditable(perfilId: string): Promise<Propuesta> {
+    // Primero completa sus datos, después sube (docs/09).
+    await this.perfiles.exigirCompleto(perfilId);
     const propuesta = await this.dePerfil(perfilId);
     if (!propuesta) throw new NotFoundException('Todavía no formás parte de ningún equipo');
 

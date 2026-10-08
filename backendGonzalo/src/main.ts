@@ -16,6 +16,10 @@ async function arrancar(): Promise<void> {
   app.useBodyParser('json', { limit: '1mb' });
   app.use(cookieParser());
 
+  // Railway pone un proxy adelante. Sin esto, `request.ip` es la del proxy y
+  // el límite de envíos del formulario bloquearía a todos juntos.
+  app.set('trust proxy', 1);
+
   // Un solo origen, con credenciales: '*' no vale cuando viaja la cookie de sesión.
   app.enableCors({
     origin: config.get('FRONTEND_URL', { infer: true }),

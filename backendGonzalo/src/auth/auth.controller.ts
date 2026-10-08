@@ -27,13 +27,24 @@ export class AuthController {
     summary: 'Arranca el ingreso con Google',
     description:
       'Redirige a Google (302). No es una llamada de fetch: el navegador tiene que navegar acá. ' +
-      '`retorno` es la ruta del front a la que volver después de entrar.',
+      '`retorno` es la ruta del front a la que volver después de entrar. ' +
+      '`invitacion` (el token del correo de invitación) o `equipo` (el token del enlace del ' +
+      'equipo) dejan entrar a una cuenta de Google que todavía no está inscripta.',
   })
-  ingresar(@Query('retorno') retorno = '/') {
+  ingresar(
+    @Query('retorno') retorno = '/',
+    @Query('invitacion') invitacion?: string,
+    @Query('equipo') equipo?: string,
+  ) {
     // Solo rutas internas: sin esto, `?retorno=https://otro-sitio` convierte
     // el login en un redirector abierto para phishing.
     const destino = retorno.startsWith('/') && !retorno.startsWith('//') ? retorno : '/';
-    return { url: this.auth.urlDeIngreso(destino) };
+    const acceso = invitacion
+      ? { tipo: 'invitacion' as const, token: invitacion }
+      : equipo
+        ? { tipo: 'equipo' as const, token: equipo }
+        : undefined;
+    return { url: this.auth.urlDeIngreso(destino, acceso) };
   }
 
   /** A dónde vuelve Google. No lo llama el front. */

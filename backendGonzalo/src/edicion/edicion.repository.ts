@@ -14,6 +14,7 @@ const SELECCION = `
   select nombre, estado, zona_horaria, cierre_entregas, cierre_evaluacion,
          margen_gracia_minutos, cupo_preseleccion, max_integrantes,
          max_bytes, max_paginas, semilla_reparto,
+         terminos_version, terminos_url,
          coalesce(
            estado = 'entregas'
            and now() <= cierre_entregas
@@ -49,6 +50,8 @@ export class EdicionRepository {
       'max_integrantes',
       'max_bytes',
       'max_paginas',
+      'terminos_version',
+      'terminos_url',
     ];
     const columnas = Object.keys(cambios).filter((c) => permitidas.includes(c));
 

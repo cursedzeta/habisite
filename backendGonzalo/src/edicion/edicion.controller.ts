@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Put } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Publico } from '../comun/autorizacion/publico.decorador.js';
 import { Roles } from '../comun/autorizacion/roles.decorador.js';
 import { ActualizarEdicionDto, CambiarEstadoDto } from './dto/edicion.dto.js';
 import { EdicionService } from './edicion.service.js';
@@ -16,6 +17,24 @@ export class EdicionController {
   })
   obtener() {
     return this.edicion.obtener();
+  }
+
+  @Publico()
+  @Get('edicion/publica')
+  @ApiOperation({
+    summary: 'Lo que la landing puede saber del concurso, sin sesión',
+    description:
+      'Para el formulario: a dónde enlaza «las bases» (`terminosUrl`, `null` mientras no ' +
+      'estén publicadas) y en qué etapa está el concurso. Nada interno.',
+  })
+  async publica() {
+    const { estado, cierreEntregas, zonaHoraria, terminosUrl } = await this.edicion.obtener();
+    return {
+      estado,
+      cierreEntregas: cierreEntregas?.toISOString() ?? null,
+      zonaHoraria,
+      terminosUrl,
+    };
   }
 
   @Roles('admin')

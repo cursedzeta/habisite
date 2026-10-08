@@ -39,26 +39,31 @@ execFileSync('node', ['--env-file=.env', 'src/migrador/migrar.ts'], {
 // mismo JWT_SECRET que usa la API. Es el único atajo del recorrido: saltea
 // el consentimiento de Google, que es de Google y no nuestro. Todo lo demás
 // —los guards, el rol leído de la base— corre igual que en producción.
+// El último valor es el tipo de institución. `eva` va sin él a propósito: es
+// la que se inscribió incompleta y el panel tiene que frenarla.
 const gente = [
-  ['ana@test.local', 'Ana', 'Duarte', 'participante'],
-  ['bruno@test.local', 'Bruno', 'Paz', 'participante'],
-  ['carla@test.local', 'Carla', 'Ruiz', 'participante'],
-  ['j1@test.local', 'Jurado', 'Uno', 'jurado'],
-  ['j2@test.local', 'Jurado', 'Dos', 'jurado'],
-  ['j3@test.local', 'Jurado', 'Tres', 'jurado'],
-  ['admin@test.local', 'Admin', 'Test', 'admin'],
+  ['ana@test.local', 'Ana', 'Duarte', 'participante', 'universidad'],
+  ['bruno@test.local', 'Bruno', 'Paz', 'participante', 'universidad'],
+  ['carla@test.local', 'Carla', 'Ruiz', 'participante', 'trabajo'],
+  ['dario@test.local', 'Dario', 'Sosa', 'participante', 'universidad'],
+  ['eva@test.local', 'Eva', 'Lugo', 'participante', null],
+  ['gabi@test.local', 'Gabi', 'Rios', 'participante', 'independiente'],
+  ['j1@test.local', 'Jurado', 'Uno', 'jurado', null],
+  ['j2@test.local', 'Jurado', 'Dos', 'jurado', null],
+  ['j3@test.local', 'Jurado', 'Tres', 'jurado', null],
+  ['admin@test.local', 'Admin', 'Test', 'admin', null],
 ];
 
 const c = new pg.Client({ connectionString: urlPruebas });
 await c.connect();
 const sesiones = {};
-for (const [correo, nombre, apellido, rol] of gente) {
+for (const [correo, nombre, apellido, rol, tipo] of gente) {
   const r = await c.query(
-    `insert into perfiles (correo, nombre, apellido, rol, estado, institucion, pais)
-     values ($1, $2, $3, $4, 'habilitado', 'FADU-UBA', 'AR')
+    `insert into perfiles (correo, nombre, apellido, rol, estado, institucion, pais, tipo_institucion)
+     values ($1, $2, $3, $4, 'habilitado', 'FADU-UBA', 'AR', $5)
      on conflict (correo) do update set rol = excluded.rol
      returning id, sesion_v`,
-    [correo, nombre, apellido, rol],
+    [correo, nombre, apellido, rol, tipo],
   );
   const { id, sesion_v } = r.rows[0];
   const token = jwt.sign({ sub: id, v: sesion_v }, process.env.JWT_SECRET, { expiresIn: '7d' });

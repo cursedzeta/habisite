@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsDateString, IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsDateString, IsIn, IsInt, IsOptional, IsString, IsUrl, Max, MaxLength, Min } from 'class-validator';
 
 /** Cambios de configuración del concurso. Todo opcional: se manda solo lo que cambia. */
 export class ActualizarEdicionDto {
@@ -57,6 +57,25 @@ export class ActualizarEdicionDto {
   @IsInt()
   @Min(1)
   maxPaginas?: number;
+
+  @ApiPropertyOptional({
+    description:
+      'La versión vigente de las bases. Queda grabada en cada aceptación: cambiarla no ' +
+      'toca a quienes ya aceptaron una anterior.',
+    example: '2026-10-01',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(40)
+  terminosVersion?: string;
+
+  @ApiPropertyOptional({
+    description: 'Dónde se leen las bases. Los correos y el formulario enlazan acá.',
+    example: 'https://challenge.habisite.com/bases',
+  })
+  @IsOptional()
+  @IsUrl({ require_protocol: true })
+  terminosUrl?: string;
 }
 
 export class CambiarEstadoDto {

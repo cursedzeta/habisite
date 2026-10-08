@@ -9,6 +9,7 @@ import { EquiposService } from './equipos.service.js';
   imports: [PerfilesModule, EdicionModule],
   controllers: [EquiposController],
   providers: [EquiposService, EquiposRepository],
-  exports: [EquiposRepository],
+  // El login pregunta acá si un token de invitación habilita a entrar.
+  exports: [EquiposRepository, EquiposService],
 })
 export class EquiposModule {}

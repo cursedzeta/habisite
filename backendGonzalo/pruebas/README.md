@@ -4,7 +4,14 @@ Un recorrido de humo que le pega a la API de verdad —con Postgres, los guards 
 el cierre puestos— y comprueba los 35 endpoints de punta a punta: inscripción,
 equipo, PDF, entrega, las dos vueltas de evaluación y la publicación.
 
-**62 comprobaciones.** Tarda unos segundos.
+**123 comprobaciones.** Tarda unos segundos.
+
+**Ningún correo sale de verdad.** La API de pruebas arranca sin
+`RESEND_API_KEY`: los correos quedan anotados en `envios` como «omitido» y el
+recorrido los verifica ahí. La última comprobación confirma que ninguno quedó
+`enviado`. Mandarle correos reales a las direcciones inventadas de
+`test.local` los haría rebotar, y los rebotes le bajan la reputación al
+dominio.
 
 ```bash
 npm run build            # el recorrido pega contra dist/

@@ -22,6 +22,18 @@ paths:
       summary: Configuración y estado del concurso
       tags: &a1
         - Edición
+  /edicion/publica:
+    get:
+      description: "Para el formulario: a dónde enlaza «las bases» (`terminosUrl`,
+        `null` mientras no estén publicadas) y en qué etapa está el concurso.
+        Nada interno."
+      operationId: EdicionController_publica
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      summary: Lo que la landing puede saber del concurso, sin sesión
+      tags: *a1
   /admin/edicion:
     put:
       operationId: EdicionController_actualizar
@@ -57,7 +69,8 @@ paths:
   /yo:
     get:
       description: "La primera llamada de todas las pantallas: de `rol` sale a qué
-        panel entra, y `edicion` evita tener que pedir la configuración aparte."
+        panel entra, `perfilCompleto` dice si hay que pedirle datos antes, y
+        `edicion` evita tener que pedir la configuración aparte."
       operationId: PerfilesController_yo
       parameters: []
       responses:
@@ -72,10 +85,33 @@ paths:
       summary: Quién está logueado, con qué rol y en qué estado está el concurso
       tags: &a2
         - Perfil
+    put:
+      description: Lo que se manda reemplaza a lo que había; lo que no se manda queda
+        igual. Es la pantalla que ve primero quien se inscribió solo con el
+        correo.
+      operationId: PerfilesController_actualizarDatos
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DatosPersonalesDto"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/YoDto"
+      summary: Completa o corrige los datos personales desde el panel
+      tags: *a2
   /inscripcion:
     post:
-      description: Habilita la cuenta en el acto. Nadie puede entrar con una cuenta de
-        Google que no se haya inscripto acá antes.
+      description: Solo `correo`, `aceptaBases` y `turnstileToken` son obligatorios.
+        Habilita en el acto para entrar con Google. Un correo que ya estaba
+        recibe exactamente la misma respuesta que uno nuevo, a propósito. Ver
+        docs/11-formulario-para-el-front.md.
       operationId: PerfilesController_inscribir
       parameters: []
       requestBody:
@@ -85,17 +121,100 @@ paths:
             schema:
               $ref: "#/components/schemas/InscripcionDto"
       responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RespuestaInscripcionDto"
+        "403":
+          description: "Turnstile no aprobó el envío: resetear el widget"
+        "429":
+          description: Demasiados envíos desde la misma IP
+      summary: El formulario de inscripción de la landing
+      tags: *a2
+  /inscripcion/completar/{token}:
+    get:
+      description: El token viene en el correo de alerta. Deja de servir cuando la
+        inscripción se completa.
+      operationId: PerfilesController_paraCompletar
+      parameters:
+        - name: token
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DatosParaCompletarDto"
+        "404":
+          description: "El token no existe o ya se usó: mostrar el formulario vacío"
+      summary: Los datos para precargar el formulario desde «Completar mi inscripción»
+      tags: *a2
+  /r/{token}:
+    get:
+      description: "Anota el clic y redirige al grupo. Es el enlace de todos los
+        correos y de la pantalla de gracias: así se frena el recordatorio, y el
+        grupo se puede cambiar sin reenviar nada. Es una navegación, no un
+        fetch."
+      operationId: PerfilesController_alGrupo
+      parameters:
+        - name: token
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "302":
+          description: Redirige al grupo de WhatsApp
+      summary: El enlace al grupo de WhatsApp
+      tags: *a2
+  /admin/jurados:
+    post:
+      description: Se invita uno por uno. Le llega un correo con el enlace para entrar
+        con Google; tiene que usar la cuenta de ESE correo.
+      operationId: PerfilesController_invitarJurado
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvitarJuradoDto"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JuradoDto"
         "409":
-          description: Ese correo ya está inscripto
-      summary: Alta desde el formulario del concurso
+          description: El correo es de un admin o de alguien inscripto como concursante
+      summary: Invita a un jurado
       tags: *a2
   /auth/google:
     get:
       description: "Redirige a Google (302). No es una llamada de fetch: el navegador
         tiene que navegar acá. `retorno` es la ruta del front a la que volver
-        después de entrar."
+        después de entrar. `invitacion` (el token del correo de invitación) o
+        `equipo` (el token del enlace del equipo) dejan entrar a una cuenta de
+        Google que todavía no está inscripta."
       operationId: AuthController_ingresar
-      parameters: []
+      parameters:
+        - name: invitacion
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: equipo
+          required: true
+          in: query
+          schema:
+            type: string
       responses:
         "200":
           description: ""
@@ -128,7 +247,8 @@ paths:
         - Equipos
     post:
       description: Se puede crear vacío y sumar gente después. Crea también la
-        propuesta en borrador.
+        propuesta en borrador. Responde 403 si quien lo pide no completó sus
+        datos (`perfilCompleto` en `/yo`).
       operationId: EquiposController_crear
       parameters: []
       requestBody:
@@ -148,8 +268,8 @@ paths:
       tags: *a4
   /mi-equipo/invitaciones:
     post:
-      description: Solo el líder. Devuelve el enlace de cada invitación, que es el que
-        va en el correo.
+      description: Solo el líder. A cada dirección le llega un correo con su enlace.
+        Devuelve los enlaces igual, por si hace falta pasarlos por otro lado.
       operationId: EquiposController_invitar
       parameters: []
       requestBody:
@@ -162,6 +282,52 @@ paths:
         "201":
           description: ""
       summary: Invita integrantes por correo
+      tags: *a4
+  /invitacion/{token}:
+    get:
+      description: La pantalla `/invitacion/{token}` del front. Después, el botón
+        manda a `/auth/google?invitacion={token}&retorno=/invitacion/{token}` y,
+        de vuelta, llama a `POST /invitacion/{token}/aceptar`.
+      operationId: EquiposController_verInvitacion
+      parameters:
+        - name: token
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvitacionDto"
+        "404":
+          description: No existe, o ya se aceptó
+      summary: Qué equipo invita, para mostrarlo antes del login
+      tags: *a4
+  /invitacion/{token}/aceptar:
+    post:
+      description: "Sirve con cualquier cuenta de Google, no solo la del correo
+        invitado: el token es lo que identifica la invitación. Registra la
+        aceptación de las bases con fecha, la versión vigente y la IP."
+      operationId: EquiposController_aceptarInvitacion
+      parameters:
+        - name: token
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EquipoDto"
+        "409":
+          description: Ya forma parte de otro equipo
+      summary: Acepta la invitación por correo
       tags: *a4
   /mi-equipo/enlace:
     put:
@@ -184,8 +350,9 @@ paths:
   /equipos/sumarme/{token}:
     post:
       description: "El camino sin fricción: sirve con cualquier cuenta de Google, sin
-        que ningún correo tenga que coincidir. Registra la aceptación de las
-        bases con fecha e IP."
+        que ningún correo tenga que coincidir. Para entrar sin estar inscripto,
+        el login va con `/auth/google?equipo={token}`. Registra la aceptación de
+        las bases con fecha, la versión vigente y la IP."
       operationId: EquiposController_sumarme
       parameters:
         - name: token
@@ -210,8 +377,8 @@ paths:
       tags: *a4
   /mi-equipo/miembros/yo:
     delete:
-      description: "Los demás siguen con la propuesta. Después del cierre ya no se
-        puede: la lista de autores queda firme."
+      description: "Los demás siguen con la propuesta y reciben un correo avisando.
+        Después del cierre ya no se puede: la lista de autores queda firme."
       operationId: EquiposController_baja
       parameters: []
       responses:
@@ -543,6 +710,20 @@ paths:
           description: ""
       summary: Publica el podio
       tags: *a7
+  /admin/tarea:
+    post:
+      description: "Lo mismo que hace sola cada 30 minutos: cierra las entregas si
+        venció el plazo, manda los recordatorios vencidos y reintenta los
+        correos que no salieron. Es seguro correrla de más: nada sale dos
+        veces."
+      operationId: TareasController_ejecutar
+      parameters: []
+      responses:
+        "200":
+          description: "{ cierreDeEntregas, recordatorios, correosReintentados }"
+      summary: Corre ahora la tarea periódica
+      tags:
+        - Administración
 info:
   title: Habisite Design Challenge 2026 — API
   description: >-
@@ -643,6 +824,15 @@ components:
           example: 31457280
         maxPaginas:
           type: number
+        terminosVersion:
+          type: string
+          description: "La versión vigente de las bases. Queda grabada en cada aceptación:
+            cambiarla no toca a quienes ya aceptaron una anterior."
+          example: 2026-10-01
+        terminosUrl:
+          type: string
+          description: Dónde se leen las bases. Los correos y el formulario enlazan acá.
+          example: https://challenge.habisite.com/bases
     CambiarEstadoDto:
       type: object
       properties:
@@ -697,6 +887,11 @@ components:
         zonaHoraria:
           type: string
           example: America/Argentina/Buenos_Aires
+        terminosUrl:
+          type: object
+          nullable: true
+          description: "Dónde se leen las bases. `null` mientras no estén publicadas:
+            mostrar el texto sin enlace."
       required:
         - estado
         - cierreEntregas
@@ -706,6 +901,7 @@ components:
         - maxIntegrantes
         - maxPaginas
         - zonaHoraria
+        - terminosUrl
     YoDto:
       type: object
       properties:
@@ -717,6 +913,17 @@ components:
           type: string
         apellido:
           type: string
+        telefono:
+          type: object
+          nullable: true
+          example: "+5491123456789"
+        tipoInstitucion:
+          type: string
+          nullable: true
+          enum:
+            - universidad
+            - trabajo
+            - independiente
         institucion:
           type: object
           nullable: true
@@ -730,6 +937,11 @@ components:
             - jurado
             - admin
           description: Decide a qué panel entra.
+        perfilCompleto:
+          type: boolean
+          description: "Si es `false`, el panel tiene que pedirle los datos que faltan
+            (`PUT /yo`) antes de dejarlo armar equipo o subir algo: el servidor
+            lo rechaza con 403 igual. Siempre `true` para jurados y admins."
         edicion:
           $ref: "#/components/schemas/EdicionResumenDto"
       required:
@@ -737,49 +949,178 @@ components:
         - correo
         - nombre
         - apellido
+        - telefono
+        - tipoInstitucion
         - institucion
         - pais
         - rol
+        - perfilCompleto
         - edicion
-    InscripcionDto:
+    DatosPersonalesDto:
       type: object
       properties:
-        correo:
-          type: string
-          description: "El correo de Google con el que va a entrar. Tiene que ser
-            exactamente ese: si después ingresa con otra cuenta, queda afuera."
-          example: ana@gmail.com
         nombre:
           type: string
           example: Ana
         apellido:
           type: string
           example: Duarte
+        telefono:
+          type: string
+          description: "Formato internacional E.164: + código de país y número, sin
+            espacios."
+          example: "+5491123456789"
+        tipoInstitucion:
+          type: string
+          enum: &a8
+            - universidad
+            - trabajo
+            - independiente
         institucion:
           type: string
           description: "Universidad o lugar de trabajo: puede haber profesionales jóvenes."
           example: FADU-UBA
-        tipoInstitucion:
-          type: string
-          enum:
-            - universidad
-            - trabajo
-            - independiente
         pais:
           type: string
           example: AR
-          description: Código ISO de dos letras
-        tokenEquipo:
+          description: Código ISO de dos letras. `ZZ` para «Otro».
+    InscripcionDto:
+      type: object
+      properties:
+        nombre:
           type: string
-          description: Token del enlace de invitación de un equipo. Si viene, además de
-            inscribirse queda como integrante de ese equipo.
+          example: Ana
+        apellido:
+          type: string
+          example: Duarte
+        telefono:
+          type: string
+          description: "Formato internacional E.164: + código de país y número, sin
+            espacios."
+          example: "+5491123456789"
+        tipoInstitucion:
+          type: string
+          enum: *a8
+        institucion:
+          type: string
+          description: "Universidad o lugar de trabajo: puede haber profesionales jóvenes."
+          example: FADU-UBA
+        pais:
+          type: string
+          example: AR
+          description: Código ISO de dos letras. `ZZ` para «Otro».
+        correo:
+          type: string
+          description: "El correo de Google con el que va a entrar. Tiene que ser
+            exactamente ese: si después ingresa con otra cuenta, queda afuera."
+          example: ana@gmail.com
+        aceptaBases:
+          type: boolean
+          description: Tiene que ser `true`. La versión de las bases la registra el
+            servidor.
+          example: true
+        turnstileToken:
+          type: string
+          description: El token que genera el widget de Cloudflare Turnstile.
+        origen:
+          type: string
+          description: "De qué canal vino: lo lee el front del parámetro `?origen=` de la
+            URL."
+          example: linkedin
+        tokenCompletar:
+          type: string
+          description: Solo si la landing se abrió desde el botón «Completar mi
+            inscripción» del correo (`?completar=`). Completa esa inscripción en
+            vez de crear otra.
+      required:
+        - correo
+        - aceptaBases
+        - turnstileToken
+    RespuestaInscripcionDto:
+      type: object
+      properties:
+        estado:
+          type: string
+          enum:
+            - completa
+            - incompleta
+          description: "`completa`: redirigir al grupo a los 3 segundos. `incompleta`:
+            mostrar el botón al grupo y avisar que le llega un correo para
+            completar. Depende solo de lo que se mandó en este envío."
+        whatsapp:
+          type: string
+          description: El enlace al grupo de WhatsApp. Pasa por la API (registra el clic)
+            y de ahí redirige. Usar siempre este, nunca uno escrito en el front.
+          example: https://api.challenge.habisite.com/r/Xk3f…
+      required:
+        - estado
+        - whatsapp
+    DatosParaCompletarDto:
+      type: object
+      properties:
+        correo:
+          type: string
+        nombre:
+          type: string
+        apellido:
+          type: string
+        telefono:
+          type: object
+          nullable: true
+        tipoInstitucion:
+          type: string
+          nullable: true
+          enum: *a8
+        institucion:
+          type: object
+          nullable: true
+        pais:
+          type: object
+          nullable: true
       required:
         - correo
         - nombre
         - apellido
-        - institucion
+        - telefono
         - tipoInstitucion
+        - institucion
         - pais
+    InvitarJuradoDto:
+      type: object
+      properties:
+        correo:
+          type: string
+          description: "El correo de su cuenta de Google: con ese y solo con ese va a
+            poder entrar."
+          example: jurado@gmail.com
+        nombre:
+          type: string
+          example: Sol
+        apellido:
+          type: string
+          example: Pulido
+      required:
+        - correo
+    JuradoDto:
+      type: object
+      properties:
+        id:
+          type: string
+        correo:
+          type: string
+        nombre:
+          type: string
+        apellido:
+          type: string
+        estado:
+          type: string
+          description: "`habilitado` hasta que entre por primera vez; después `activo`."
+      required:
+        - id
+        - correo
+        - nombre
+        - apellido
+        - estado
     MiembroDto:
       type: object
       properties:
@@ -856,8 +1197,8 @@ components:
       type: object
       properties:
         correos:
-          description: "Un correo por integrante. Ojo: tiene que ser el de su cuenta de
-            Google, porque si no coincide la invitación queda muerta."
+          description: Un correo por integrante. A cada uno le llega un enlace que sirve
+            con cualquier cuenta de Google, no solo la de ese correo.
           example:
             - tomas@gmail.com
             - sol@gmail.com
@@ -866,16 +1207,30 @@ components:
             type: string
       required:
         - correos
+    InvitacionDto:
+      type: object
+      properties:
+        equipo:
+          type: object
+          nullable: true
+          example: Estudio Norte
+        invitadoPor:
+          type: object
+          nullable: true
+          example: Ana Duarte
+          description: Quién armó el equipo. `null` si todavía no cargó su nombre.
+      required:
+        - equipo
+        - invitadoPor
     AceptarInvitacionDto:
       type: object
       properties:
         terminosVersion:
           type: string
-          description: Versión de las bases que la persona aceptó. Queda guardada con la
-            fecha y la IP.
-          example: 2026-09-01
-      required:
-        - terminosVersion
+          deprecated: true
+          description: "Ya no se usa: la versión de las bases la pone el servidor (la
+            vigente en la edición). Se acepta para no romper llamadas viejas,
+            pero se ignora."
     ArchivoResumenDto:
       type: object
       properties:

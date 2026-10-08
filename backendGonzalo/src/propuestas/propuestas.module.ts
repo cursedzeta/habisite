@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
 import { EdicionModule } from '../edicion/edicion.module.js';
 import { EquiposModule } from '../equipos/equipos.module.js';
+import { PerfilesModule } from '../perfiles/perfiles.module.js';
 import { ArchivoService } from './archivo.service.js';
 import { PropuestasController } from './propuestas.controller.js';
 import { PropuestasRepository } from './propuestas.repository.js';
 import { PropuestasService } from './propuestas.service.js';
 
 @Module({
-  imports: [EquiposModule, EdicionModule],
+  imports: [EquiposModule, EdicionModule, PerfilesModule],
   controllers: [PropuestasController],
   providers: [PropuestasService, PropuestasRepository, ArchivoService],
   // El módulo de evaluación las lee y sirve el mismo PDF a los jurados.

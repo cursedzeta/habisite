@@ -140,6 +140,39 @@ export class ResultadosRepository {
     return rows[0] ? { gano: true, posicion: rows[0].posicion } : { gano: false, posicion: null };
   }
 
+  /**
+   * A quién avisar al publicar: todos los integrantes que aceptaron, de toda
+   * propuesta entregada. `posicion` viene solo para el podio publicado; para
+   * el resto es null y reciben el aviso general, que no dice ningún puesto.
+   */
+  async destinatariosDePublicacion(): Promise<
+    { propuestaId: string; titulo: string; posicion: number | null; correo: string; perfilId: string }[]
+  > {
+    const { rows } = await this.db.consultar<{
+      propuesta_id: string;
+      titulo: string;
+      posicion: number | null;
+      correo: string;
+      perfil_id: string;
+    }>(
+      `select p.id as propuesta_id, p.titulo,
+              case when r.posicion <= 3 then r.posicion end as posicion,
+              pf.correo, pf.id as perfil_id
+         from propuestas p
+         left join resultados r   on r.propuesta_id = p.id and r.publicado_en is not null
+         join equipo_miembros m   on m.equipo_id = p.equipo_id and m.estado = 'aceptado'
+         join perfiles pf         on pf.id = m.perfil_id
+        where p.estado = 'entregada'`,
+    );
+    return rows.map((f) => ({
+      propuestaId: f.propuesta_id,
+      titulo: f.titulo,
+      posicion: f.posicion,
+      correo: f.correo,
+      perfilId: f.perfil_id,
+    }));
+  }
+
   async hayPublicados(): Promise<boolean> {
     const { rows } = await this.db.consultar(
       'select 1 from resultados where publicado_en is not null limit 1',

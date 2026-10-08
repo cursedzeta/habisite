@@ -1,7 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { randomBytes } from 'node:crypto';
 import { BaseDeDatos } from '../comun/base-de-datos/base-de-datos.service.js';
+import { nuevoToken } from '../comun/tokens.js';
 import { aMiembro, type Equipo, type FilaMiembro, type Miembro } from './equipo.entity.js';
+
+export interface InvitacionPendiente {
+  miembroId: string;
+  equipoId: string;
+  /** El perfil que se reservó para el correo invitado. */
+  perfilId: string;
+  equipo: string | null;
+  /** «Nombre Apellido» del líder, o null si todavía no cargó sus datos. */
+  lider: string | null;
+}
 
 interface FilaEquipo {
   id: string;
@@ -10,9 +20,6 @@ interface FilaEquipo {
   token_invitacion: string;
   invitacion_activa: boolean;
 }
-
-/** 32 bytes en base64url: imposible de adivinar por fuerza bruta. */
-export const nuevoToken = (): string => randomBytes(32).toString('base64url');
 
 @Injectable()
 export class EquiposRepository {
@@ -99,16 +106,113 @@ export class EquiposRepository {
     return rows.map(aMiembro);
   }
 
-  /** Deja la invitación creada. Devuelve el token para armar el enlace del correo. */
-  async invitar(equipoId: string, perfilId: string): Promise<string> {
-    const token = nuevoToken();
-    await this.db.consultar(
+  /**
+   * Deja la invitación creada y devuelve el token para el enlace del correo.
+   *
+   * Si la persona ya estaba invitada, devuelve el token que ya tenía: antes se
+   * generaba uno nuevo que nunca se guardaba, y el correo salía con un enlace
+   * muerto. Si se había dado de baja, vuelve a quedar invitada. Si ya es
+   * integrante aceptado, devuelve null: no hay nada que invitar.
+   */
+  async invitar(equipoId: string, perfilId: string): Promise<string | null> {
+    const { rows } = await this.db.consultar<{ token: string }>(
       `insert into equipo_miembros (equipo_id, perfil_id, estado, token)
        values ($1, $2, 'invitado', $3)
-       on conflict (equipo_id, perfil_id) do nothing`,
-      [equipoId, perfilId, token],
+       on conflict (equipo_id, perfil_id) do update
+          set token       = coalesce(equipo_miembros.token, excluded.token),
+              invitado_en = case when equipo_miembros.estado = 'baja' then now()
+                                 else equipo_miembros.invitado_en end,
+              estado      = 'invitado',
+              aceptado_en = null,
+              baja_en     = null
+        where equipo_miembros.estado <> 'aceptado'
+    returning token`,
+      [equipoId, perfilId, nuevoToken()],
     );
-    return token;
+    return rows[0]?.token ?? null;
+  }
+
+  /** La invitación individual por correo, por su token. Solo si sigue pendiente. */
+  async invitacionPorToken(token: string): Promise<InvitacionPendiente | null> {
+    const { rows } = await this.db.consultar<{
+      id: string;
+      equipo_id: string;
+      perfil_id: string;
+      equipo: string | null;
+      lider: string | null;
+    }>(
+      `select m.id, m.equipo_id, m.perfil_id, e.nombre as equipo,
+              (select nullif(trim(p.nombre || ' ' || p.apellido), '')
+                 from equipo_miembros l join perfiles p on p.id = l.perfil_id
+                where l.equipo_id = m.equipo_id and l.es_lider and l.estado = 'aceptado'
+                limit 1) as lider
+         from equipo_miembros m
+         join equipos e on e.id = m.equipo_id
+        where m.token = $1 and m.estado = 'invitado'`,
+      [token],
+    );
+    const f = rows[0];
+    return f
+      ? { miembroId: f.id, equipoId: f.equipo_id, perfilId: f.perfil_id, equipo: f.equipo, lider: f.lider }
+      : null;
+  }
+
+  /**
+   * Acepta la invitación del correo con la cuenta que la persona usó para
+   * entrar, aunque no sea la del correo invitado. Ese es todo el punto del
+   * token (docs/05): la fila de la invitación pasa a ser de quien la abrió.
+   *
+   * Si el perfil que se había reservado para el correo invitado queda sin uso
+   * (nunca entró, no tiene datos ni otros equipos), se borra: si no, ese
+   * correo quedaría habilitado para entrar a un panel vacío.
+   */
+  async aceptarInvitacion(
+    invitacion: InvitacionPendiente,
+    perfilId: string,
+    terminosVersion: string,
+    ip: string | null,
+  ): Promise<void> {
+    await this.db.transaccion(async (cliente) => {
+      if (invitacion.perfilId !== perfilId) {
+        // Si ya tenía su propia fila en este equipo, la invitación ajena sobra.
+        const { rows } = await cliente.query(
+          'select 1 from equipo_miembros where equipo_id = $1 and perfil_id = $2',
+          [invitacion.equipoId, perfilId],
+        );
+        if (rows.length > 0) {
+          await cliente.query('delete from equipo_miembros where id = $1', [invitacion.miembroId]);
+        } else {
+          await cliente.query('update equipo_miembros set perfil_id = $2 where id = $1', [
+            invitacion.miembroId,
+            perfilId,
+          ]);
+        }
+      }
+
+      await cliente.query(
+        `update equipo_miembros
+            set estado = 'aceptado', aceptado_en = now(), baja_en = null, token = null,
+                terminos_en = now(), terminos_version = $3, terminos_ip = $4
+          where equipo_id = $1 and perfil_id = $2`,
+        [invitacion.equipoId, perfilId, terminosVersion, ip],
+      );
+
+      if (invitacion.perfilId !== perfilId) {
+        await cliente.query(
+          `delete from perfiles p
+            where p.id = $1
+              and p.google_sub is null and p.nombre = '' and p.rol = 'participante'
+              and p.terminos_en is null
+              and not exists (select 1 from equipo_miembros m where m.perfil_id = p.id)`,
+          [invitacion.perfilId],
+        );
+      }
+    });
+  }
+
+  /** Los integrantes que cuentan: los que aceptaron. A ellos les llegan los correos del equipo. */
+  async aceptados(equipoId: string): Promise<Miembro[]> {
+    return (await this.miembros(equipoId)).filter((m) => m.estado === 'aceptado');
   }
 
   /**
@@ -129,6 +233,10 @@ export class EquiposRepository {
        on conflict (equipo_id, perfil_id) do update
           set estado           = 'aceptado',
               aceptado_en      = now(),
+              -- Vuelve alguien que se había dado de baja: sin esto, la fila
+              -- quedaría aceptada con fecha de baja y la restricción la rechaza.
+              baja_en          = null,
+              token            = null,
               terminos_en      = now(),
               terminos_version = excluded.terminos_version,
               terminos_ip      = excluded.terminos_ip`,
@@ -139,9 +247,10 @@ export class EquiposRepository {
   /**
    * Baja voluntaria. La fila queda —hace falta el rastro de que aceptó las
    * bases— y, si era el líder, el rol pasa al integrante aceptado más antiguo.
+   * Devuelve quién quedó de líder, si cambió.
    */
-  async darDeBaja(equipoId: string, perfilId: string): Promise<void> {
-    await this.db.transaccion(async (cliente) => {
+  async darDeBaja(equipoId: string, perfilId: string): Promise<{ nuevoLiderId: string | null }> {
+    return this.db.transaccion(async (cliente) => {
       const { rows } = await cliente.query<{ es_lider: boolean }>(
         `update equipo_miembros
             set estado = 'baja', baja_en = now(), es_lider = false
@@ -150,19 +259,21 @@ export class EquiposRepository {
         [equipoId, perfilId],
       );
 
-      if (rows[0]?.es_lider) {
-        await cliente.query(
-          `update equipo_miembros
-              set es_lider = true
-            where id = (
-              select id from equipo_miembros
-               where equipo_id = $1 and estado = 'aceptado'
-               order by aceptado_en
-               limit 1
-            )`,
-          [equipoId],
-        );
-      }
+      if (!rows[0]?.es_lider) return { nuevoLiderId: null };
+
+      const { rows: nuevo } = await cliente.query<{ perfil_id: string }>(
+        `update equipo_miembros
+            set es_lider = true
+          where id = (
+            select id from equipo_miembros
+             where equipo_id = $1 and estado = 'aceptado'
+             order by aceptado_en
+             limit 1
+          )
+      returning perfil_id`,
+        [equipoId],
+      );
+      return { nuevoLiderId: nuevo[0]?.perfil_id ?? null };
     });
   }
 

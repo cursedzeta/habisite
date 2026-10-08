@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import type { Entorno } from '../configuracion/entorno.js';
+import { EquiposModule } from '../equipos/equipos.module.js';
 import { PerfilesModule } from '../perfiles/perfiles.module.js';
 import { AuthController } from './auth.controller.js';
 import { AuthService } from './auth.service.js';
@@ -11,6 +12,7 @@ import { SesionService } from './sesion.service.js';
 @Module({
   imports: [
     PerfilesModule,
+    EquiposModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService<Entorno, true>) => ({

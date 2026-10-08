@@ -1,6 +1,7 @@
 # 09 · El embudo de inscripción
 
-**Borrador para discutir.** Nada de esto está implementado todavía.
+**Implementado el 08.10.** Lo que el front tiene que hacer está en el
+[doc 11](11-formulario-para-el-front.md); los correos, en el [doc 10](10-correos.md).
 
 El concurso se publicita en varios lugares a la vez: LinkedIn, Instagram,
 otras redes y más. **Todos los canales llevan al mismo formulario, el de la
@@ -35,11 +36,12 @@ comparte el resto de la información y los enlaces a los paneles.
 - **Quien completa todo ve la pantalla de gracias y pasa solo a WhatsApp**
   después de unos segundos, con un botón por si el navegador frena la
   redirección.
-- **Los correos salen de `habisitechallenge@habisite.com`** (cambiado el
-  08.10). `habisite.com` ya estaba verificado en Resend (región São Paulo) y
-  nada más manda desde ahí, así que no hace falta el subdominio. Esa dirección
-  ya existe en Cloudflare Email Routing, así que **las respuestas llegan**: se
-  reenvían a la casilla configurada ahí. Se agregó `_dmarc` con `p=none`.
+- **Los correos salen de `noreply@habisite.com`**, sin dirección de
+  respuesta (cambiado el 08.10). `habisite.com` ya estaba verificado en Resend
+  (región São Paulo) y nada más manda desde ahí, así que no hace falta el
+  subdominio. Las consultas van al grupo de WhatsApp; lo que llegue a
+  `noreply@` lo descarta una regla de Cloudflare Email Routing. Se agregó
+  `_dmarc` con `p=none`.
 - **El formulario lleva Cloudflare Turnstile**, más un límite de pedidos por
   IP en la API. Widget «Habisite Challenge · inscripción», modo gestionado,
   hosts `challenge.habisite.com` y `localhost`. La clave de sitio es pública y
@@ -263,7 +265,7 @@ pero hoy pide todos los campos y no manda ningún correo.
 | No manda nada | Confirmación o alerta por Resend; el recordatorio lo manda la tarea periódica |
 | — | Columnas `recordatorio_para`, `recordatorio_enviado_en`, `clic_en` y el token de `/r/{token}` |
 | — | `GET /r/{token}`: guarda el clic y redirige al grupo |
-| — | Tarea cada 30 minutos (`@nestjs/schedule`): recordatorios vencidos y cierre de entregas |
+| — | Tarea cada 30 minutos (un `setInterval` adentro de la API, sin dependencias): recordatorios vencidos, cierre de entregas y reintento de correos. `POST /admin/tarea` la corre a mano |
 
 | No hay aceptación de bases en la inscripción | Columnas `terminos_en`, `terminos_version`, `terminos_ip` también en `perfiles` |
 | La versión de las bases la manda el cliente | La pone el servidor, desde `edicion.terminos_version`. El enlace sale de `edicion.terminos_url` (doc 05) |

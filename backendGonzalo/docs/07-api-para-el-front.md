@@ -41,6 +41,16 @@ ahí al front. Un `fetch` contra esa ruta no hace nada útil.
 del formulario de inscripción o de una invitación. Una cuenta de Google que no
 figure vuelve al front con `?error=sin-acceso`.
 
+**La excepción son las invitaciones** (desde el 08.10). Si el login lleva el
+token de una invitación válida, entra con cualquier cuenta de Google:
+
+```jsx
+// Invitación por correo: /invitacion/{token}
+<a href={`${API}/auth/google?invitacion=${token}&retorno=/invitacion/${token}`}>
+// Enlace del equipo: /equipo/sumarme/{token}
+<a href={`${API}/auth/google?equipo=${token}&retorno=/equipo/sumarme/${token}`}>
+```
+
 | Vuelve con | Qué pasó |
 |---|---|
 | `/ingresar?error=cancelado` | Canceló en la pantalla de Google |
@@ -69,8 +79,9 @@ dicen «Algo falló de nuestro lado»: el detalle queda en el log del servidor.
 | Código | Qué mostrar |
 |---|---|
 | `401` | La sesión venció → mandar a la pantalla de ingreso |
-| `403` | Su rol no puede hacer eso, o su cuenta está bloqueada |
-| `409` | Choque de estado: ya está inscripto, ya tiene equipo… |
+| `403` | Su rol no puede hacer eso, su cuenta está bloqueada, o **le faltan datos** (ver `perfilCompleto`) |
+| `409` | Choque de estado: ya tiene equipo, ya forma parte de otro… |
+| `429` | Demasiados envíos del formulario desde la misma IP |
 | `423` | **Las entregas están cerradas.** Es el que importa el día del cierre |
 | `413` | El PDF se pasa del tope |
 
@@ -89,9 +100,12 @@ que pedir la configuración aparte.**
   "correo": "ana@gmail.com",
   "nombre": "Ana",
   "apellido": "Duarte",
+  "telefono": "+5491123456789",
+  "tipoInstitucion": "universidad",
   "institucion": "FADU-UBA",
   "pais": "AR",
   "rol": "participante",
+  "perfilCompleto": true,
   "edicion": {
     "estado": "entregas",
     "cierreEntregas": "2026-10-15T23:59:59.000Z",
@@ -100,10 +114,17 @@ que pedir la configuración aparte.**
     "maxBytes": 31457280,
     "maxIntegrantes": 5,
     "maxPaginas": null,
-    "zonaHoraria": "America/Argentina/Buenos_Aires"
+    "zonaHoraria": "America/Argentina/Buenos_Aires",
+    "terminosUrl": null
   }
 }
 ```
+
+**`perfilCompleto: false`** significa que se inscribió dejando solo el correo.
+Antes de cualquier otra cosa, el panel le pide los datos que faltan con
+`PUT /yo` (mismos campos que el formulario, todos opcionales). Hasta entonces el
+servidor rechaza con `403` armar equipo, invitar y subir o entregar. Para
+jurados y admins siempre es `true`.
 
 **`entregasAbiertas` es lo único que hay que mirar** para decidir si se muestra
 el botón de entregar. Ya tiene en cuenta el cierre, el margen de gracia y la
@@ -130,6 +151,20 @@ inscripcion → entregas → preseleccion → final → cerrada → publicada
 
 ---
 
+## El formulario de la landing
+
+Tiene su propio documento: [11 · El formulario](11-formulario-para-el-front.md).
+Las rutas, todas **sin sesión**:
+
+| Método | Ruta | Para qué |
+|---|---|---|
+| `POST` | `/inscripcion` | El formulario. Solo `correo`, `aceptaBases` y `turnstileToken` son obligatorios |
+| `GET` | `/inscripcion/completar/{token}` | Precarga el formulario desde el correo de alerta |
+| `GET` | `/edicion/publica` | El enlace de las bases (`terminosUrl`) y la etapa del concurso |
+| `GET` | `/r/{token}` | El enlace al grupo de WhatsApp. Es una navegación, no un fetch |
+
+---
+
 ## Panel de concursantes
 
 ### El equipo
@@ -138,7 +173,9 @@ inscripcion → entregas → preseleccion → final → cerrada → publicada
 |---|---|---|
 | `GET` | `/mi-equipo` | El equipo, o **`null`** si todavía no tiene |
 | `POST` | `/mi-equipo` | Lo arma. Se puede crear vacío |
-| `POST` | `/mi-equipo/invitaciones` | Invita por correo *(solo el líder)* |
+| `POST` | `/mi-equipo/invitaciones` | Invita por correo *(solo el líder)*. Le llega un correo a cada uno |
+| `GET` | `/invitacion/{token}` | **Sin sesión.** Qué equipo invita y quién, para la pantalla de la invitación |
+| `POST` | `/invitacion/{token}/aceptar` | Acepta la invitación del correo, con la cuenta que sea |
 | `PUT` | `/mi-equipo/enlace` | Genera un enlace nuevo, invalida el anterior |
 | `DELETE` | `/mi-equipo/enlace` | Apaga el enlace |
 | `POST` | `/equipos/sumarme/{token}` | Se suma con el enlace compartido |
@@ -178,17 +215,26 @@ Tres cosas de esta respuesta:
   y el enlace para compartir. El enlace además **inscribe** a quien lo usa, así
   que sirve para gente que no pasó por el formulario.
 
-Sobre la card: el correo tipeado **tiene que ser el de la cuenta de Google del
-invitado**. Si no coincide, esa invitación queda muerta y nadie entiende por
-qué — conviene avisarlo ahí mismo. El enlace no tiene ese problema.
+**Sobre la card: desde el 08.10 el correo tipeado ya no tiene que coincidir**
+con la cuenta de Google del invitado. A cada dirección le llega un correo con un
+enlace a `/invitacion/{token}` (una pantalla que hay que hacer), y ese token es
+el que lo reconoce:
 
-`POST /mi-equipo/invitaciones` devuelve el enlace de cada invitación:
+1. La pantalla llama a `GET /invitacion/{token}` → `{ "equipo": "Estudio Norte", "invitadoPor": "Ana Duarte" }`.
+   Si responde `404`, la invitación ya se usó o no existe.
+2. El botón manda a `/auth/google?invitacion={token}&retorno=/invitacion/{token}`.
+3. De vuelta en la pantalla, ya con sesión, `POST /invitacion/{token}/aceptar`.
+
+`POST /mi-equipo/invitaciones` devuelve igual el enlace de cada invitación, por
+si hace falta pasarlo por otro lado. Reinvitar a alguien pendiente devuelve el
+mismo enlace y no le vuelve a mandar el correo:
 
 ```json
-[{ "correo": "tomas@gmail.com", "enlace": "https://…/invitacion/9fA…" }]
+[{ "correo": "tomas@gmail.com", "enlace": "https://challenge.habisite.com/invitacion/9fA…" }]
 ```
 
-*(El envío del correo todavía no está: falta verificar el dominio remitente.)*
+`POST /equipos/sumarme/{token}` ya no necesita cuerpo: la versión de las bases
+la pone el servidor. Si se manda `{ terminosVersion }`, se acepta y se ignora.
 
 ### La propuesta
 
@@ -367,7 +413,9 @@ Se sirven con `Content-Disposition: inline` y `Cache-Control: private, no-store`
 | `PUT` | `/admin/edicion/estado` | Mueve el concurso de etapa |
 | `POST` | `/admin/reparto` | Reparte las propuestas entre los jurados |
 | `POST` | `/admin/resultados/calcular` | Calcula el ranking |
-| `POST` | `/admin/resultados/publicar` | Publica el podio |
+| `POST` | `/admin/resultados/publicar` | Publica el podio y avisa por correo a todos los que entregaron |
+| `POST` | `/admin/jurados` | Invita a un jurado: `{ correo, nombre?, apellido? }`. Le llega un correo |
+| `POST` | `/admin/tarea` | Corre ahora la tarea de cada 30 minutos (cierre y recordatorios) |
 | `GET` | `/admin/resultados` | El ranking completo, con puntajes |
 
 Dos acciones tienen consecuencias que conviene advertir en pantalla antes de

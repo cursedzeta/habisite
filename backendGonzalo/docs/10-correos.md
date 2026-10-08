@@ -1,9 +1,12 @@
 # 10 · Los correos de la plataforma
 
-**Definido el 08.10.** Se implementan **todos juntos**. Todos salen por **Resend**, desde
-`Habisite Design Challenge <habisitechallenge@habisite.com>`, que también es
-el *reply-to*: Cloudflare Email Routing reenvía las respuestas. Ninguno está implementado: el único rastro en el
-código es un `TODO` en `equipos.service.ts`.
+**Implementados el 08.10, los diez.** Las plantillas están en
+`src/correo/plantillas.ts`. Todos salen por **Resend**, desde
+`Habisite Design Challenge <noreply@habisite.com>`, **sin dirección de
+respuesta** (decidido el 08.10). Las consultas van al grupo de WhatsApp, que es
+el canal oficial; el pie de cada correo lo dice. Lo que alguien responda igual
+lo descarta una regla de Cloudflare Email Routing, sin rebote. Al jurado, que
+no está en ese grupo, el pie le dice que contacte a la organización.
 
 Este documento es el catálogo: qué correo existe, qué lo dispara, a quién le
 llega y qué lleva. Las plantillas se diseñan de cero con la identidad de
@@ -65,7 +68,8 @@ flowchart LR
 
 - **Cuándo:** la inscripción llega con nombre, apellido, tipo, institución y
   país. También cuando alguien del camino B vuelve y completa lo que faltaba.
-- **Asunto:** «Ya estás inscripto en el Habisite Design Challenge 2026»
+- **Asunto:** «Ya estás inscrito en el Habisite Design Challenge 2026» (los
+  correos van en «tú» neutro, como la landing)
 - **Lleva:**
   - el botón al grupo de WhatsApp, por `/r/{token}`;
   - el recordatorio de entrar con **ese mismo correo de Google**;
@@ -199,3 +203,20 @@ No se hacen en esta etapa. Si hacen falta, se suman con el mismo servicio.
 4. **Todo enlace a WhatsApp pasa por `/r/{token}`**, nunca directo, así se
    frena el recordatorio y se puede cambiar el grupo sin reenviar nada.
 5. **Texto plano además del HTML**, para que no caigan en spam.
+
+## Cómo quedó implementado · 08.10
+
+- **Cada correo se anota antes de salir** en la tabla `envios`: código,
+  destinatario, la clave y los datos con los que se arma la plantilla. La API
+  responde enseguida y el correo sale después, desde una cola.
+- **La cola manda de a uno, cada 600 ms.** Resend admite 2 envíos por segundo:
+  el día que se publiquen los resultados salen cientos juntos, y sin esto
+  Resend los rechazaría.
+- **Estados:** `pendiente` → `enviado`, o `fallido` (se reintenta hasta 5
+  veces, desde la tarea periódica). `omitido` es cuando no hay
+  `RESEND_API_KEY`: en local y en el recorrido de pruebas no sale nada de
+  verdad, solo queda anotado.
+- **La clave de cada envío incluye al destinatario**, porque cada fila es un
+  correo a una persona: por ejemplo `c8:{propuesta}:{versión del PDF}:{perfil}`.
+- **Para ver las plantillas sin mandar nada**: armarlas con `armarCorreo()`
+  desde `dist/correo/plantillas.js` y abrir el HTML.

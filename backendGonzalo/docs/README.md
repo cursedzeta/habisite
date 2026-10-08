@@ -16,11 +16,11 @@ dónde*, no *cuál es la clave*.
 | [04 · Máquinas de estado](04-maquinas-de-estado.md) | Edición, propuesta, resultado, perfil y evaluación | Diseñado |
 | [05 · Inscripción por grupo](05-inscripcion-por-grupo.md) | Equipos, invitación por correo, términos y bajas | Diseñado |
 | [06 · Evaluación en dos vueltas](06-evaluacion-en-dos-vueltas.md) | Reparto por tercios, preselección y final | Implementado |
-| [07 · La API para el front](07-api-para-el-front.md) | **Para Tomás**: los 34 endpoints, qué pantalla usa cada uno y qué puede cambiar | Al día |
+| [07 · La API para el front](07-api-para-el-front.md) | **Para Tomás**: los 42 endpoints, qué pantalla usa cada uno y qué puede cambiar | Al día |
 | [08 · La base de datos local](08-base-de-datos-local.md) | Postgres 18 nativo en una PC, en Docker en la otra; el reseteo de contraseña y las migraciones | Andando en las dos |
-| [09 · El embudo de inscripción](09-embudo-de-inscripcion.md) | Formularios de cada canal → grupo de WhatsApp, bifurcaciones y alertas | **Borrador para discutir** |
-| [10 · Los correos](10-correos.md) | Catálogo de los correos de Resend: qué los dispara, a quién y qué llevan | **Borrador para discutir** |
-| [11 · El formulario · para Tomás](11-formulario-para-el-front.md) | **Para Tomás**: campos, validaciones, envío, respuestas y textos del formulario de inscripción | Contrato acordado, endpoint sin implementar |
+| [09 · El embudo de inscripción](09-embudo-de-inscripcion.md) | El formulario único → grupo de WhatsApp, bifurcaciones, alerta y recordatorio | Implementado |
+| [10 · Los correos](10-correos.md) | Catálogo de los correos de Resend: qué los dispara, a quién y qué llevan | Implementado |
+| [11 · El formulario · para Tomás](11-formulario-para-el-front.md) | **Para Tomás**: campos, validaciones, envío, respuestas y textos del formulario de inscripción | Implementado |
 
 ## Estado del código
 
@@ -35,8 +35,15 @@ dónde*, no *cuál es la clave*.
 - **10.09 · La base local anda.** `habisite_challenge` creada en el Postgres 18
   nativo, migraciones aplicadas y API comprobada contra datos reales.
   Ver [08](08-base-de-datos-local.md).
-- **Pendiente.** El envío de correos, que necesita verificar el dominio
-  remitente; y el despliegue en Railway.
+- **08.10 · Embudo, correos e invitaciones.** El formulario único de la
+  landing con Turnstile y límite por IP, los diez correos por Resend, la
+  aceptación de invitaciones con cualquier cuenta de Google, la tarea
+  periódica (recordatorio y cierre automático) y la migración `003`. Se
+  corrigieron dos errores que estaban de antes: la baja de un equipo respondía
+  500 y reinvitar generaba un enlace muerto. **42 endpoints**, y el recorrido
+  pasó de 62 a 123 comprobaciones.
+- **Pendiente.** El despliegue en Railway, el enlace del grupo de WhatsApp y
+  el texto de las bases.
 
 ## Decisiones ya cerradas
 

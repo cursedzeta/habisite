@@ -118,6 +118,51 @@ export class Entorno {
   @IsInt()
   @Min(1)
   MAX_BYTES_ARCHIVO = 31_457_280;
+
+  // La dirección pública de esta misma API. Hace falta para armar los enlaces
+  // de los correos que pasan por acá antes de ir a WhatsApp (/r/{token}).
+  @IsUrl({ require_tld: false, require_protocol: true })
+  API_URL = 'http://localhost:3000';
+
+  // ── Correo ─────────────────────────────────────────────────────────
+  // Vacía, los correos no salen: quedan anotados como «omitido» y van al log.
+  // Es lo que usa el recorrido de pruebas, para no mandarle nada a las
+  // direcciones inventadas de test.local.
+  @Transform(vacioAIndefinido)
+  @IsOptional()
+  @Matches(/^re_/, { message: 'RESEND_API_KEY no tiene la forma de una clave de Resend (re_…)' })
+  RESEND_API_KEY?: string;
+
+  @IsNotEmpty()
+  CORREO_REMITENTE = 'Habisite Design Challenge <noreply@habisite.com>';
+
+  // Vacía: los correos no llevan dirección de respuesta. Es lo que se usa: las
+  // consultas van al grupo de WhatsApp y lo que llegue a noreply@ lo descarta
+  // Cloudflare. Queda por si algún día se quiere una casilla que responda.
+  @Transform(vacioAIndefinido)
+  @IsOptional()
+  @IsString()
+  CORREO_RESPONDER_A?: string;
+
+  // ── Turnstile ──────────────────────────────────────────────────────
+  // La clave SECRETA del widget. Para probar sin widget, Cloudflare tiene
+  // 1x0000000000000000000000000000000AA (siempre aprueba).
+  @IsNotEmpty({ message: 'Falta TURNSTILE_SECRET: sin él no se puede validar el formulario' })
+  TURNSTILE_SECRET: string;
+
+  // ── WhatsApp ───────────────────────────────────────────────────────
+  // Vacío mientras no exista el grupo: /r/{token} manda al front en su lugar.
+  @Transform(vacioAIndefinido)
+  @IsOptional()
+  @IsUrl({ require_protocol: true })
+  WHATSAPP_URL?: string;
+
+  // Cada cuántos minutos corre la tarea de recordatorios y cierre. 0 la
+  // apaga (el recorrido de pruebas la corre a mano con POST /admin/tarea).
+  @Transform(aNumero)
+  @IsInt()
+  @Min(0)
+  TAREA_INTERVALO_MINUTOS = 30;
 }
 
 /** Lo llama ConfigModule con el .env ya mezclado con process.env. */

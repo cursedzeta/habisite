@@ -6,6 +6,7 @@ import { SesionGuard } from './auth/sesion.guard.js';
 import { RolGuard } from './comun/autorizacion/rol.guard.js';
 import { BaseDeDatosModule } from './comun/base-de-datos/base-de-datos.module.js';
 import { validarEntorno } from './configuracion/entorno.js';
+import { CorreoModule } from './correo/correo.module.js';
 import { EdicionModule } from './edicion/edicion.module.js';
 import { EquiposModule } from './equipos/equipos.module.js';
 import { EvaluacionModule } from './evaluacion/evaluacion.module.js';
@@ -13,6 +14,7 @@ import { PerfilesModule } from './perfiles/perfiles.module.js';
 import { PropuestasModule } from './propuestas/propuestas.module.js';
 import { ResultadosModule } from './resultados/resultados.module.js';
 import { SaludModule } from './salud/salud.module.js';
+import { TareasModule } from './tareas/tareas.module.js';
 
 @Module({
   imports: [
@@ -20,6 +22,7 @@ import { SaludModule } from './salud/salud.module.js';
     // y dice cuál es la variable — mejor que fallar en el primer login.
     ConfigModule.forRoot({ isGlobal: true, cache: true, validate: validarEntorno }),
     BaseDeDatosModule,
+    CorreoModule,
     SaludModule,
     EdicionModule,
     PerfilesModule,
@@ -28,6 +31,7 @@ import { SaludModule } from './salud/salud.module.js';
     PropuestasModule,
     EvaluacionModule,
     ResultadosModule,
+    TareasModule,
   ],
   providers: [
     // El ORDEN importa: los guards globales corren en el orden en que se

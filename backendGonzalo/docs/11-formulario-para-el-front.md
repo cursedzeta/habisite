@@ -8,10 +8,9 @@ responda.
 El porqué de cada decisión está en el [doc 09](09-embudo-de-inscripcion.md).
 Los correos que dispara, en el [doc 10](10-correos.md).
 
-> **Estado:** el endpoint **todavía no está implementado**. Este documento es
-> el contrato acordado; cuando esté hecho va a aparecer en
-> `contrato/openapi.yaml` y te aviso. Mientras tanto se puede construir contra
-> las respuestas de ejemplo de abajo.
+> **Estado (08.10): implementado.** Todo lo de este documento ya está en la
+> API y en `contrato/openapi.yaml`. Con la API corriendo en local, se puede
+> probar desde `http://localhost:3000/docs`.
 
 ---
 
@@ -266,22 +265,21 @@ No es diseño, pero son textos que hoy dicen algo que ya no es cierto:
 confirmadas. Hasta que la organización confirme las reales, mejor no mostrar
 ninguna.
 
-**El enlace de «las bases»:** la URL va a venir de la API (`GET /edicion`
-la va a incluir como `terminosUrl`). Hasta que exista el texto de las bases,
-puede quedar en `null`: en ese caso, mostrar el texto sin enlace.
+**El enlace de «las bases»:** la URL la da `GET /edicion/publica` (sin sesión)
+en `terminosUrl`. Hasta que exista el texto de las bases viene en `null`: en
+ese caso, mostrar el texto sin enlace.
 
 ---
 
 ## 6 · Lo que viene después
 
-Pantallas que también van a hacer falta, con su especificación aparte cuando
-el back esté:
+Pantallas que también hacen falta. Las rutas ya están; el detalle está en el
+[doc 07](07-api-para-el-front.md):
 
 - **`/invitacion/{token}`:** «Ana te invitó a su equipo», con el botón para
   entrar con Google y aceptar.
-- **Completar datos en el panel:** quien se inscribió solo con el correo y
-  entra con Google ve primero un pedido de completar sus datos. `GET /yo` va a
-  traer un campo que lo indica.
+- **Completar datos en el panel:** si `GET /yo` trae `perfilCompleto: false`,
+  el panel le pide primero los datos que faltan y los manda con `PUT /yo`.
 
 ---
 
@@ -289,5 +287,5 @@ el back esté:
 
 | | |
 |---|---|
-| API | `http://localhost:3000` |
+| API | `http://localhost:3000` · documentación navegable en `/docs` |
 | Turnstile | La clave de sitio real funciona en `localhost`. Para forzar casos, Cloudflare tiene claves de prueba: `1x00000000000000000000AA` (siempre aprueba) y `2x00000000000000000000AB` (siempre rechaza) |

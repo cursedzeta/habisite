@@ -29,6 +29,12 @@ export class EdicionResumenDto {
 
   @ApiProperty({ example: 'America/Argentina/Buenos_Aires' })
   zonaHoraria: string;
+
+  @ApiProperty({
+    nullable: true,
+    description: 'Dónde se leen las bases. `null` mientras no estén publicadas: mostrar el texto sin enlace.',
+  })
+  terminosUrl: string | null;
 }
 
 /** La respuesta de `GET /yo`: la primera llamada de todas las pantallas. */
@@ -45,6 +51,12 @@ export class YoDto {
   @ApiProperty()
   apellido: string;
 
+  @ApiProperty({ nullable: true, example: '+5491123456789' })
+  telefono: string | null;
+
+  @ApiProperty({ nullable: true, enum: ['universidad', 'trabajo', 'independiente'] })
+  tipoInstitucion: string | null;
+
   @ApiProperty({ nullable: true })
   institucion: string | null;
 
@@ -56,6 +68,14 @@ export class YoDto {
     description: 'Decide a qué panel entra.',
   })
   rol: string;
+
+  @ApiProperty({
+    description:
+      'Si es `false`, el panel tiene que pedirle los datos que faltan (`PUT /yo`) antes ' +
+      'de dejarlo armar equipo o subir algo: el servidor lo rechaza con 403 igual. ' +
+      'Siempre `true` para jurados y admins.',
+  })
+  perfilCompleto: boolean;
 
   @ApiProperty({ type: EdicionResumenDto })
   edicion: EdicionResumenDto;

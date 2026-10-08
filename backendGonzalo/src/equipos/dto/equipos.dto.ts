@@ -13,8 +13,8 @@ export class InvitarDto {
   @ApiProperty({
     type: [String],
     description:
-      'Un correo por integrante. Ojo: tiene que ser el de su cuenta de Google, ' +
-      'porque si no coincide la invitación queda muerta.',
+      'Un correo por integrante. A cada uno le llega un enlace que sirve con cualquier ' +
+      'cuenta de Google, no solo la de ese correo.',
     example: ['tomas@gmail.com', 'sol@gmail.com'],
   })
   @IsArray()
@@ -25,13 +25,29 @@ export class InvitarDto {
 }
 
 export class AceptarInvitacionDto {
-  @ApiProperty({
-    description: 'Versión de las bases que la persona aceptó. Queda guardada con la fecha y la IP.',
-    example: '2026-09-01',
+  @ApiPropertyOptional({
+    deprecated: true,
+    description:
+      'Ya no se usa: la versión de las bases la pone el servidor (la vigente en la edición). ' +
+      'Se acepta para no romper llamadas viejas, pero se ignora.',
   })
+  @IsOptional()
   @IsString()
   @MaxLength(40)
-  terminosVersion: string;
+  terminosVersion?: string;
+}
+
+/** Lo que muestra la pantalla de una invitación por correo, antes del login. */
+export class InvitacionDto {
+  @ApiProperty({ nullable: true, example: 'Estudio Norte' })
+  equipo: string | null;
+
+  @ApiProperty({
+    nullable: true,
+    example: 'Ana Duarte',
+    description: 'Quién armó el equipo. `null` si todavía no cargó su nombre.',
+  })
+  invitadoPor: string | null;
 }
 
 export class MiembroDto {

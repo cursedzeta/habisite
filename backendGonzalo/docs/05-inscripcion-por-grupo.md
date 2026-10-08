@@ -229,7 +229,7 @@ no se agregan autores después de entregar.
 En los dos casos, **sumar gente se cierra junto con las entregas**: no se
 agregan autores después de entregar.
 
-## Aceptar una invitación por correo · definido 08.10
+## Aceptar una invitación por correo · implementado 08.10
 
 Hoy la card genera enlaces `/invitacion/{token}`, pero **no existe ningún
 endpoint que los acepte**. Se completa así:
@@ -264,6 +264,18 @@ nunca se guardó: el correo saldría con un enlace muerto. Pasa a **reusar el
 token existente** si la invitación sigue pendiente.
 
 Del lado del front hace falta la pantalla `/invitacion/{token}`.
+
+El mismo ajuste del login sirve para el **enlace del equipo**:
+`/auth/google?equipo={token}` deja entrar a una cuenta que no estaba inscripta,
+que es lo que este documento prometía desde el principio («ese mismo enlace lo
+inscribe»).
+
+### Un error que apareció al implementarlo
+
+**Darse de baja respondía siempre 500.** La restricción `coherencia_aceptacion`
+exigía que solo un integrante «aceptado» tuviera fecha de aceptación, pero la
+baja conserva esa fecha a propósito. El recorrido de pruebas no cubría la baja.
+Lo corrige la migración `003`, y ahora el recorrido la prueba.
 
 ## Cuando alguien se da de baja
 

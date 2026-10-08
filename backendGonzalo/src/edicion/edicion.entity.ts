@@ -18,6 +18,10 @@ export interface Edicion {
   maxBytes: number;
   maxPaginas: number | null;
   semillaReparto: string | null;
+  /** La versión vigente de las bases. La graba el servidor en cada aceptación. */
+  terminosVersion: string | null;
+  /** Dónde se leen las bases. `null` mientras no estén publicadas. */
+  terminosUrl: string | null;
   /** Calculado en SQL: ya tiene en cuenta el margen de gracia. */
   entregasAbiertas: boolean;
 }
@@ -34,6 +38,8 @@ export interface FilaEdicion {
   max_bytes: number;
   max_paginas: number | null;
   semilla_reparto: string | null;
+  terminos_version: string | null;
+  terminos_url: string | null;
   entregas_abiertas: boolean;
 }
 
@@ -49,5 +55,7 @@ export const aEdicion = (f: FilaEdicion): Edicion => ({
   maxBytes: f.max_bytes,
   maxPaginas: f.max_paginas,
   semillaReparto: f.semilla_reparto,
+  terminosVersion: f.terminos_version,
+  terminosUrl: f.terminos_url,
   entregasAbiertas: f.entregas_abiertas,
 });
