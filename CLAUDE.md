@@ -122,8 +122,17 @@ workspace *GrowthIMBAR's Projects*, único entorno `production`.
 | Servicio | Root | Dominio |
 |---|---|---|
 | `challenge-web` | `web/` | challenge.habisite.com |
+| `challenge-api` | `backendGonzalo/` | api.challenge.habisite.com |
+| `Postgres` | — | solo red privada (`postgres.railway.internal`) |
 
-Espacio previsto para `api/`, la base y el sitio institucional migrado.
+La API y su base se desplegaron el 08.10; el detalle está en
+`backendGonzalo/docs/02-arquitectura.md`. Queda espacio para el sitio
+institucional migrado.
+
+⚠️ **`api.challenge` va con la nube GRIS (DNS only), no naranja.** El
+certificado gratis de Cloudflare cubre un solo nivel (`*.habisite.com`) y
+`api.challenge.habisite.com` tiene dos: con proxy, el navegador da error de
+certificado. En gris, el certificado lo emite Railway.
 
 ### El proyecto viejo (borrado)
 

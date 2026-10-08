@@ -25,8 +25,8 @@ workspace *GrowthIMBAR's Projects*, único entorno `production`.
 | Servicio | Root | Dominio | Estado |
 |---|---|---|---|
 | `challenge-web` | `web/` | `challenge.habisite.com` | **desplegado** |
-| *(la API)* | `backendGonzalo/` | a definir | no existe |
-| *(la base)* | — | — | no existe |
+| `challenge-api` | `backendGonzalo/` | `api.challenge.habisite.com` | **desplegado 08.10** |
+| `Postgres` | — | solo red privada | **desplegado 08.10** |
 
 ```mermaid
 flowchart TB
@@ -317,5 +317,56 @@ alta de inscripción, choque de correo repetido con `409`, `GET /yo` con rol y
 edición, y los siete criterios sumando 1. Cero `500` en el log.
 Ver [08 · La base de datos local](08-base-de-datos-local.md).
 
-**Falta el despliegue** —el servicio de la API y el de Postgres en Railway— y el
-envío de correos, que necesita verificar el dominio remitente.
+**08.10 · Desplegado en Railway.** Ver la sección de abajo.
+
+## El despliegue en Railway · 08.10
+
+Proyecto `habisite-plataforma`, entorno `production`, región US East (la
+misma que la landing). Se hizo con el CLI, desde la cuenta GrowthIMBAR.
+
+| Servicio | Qué es |
+|---|---|
+| `challenge-api` | La API, desde GitHub (`cursedzeta/habisite`, rama `main`) |
+| `Postgres` | La base. **Sin acceso público**: solo se llega desde adentro de Railway |
+
+La configuración de `challenge-api`:
+
+| | |
+|---|---|
+| Root directory | `/backendGonzalo` |
+| Watch paths | `backendGonzalo/**` (un commit de `web/` no la redespliega) |
+| Build | `npm run build` (Railpack; toma Node 24 de `engines` en el `package.json`) |
+| Pre-deploy | `npm run migrar` — aplica las migraciones antes de cada versión |
+| Start | `node dist/main.js` |
+| Health check | `/salud`, 120 s |
+| App Sleeping | **apagado**: la tarea periódica necesita la API prendida |
+| Reinicio | si falla, hasta 5 veces |
+
+Las variables viven en Railway, no en el repo. `DATABASE_URL` es una referencia
+(`${{Postgres.DATABASE_URL}}`), no un valor escrito a mano. El `JWT_SECRET` es
+distinto del de desarrollo.
+
+### El dominio
+
+En Cloudflare, zona `habisite.com`:
+
+| Tipo | Nombre | Proxy |
+|---|---|---|
+| `CNAME` | `api.challenge` → el que da Railway | **DNS only (gris)** |
+| `TXT` | `_railway-verify.api.challenge` | — |
+
+**Gris, a diferencia de la landing.** El certificado gratis de Cloudflare cubre
+un solo nivel de subdominio (`*.habisite.com`): sirve para `challenge` pero no
+para `api.challenge`. Con la nube naranja el navegador daría error de
+certificado. En gris lo emite Railway, y tardó unos tres minutos.
+
+Consecuencia: los pedidos a la API no pasan por Cloudflare, así que no llega
+la cabecera `CF-Connecting-IP`. La IP del cliente sale de `X-Forwarded-For`
+con `trust proxy`, que es lo que pone el proxy de Railway.
+
+### Comprobado en producción
+
+`/salud` por HTTPS, `/docs`, `/edicion/publica` (lee la base con la migración
+003), `/yo` sin sesión → 401, el login redirigiendo a Google con la URI de
+producción, CORS solo para la landing, y Turnstile real rechazando un token
+falso. Las tres migraciones aplicadas por el pre-deploy.

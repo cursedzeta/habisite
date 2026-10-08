@@ -42,8 +42,11 @@ dónde*, no *cuál es la clave*.
   corrigieron dos errores que estaban de antes: la baja de un equipo respondía
   500 y reinvitar generaba un enlace muerto. **42 endpoints**, y el recorrido
   pasó de 62 a 123 comprobaciones.
-- **Pendiente.** El despliegue en Railway, el enlace del grupo de WhatsApp y
-  el texto de las bases.
+- **08.10 · Desplegado en Railway.** `challenge-api` en
+  `https://api.challenge.habisite.com` y Postgres en la red privada. Ver
+  [02](02-arquitectura.md#el-despliegue-en-railway--0810).
+- **Pendiente.** El enlace del grupo de WhatsApp, el texto de las bases y que
+  el front conecte el formulario.
 
 ## Decisiones ya cerradas
 
