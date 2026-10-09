@@ -215,6 +215,30 @@ html{scroll-behavior:smooth}
 }
 
 /* ==========================================================
+   Inscripción: lo que el formulario conectado a la API agregó
+
+   El diseño traía cinco campos sin ayudas ni errores. Sobre el
+   naranja, la ayuda gris no se lee y el error naranja directamente
+   desaparece: los dos pasan a los colores de la sección.
+   ========================================================== */
+.signup .hs-field__hint{color:var(--white-72)}
+.signup .hs-field__error{color:var(--ink)}
+
+/* Prefijo del país + número, en una sola fila. */
+.telefono{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  gap:var(--space-2);
+}
+
+/* El correo queda fijo cuando se completa una inscripción desde el
+   correo de alerta: se completa esa, no se crea otra. */
+.signup .hs-input[readonly]{color:var(--white-72);cursor:default}
+
+/* El enlace a las bases, dentro del texto del tilde. */
+.signup .hs-check a{color:inherit;text-decoration:underline}
+
+/* ==========================================================
    Accesibilidad
    ========================================================== */
 @media (prefers-reduced-motion:reduce){

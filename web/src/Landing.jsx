@@ -5,13 +5,10 @@ import {
   Eyebrow,
   SectionHeader,
   IconButton,
-  Field,
-  Input,
-  Select,
-  Checkbox,
   Navbar,
   Footer,
 } from './ds'
+import Inscripcion from './Inscripcion'
 
 const NAV = [
   ['El reto', 'reto'],
@@ -29,13 +26,13 @@ const JURY = [
   { role: 'Sostenibilidad', bio: 'Consultora en energía, agua y ciclo de vida de materiales para vivienda de baja huella.' },
 ]
 
+/* Sin fechas a propósito: las que traía el diseño ya pasaron y nunca
+   estuvieron confirmadas. Vuelven cuando la organización las defina. */
 const FACTS = [
-  ['Período del reto', '25 mayo – 7 junio'],
-  ['Anuncio de ganadores', '13 junio 2026'],
-  ['Modalidad', 'Individual · en línea'],
+  ['Modalidad', 'Individual o en equipo · en línea'],
+  ['Entrega', 'Un único PDF'],
+  ['Calendario', 'Se comparte en el grupo oficial'],
 ]
-
-const PAISES = ['Argentina', 'Bolivia', 'Brasil', 'Chile', 'Colombia', 'Costa Rica', 'Ecuador', 'México', 'Paraguay', 'Perú', 'Uruguay', 'Otro']
 
 /* El desplazamiento lo resuelve el navegador con scroll-margin-top.
    Restar pixeles a mano dejaba de ser correcto con el zoom del 90%. */
@@ -53,9 +50,9 @@ function Hero({ refHero }) {
             <h1 className="hero__h1">
               Habisite
               <br />
-              Design
+              Challenge
               <br />
-              Challenge <span>2026</span>
+              <span>2026-II</span>
             </h1>
             <p className="hero__sub">
               Un reto abierto al talento emergente de América Latina para imaginar nuevas formas de
@@ -67,8 +64,8 @@ function Hero({ refHero }) {
             <p className="hero__rotulo">PREMIO</p>
             <p className="hero__valor">USD 5.000</p>
 
-            <p className="hero__rotulo">FECHA FINAL DE INSCRIPCION</p>
-            <p className="hero__valor">24 MAYO 2026</p>
+            <p className="hero__rotulo">INSCRIPCIÓN</p>
+            <p className="hero__valor">SIN COSTO</p>
 
             <Button
               href="#inscripcion"
@@ -115,7 +112,7 @@ function Jurado() {
                 Quién lee tu <em>propuesta</em>
               </>
             }
-            text="Seis perfiles del oficio: proyecto, paisaje, estructura, curaduría, desarrollo y sostenibilidad. Cada propuesta pasa por todos."
+            text="Perfiles del oficio: proyecto, paisaje, estructura, curaduría, desarrollo y sostenibilidad."
           />
           <div className="arrows">
             <IconButton icon="arrow-left" label="Anterior" onClick={() => slide(-1)} />
@@ -137,7 +134,7 @@ function Jurado() {
         </div>
 
         <p className="fine">
-          Los nombres y retratos se publican con las bases del concurso, en abril 2026.
+          Los nombres y retratos del jurado 2026-II se publican próximamente.
         </p>
       </div>
     </section>
@@ -169,8 +166,7 @@ function Reto() {
             en una sola entrega.
           </p>
           <p className="fine">
-            Entrega digital: memoria descriptiva, planos esquemáticos y una lámina de presentación.
-            Sin maquetas físicas.
+            Entrega digital en un único PDF, con todo el proyecto adentro. Sin maquetas físicas.
           </p>
         </div>
 
@@ -241,144 +237,6 @@ function Premios() {
         <p className="fine">
           Certificado oficial e insignia digital para todo participante que complete la entrega.
         </p>
-      </div>
-    </section>
-  )
-}
-
-function Inscripcion() {
-  const [sent, setSent] = useState(null)
-  const [v, setV] = useState({ nombre: '', apellido: '', email: '', institucion: '', pais: '', terms: false })
-
-  function set(k, val) {
-    setV(Object.assign({}, v, { [k]: val }))
-  }
-
-  function submit(e) {
-    e.preventDefault()
-    if (!v.nombre.trim() || !/.+@.+\..+/.test(v.email) || !v.terms) {
-      setSent(false)
-      return
-    }
-    setSent(true)
-  }
-
-  return (
-    <section className="signup" id="inscripcion" data-screen-label="Inscripción">
-      <div className="page signup__in">
-        <div>
-          <SectionHeader
-            onBrand
-            eyebrow="Inscripción"
-            title={
-              <>
-                Pre-registro <em>2026</em>
-              </>
-            }
-          />
-          <p className="signup__apoyo">
-            Deja tus datos y te enviamos las bases, el calendario y el enlace al grupo oficial del
-            concurso.
-          </p>
-          <ol className="steps">
-            <li>
-              <b>01</b>
-              <span>Completas el pre-registro. Sin costo.</span>
-            </li>
-            <li>
-              <b>02</b>
-              <span>Recibes las bases y la plantilla de entrega.</span>
-            </li>
-            <li>
-              <b>03</b>
-              <span>Subes tu propuesta antes del 7 de junio.</span>
-            </li>
-          </ol>
-        </div>
-
-        {sent === true ? (
-          <div className="done" role="status">
-            <Eyebrow tone="on-brand">Pre-registro recibido</Eyebrow>
-            <p>
-              Listo, {v.nombre.trim().split(' ')[0]}. Te escribimos a <b>{v.email.trim()}</b> con las
-              bases y el enlace al grupo oficial.
-            </p>
-          </div>
-        ) : (
-          <form className="fields" onSubmit={submit} noValidate>
-            <Field label="Nombre" htmlFor="nombre">
-              <Input
-                onBrand
-                id="nombre"
-                value={v.nombre}
-                placeholder="Juan Carlos"
-                onChange={(e) => set('nombre', e.target.value)}
-              />
-            </Field>
-
-            <Field label="Apellido" htmlFor="apellido">
-              <Input
-                onBrand
-                id="apellido"
-                value={v.apellido}
-                placeholder="Pérez García"
-                onChange={(e) => set('apellido', e.target.value)}
-              />
-            </Field>
-
-            <Field className="full" label="Correo electrónico" htmlFor="email">
-              <Input
-                onBrand
-                id="email"
-                type="email"
-                value={v.email}
-                placeholder="tu@correo.com"
-                onChange={(e) => set('email', e.target.value)}
-              />
-            </Field>
-
-            <Field label="Universidad o estudio" htmlFor="institucion">
-              <Input
-                onBrand
-                id="institucion"
-                value={v.institucion}
-                placeholder="Facultad, escuela u oficina"
-                onChange={(e) => set('institucion', e.target.value)}
-              />
-            </Field>
-
-            <Field label="País" htmlFor="pais">
-              <Select onBrand id="pais" value={v.pais} onChange={(e) => set('pais', e.target.value)}>
-                <option value="">Selecciona</option>
-                {PAISES.map((p) => (
-                  <option key={p} value={p}>
-                    {p}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-
-            <div className="full">
-              <Checkbox
-                onBrand
-                checked={v.terms}
-                onChange={(e) => set('terms', e.target.checked)}
-                label="Acepto las bases del concurso y el tratamiento de mis datos para recibir información del Habisite Design Challenge 2026."
-              />
-            </div>
-
-            <div className="full submit">
-              <Button variant="ink" size="lg" type="submit">
-                Pre-registrarme
-              </Button>
-              <span className="signup__fine">
-                {sent === false
-                  ? 'Revisa nombre, correo y aceptación de las bases.'
-                  : 'Cierra el 24 de mayo 2026 · sin costo'}
-              </span>
-            </div>
-          </form>
-        )}
       </div>
     </section>
   )
@@ -467,9 +325,8 @@ export default function Landing() {
         columns={[
           { title: 'Concurso', links: ['El reto', 'Jurado', 'Premios', 'Inscripción'] },
           { title: 'Estudio', links: ['Proyectos', 'Talleres 2026', 'Publicaciones', 'Contacto'] },
-          { title: 'Contacto', links: ['challenge@habisite.com', '+52 55 1234 5678', 'Instagram'] },
         ]}
-        note="© 2026 Habisite · Design Challenge — bases sujetas a publicación en abril 2026"
+        note="© 2026 Habisite · Challenge 2026-II"
       />
       </div>
     </>
