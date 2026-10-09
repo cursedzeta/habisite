@@ -43,6 +43,13 @@ export class Enlaces {
     return `${this.api}/auth/google?retorno=/`;
   }
 
+  /** El enlace del correo de ingreso (docs/12). Lo canjea el front con un POST:
+   *  si fuera un GET directo a la API, los antivirus de correo que abren los
+   *  enlaces para revisarlos lo gastarían antes que la persona. */
+  ingresoPorCorreo(token: string): string {
+    return `${this.front}/ingresar?enlace=${token}`;
+  }
+
   panel(): string {
     return `${this.front}/`;
   }

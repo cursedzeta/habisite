@@ -146,6 +146,14 @@ reemplaza a los dos.
 - **Lo que no puede llevar nunca:** puntaje, nota, posición fuera del podio ni
   devolución. C13b no dice «no ganaste»: dice que ya están los resultados.
 
+### C14 · Tu enlace para entrar · 09.10
+
+Lo pide la persona desde la pantalla de ingreso, en vez de entrar con Google
+(ver [doc 12](12-ingreso-por-enlace.md)). Le llega a cualquier rol, así que
+lleva el pie neutro del jurado y no manda al grupo. Vence a los 15 minutos y
+sirve una vez. La clave es la del enlace (`c14:{id}`), no la de la persona:
+cada pedido es un correo distinto.
+
 ---
 
 ## Los propuestos que se aprobaron · 08.10

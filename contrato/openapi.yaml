@@ -221,6 +221,47 @@ paths:
       summary: Arranca el ingreso con Google
       tags: &a3
         - Autenticación
+  /auth/enlace:
+    post:
+      description: "Responde 204 siempre, esté o no inscripto el correo: decir «no
+        figura» filtraría quiénes se anotaron. Si está, le llega un enlace que
+        vence a los 15 minutos y sirve una vez."
+      operationId: AuthController_pedirEnlace
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PedirEnlaceDto"
+      responses:
+        "204":
+          description: ""
+      summary: Pide un enlace de ingreso por correo
+      tags: *a3
+  /auth/enlace/canjear:
+    post:
+      description: "Lo llama el front desde /ingresar?enlace=…, con `credentials:
+        include`. Es un POST y no un GET a propósito: los antivirus de correo
+        abren los enlaces para revisarlos y gastarían el de un solo uso. 401 si
+        venció o ya se usó."
+      operationId: AuthController_canjearEnlace
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CanjearEnlaceDto"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RespuestaCanjeDto"
+      summary: Canjea el enlace del correo por una sesión
+      tags: *a3
   /auth/salir:
     post:
       operationId: AuthController_salir
@@ -1121,6 +1162,37 @@ components:
         - nombre
         - apellido
         - estado
+    PedirEnlaceDto:
+      type: object
+      properties:
+        correo:
+          type: string
+          description: El correo con el que se inscribió.
+          example: ana@estudio.com
+        retorno:
+          type: string
+          description: Ruta del front a la que volver después de entrar. Solo rutas
+            internas.
+          example: /panel
+      required:
+        - correo
+    CanjearEnlaceDto:
+      type: object
+      properties:
+        token:
+          type: string
+          description: El token que trae el enlace del correo (`?enlace=`).
+      required:
+        - token
+    RespuestaCanjeDto:
+      type: object
+      properties:
+        retorno:
+          type: string
+          description: A dónde llevar a la persona ahora que tiene sesión.
+          example: /panel
+      required:
+        - retorno
     MiembroDto:
       type: object
       properties:

@@ -6,6 +6,9 @@ import { EquiposModule } from '../equipos/equipos.module.js';
 import { PerfilesModule } from '../perfiles/perfiles.module.js';
 import { AuthController } from './auth.controller.js';
 import { AuthService } from './auth.service.js';
+import { EnlaceIngresoRepository } from './enlace-ingreso.repository.js';
+import { EnlaceIngresoService } from './enlace-ingreso.service.js';
+import { LimitadorInscripcion } from '../perfiles/limitador.js';
 import { SesionGuard } from './sesion.guard.js';
 import { SesionService } from './sesion.service.js';
 
@@ -22,7 +25,14 @@ import { SesionService } from './sesion.service.js';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, SesionService, SesionGuard],
+  providers: [
+    AuthService,
+    SesionService,
+    SesionGuard,
+    EnlaceIngresoService,
+    EnlaceIngresoRepository,
+    LimitadorInscripcion,
+  ],
   // SesionGuard sale exportado porque AppModule lo registra como guard global.
   exports: [SesionService, SesionGuard],
 })

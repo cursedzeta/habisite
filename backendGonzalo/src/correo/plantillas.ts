@@ -20,7 +20,8 @@ export type CodigoCorreo =
   | 'c8'
   | 'c9'
   | 'c13a'
-  | 'c13b';
+  | 'c13b'
+  | 'c14';
 
 export interface CorreoArmado {
   asunto: string;
@@ -75,6 +76,11 @@ export interface DatosC13a {
 export interface DatosC13b {
   enlacePanel: string;
 }
+export interface DatosC14 {
+  nombre: string | null;
+  enlace: string;
+  minutos: number;
+}
 
 export interface DatosPorCodigo {
   c1: DatosC1;
@@ -87,6 +93,7 @@ export interface DatosPorCodigo {
   c9: DatosC9;
   c13a: DatosC13a;
   c13b: DatosC13b;
+  c14: DatosC14;
 }
 
 // ── Piezas comunes ───────────────────────────────────────────────────
@@ -441,6 +448,33 @@ const plantillas: { [C in CodigoCorreo]: (d: DatosPorCodigo[C]) => CorreoArmado 
         '',
         `Ver los resultados: ${d.enlacePanel}`,
       ),
+    };
+  },
+
+  // El enlace para entrar sin Google (docs/12). Sale para cualquier rol,
+  // así que el pie es el neutro del jurado y no manda al grupo.
+  c14: (d) => {
+    const titulo = 'Tu enlace para entrar';
+    const aviso = `El enlace vence en ${d.minutos} minutos y sirve una sola vez. Si no lo pediste, ignora este correo: nadie puede entrar sin abrirlo.`;
+    return {
+      asunto: 'Tu enlace para entrar a la plataforma · Habisite Challenge',
+      html: marco(
+        titulo,
+        parrafo(esc(saludo(d.nombre))) +
+          parrafo('Pediste entrar a la plataforma del Habisite Challenge con este correo. Toca el botón para entrar directo, sin contraseña.') +
+          boton('Entrar a la plataforma', d.enlace) +
+          nota(esc(aviso)),
+        PIE_JURADO.html,
+      ),
+      texto: plano(
+        titulo,
+        saludo(d.nombre),
+        'Pediste entrar a la plataforma del Habisite Challenge con este correo. Abre este enlace para entrar directo, sin contraseña:',
+        '',
+        d.enlace,
+        '',
+        aviso,
+      ).replace(PIE_CONCURSANTE.texto, PIE_JURADO.texto),
     };
   },
 };
