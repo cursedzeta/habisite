@@ -23,7 +23,7 @@ export default function Shell({
       <header className="crm-top">
         <div className="crm-top__marca">
           Habisite
-          <span>Challenge 2026</span>
+          <span>Habisite Challenge 2026-II</span>
         </div>
 
         <nav className="crm-tabs">

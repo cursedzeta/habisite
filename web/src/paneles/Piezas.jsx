@@ -11,7 +11,7 @@ export function Acceso({ rol, onEntrar }) {
   return (
     <div className="pnl-acceso">
       <div className="pnl-acceso__card">
-        <span className="hs-eyebrow hs-eyebrow--brand">Habisite Design Challenge 2026</span>
+        <span className="hs-eyebrow hs-eyebrow--brand">Habisite Challenge 2026-II</span>
         <h1>{rol === 'jurado' ? 'Panel de jurado' : 'Panel de concursantes'}</h1>
         <p>
           {rol === 'jurado'

@@ -42,7 +42,7 @@
    el sidebar usan sticky, que con zoom no se rompe. Ese fue justamente
    el problema que tuvimos en la landing. */
 .crm{
-  zoom:1.08;
+  zoom: 0.9;
   min-height:100vh;
   display:flex;
   flex-direction:column;

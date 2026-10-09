@@ -30,7 +30,7 @@ export default function PanelConcursante() {
       rol="Participante"
       persona={`${usuarioDemo.nombre} ${usuarioDemo.apellido}`}
       pestanas={[
-        { id: 'concurso', texto: 'Design Challenge 2026' },
+        { id: 'concurso', texto: 'Habisite Challenge 2026-II' },
         { id: 'perfil', texto: 'Mi perfil' },
       ]}
       pestanaActiva="concurso"
