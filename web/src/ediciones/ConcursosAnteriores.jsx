@@ -216,81 +216,86 @@ function Ficha({ proyecto, destacada = false, invertida = false, onAbrir }) {
 
   return (
     <article className={clases} id={proyecto.id} aria-labelledby={idTitulo}>
-      <button
-        type="button"
-        className="ed-ficha__portada"
-        onClick={() => onAbrir(proyecto.titulo, imagenes, 0)}
-        aria-label={`Ampliar: ${proyecto.portada.titulo}`}
-      >
-        <Foto
-          imagen={proyecto.portada}
-          prioridad={destacada}
-          sizes={destacada ? '(max-width: 1280px) 100vw, 1220px' : '(max-width: 900px) 100vw, 700px'}
-        />
-        <span className="ed-ficha__ampliar" aria-hidden="true">
-          <Icon name="expand" size={18} />
-        </span>
-      </button>
+      {/* Portada y texto comparten un contenedor que termina con la cita:
+          la portada sticky de los finalistas se frena ahí. La galería va
+          afuera; si quedara adentro, la portada bajaría hasta taparla. */}
+      <div className="ed-ficha__principal">
+        <button
+          type="button"
+          className="ed-ficha__portada"
+          onClick={() => onAbrir(proyecto.titulo, imagenes, 0)}
+          aria-label={`Ampliar: ${proyecto.portada.titulo}`}
+        >
+          <Foto
+            imagen={proyecto.portada}
+            prioridad={destacada}
+            sizes={destacada ? '(max-width: 1280px) 100vw, 1220px' : '(max-width: 900px) 100vw, 700px'}
+          />
+          <span className="ed-ficha__ampliar" aria-hidden="true">
+            <Icon name="expand" size={18} />
+          </span>
+        </button>
 
-      <div className="ed-ficha__cuerpo">
-        <div className="ed-ficha__ident">
-          <Badge tone={destacada ? 'brand' : 'outline'}>{proyecto.distincion}</Badge>
-          <h3 className="ed-ficha__titulo" id={idTitulo}>
-            {proyecto.titulo}
-          </h3>
-          <p className="ed-ficha__lema">{proyecto.lema}</p>
+        <div className="ed-ficha__cuerpo">
+          <div className="ed-ficha__ident">
+            <Badge tone={destacada ? 'brand' : 'outline'}>{proyecto.distincion}</Badge>
+            <h3 className="ed-ficha__titulo" id={idTitulo}>
+              {proyecto.titulo}
+            </h3>
+            <p className="ed-ficha__lema">{proyecto.lema}</p>
 
-          <Autoria proyecto={proyecto} />
+            <Autoria proyecto={proyecto} />
 
-          <dl className="ed-datos">
-            {proyecto.datos.map(([rotulo, valor]) => (
-              <div key={rotulo}>
-                <dt>{rotulo}</dt>
-                <dd>{valor}</dd>
-              </div>
-            ))}
-          </dl>
-
-          <button
-            type="button"
-            className="ed-lamina"
-            onClick={() => onAbrir(proyecto.titulo, [proyecto.lamina], 0)}
-          >
-            <span className="ed-lamina__miniatura">
-              <Foto imagen={proyecto.lamina} sizes="120px" />
-            </span>
-            <span className="ed-lamina__texto">
-              <span className="hs-eyebrow hs-eyebrow--brand">Lámina A1</span>
-              <b>Mira la lámina completa</b>
-              <span>Ábrela y acércate a cada detalle.</span>
-            </span>
-          </button>
-        </div>
-
-        <div className="ed-ficha__relato">
-          {proyecto.memoria.map((parrafo, i) => (
-            <p key={i} className={i === 0 ? 'ed-ficha__entrada' : undefined}>
-              {parrafo}
-            </p>
-          ))}
-
-          {proyecto.claves.length > 0 && (
-            <ol className="ed-claves">
-              {proyecto.claves.map((c) => (
-                <li key={c.rotulo}>
-                  <span className="ed-claves__rotulo">{c.rotulo}</span>
-                  <b>{c.titulo}</b>
-                  <p>{c.texto}</p>
-                </li>
+            <dl className="ed-datos">
+              {proyecto.datos.map(([rotulo, valor]) => (
+                <div key={rotulo}>
+                  <dt>{rotulo}</dt>
+                  <dd>{valor}</dd>
+                </div>
               ))}
-            </ol>
-          )}
+            </dl>
 
-          {proyecto.cita && (
-            <blockquote className="ed-cita">
-              <p>«{proyecto.cita}»</p>
-            </blockquote>
-          )}
+            <button
+              type="button"
+              className="ed-lamina"
+              onClick={() => onAbrir(proyecto.titulo, [proyecto.lamina], 0)}
+            >
+              <span className="ed-lamina__miniatura">
+                <Foto imagen={proyecto.lamina} sizes="120px" />
+              </span>
+              <span className="ed-lamina__texto">
+                <span className="hs-eyebrow hs-eyebrow--brand">Lámina A1</span>
+                <b>Mira la lámina completa</b>
+                <span>Ábrela y acércate a cada detalle.</span>
+              </span>
+            </button>
+          </div>
+
+          <div className="ed-ficha__relato">
+            {proyecto.memoria.map((parrafo, i) => (
+              <p key={i} className={i === 0 ? 'ed-ficha__entrada' : undefined}>
+                {parrafo}
+              </p>
+            ))}
+
+            {proyecto.claves.length > 0 && (
+              <ol className="ed-claves">
+                {proyecto.claves.map((c) => (
+                  <li key={c.rotulo}>
+                    <span className="ed-claves__rotulo">{c.rotulo}</span>
+                    <b>{c.titulo}</b>
+                    <p>{c.texto}</p>
+                  </li>
+                ))}
+              </ol>
+            )}
+
+            {proyecto.cita && (
+              <blockquote className="ed-cita">
+                <p>«{proyecto.cita}»</p>
+              </blockquote>
+            )}
+          </div>
         </div>
       </div>
 

@@ -448,9 +448,9 @@ participante y con un admin. El detalle está en
          `https://api.challenge.habisite.com/auth/google/callback`
    - [ ] Agregar en *Orígenes de JavaScript autorizados*:
          `https://challenge.habisite.com`
-   - [ ] Mientras siga en *Testing*, cargar como usuarios de prueba las
-         cuentas que vayan a probar (hoy solo están `gonzalomaurino@gmail.com`
-         y `zengatomi@gmail.com`).
+   - [x] Usuarios de prueba (modo *Testing*): `gonzalomaurino@gmail.com`,
+         `zengatomi@gmail.com` y `growthimbar@gmail.com` (la cuenta del equipo
+         para probar como participante, cargada por Tomás el 9/10).
    - [ ] Cambiar el nombre de la app a «Habisite Challenge» y **pasar el
          proyecto a *En producción*** antes de abrir la inscripción. Ver el
          checklist de `backendGonzalo/docs/01-google-oauth.md`, «Producción».

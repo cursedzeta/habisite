@@ -237,8 +237,15 @@
 }
 
 /* Compacta (finalistas): portada y texto lado a lado. El cuerpo
-   pasa a una sola columna y la portada acompaña al scroll. */
-.ed-ficha--compacta{
+   pasa a una sola columna y la portada acompaña al scroll.
+
+   Un sticky se frena al final de su bloque contenedor, no de su celda
+   de grilla. Cuando portada, cuerpo y galería eran hijos de la misma
+   grilla (el <article>), la portada seguía bajando hasta el final de
+   la galería y la tapaba. Por eso portada y cuerpo viven en
+   .ed-ficha__principal, que termina con la cita, y la galería queda
+   afuera: ahí se frena la portada. */
+.ed-ficha--compacta .ed-ficha__principal{
   display:grid;
   grid-template-columns:minmax(0,7fr) minmax(0,5fr);
   gap:var(--space-7);
@@ -247,6 +254,7 @@
 .ed-ficha--compacta .ed-ficha__portada{
   position:sticky;
   top:var(--alto-nav);
+  align-self:start;
 }
 .ed-ficha--compacta .ed-ficha__portada img{aspect-ratio:var(--ed-proporcion-portada-movil)}
 .ed-ficha--compacta .ed-ficha__cuerpo{
@@ -261,21 +269,23 @@
 .ed-ficha--compacta .ed-ficha__relato .ed-ficha__entrada{
   font:var(--weight-regular) var(--size-body-lg)/var(--leading-body) var(--font-core);
 }
-.ed-ficha--compacta .ed-galeria{
-  grid-column:1/-1;
-  columns:4 var(--ed-columna-galeria-chica);
-}
-.ed-ficha--invertida{grid-template-columns:minmax(0,5fr) minmax(0,7fr)}
+.ed-ficha--compacta .ed-galeria{columns:4 var(--ed-columna-galeria-chica)}
+.ed-ficha--invertida .ed-ficha__principal{grid-template-columns:minmax(0,5fr) minmax(0,7fr)}
 .ed-ficha--invertida .ed-ficha__portada{order:2}
 .ed-ficha--invertida .ed-ficha__cuerpo{order:1}
-.ed-ficha--invertida .ed-galeria{order:3}
 
+/* Una columna: la portada va arriba del texto y ya no acompaña. */
 @media (max-width:900px){
   .ed-ficha__cuerpo{grid-template-columns:1fr;gap:var(--space-7)}
-  .ed-ficha--compacta{grid-template-columns:1fr;gap:var(--space-6)}
+  .ed-ficha--compacta .ed-ficha__principal{grid-template-columns:1fr;gap:var(--space-6)}
   .ed-ficha--compacta .ed-ficha__portada{position:relative;top:auto}
   .ed-ficha--invertida .ed-ficha__portada{order:0}
   .ed-ficha--invertida .ed-ficha__cuerpo{order:0}
+}
+/* Pantallas bajas: si la portada no entra entera debajo de la barra,
+   fija se le cortaría el pie. Ahí tampoco acompaña. */
+@media (max-height:700px){
+  .ed-ficha--compacta .ed-ficha__portada{position:relative;top:auto}
 }
 
 /* ---------- autoría ---------- */
