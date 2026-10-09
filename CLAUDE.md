@@ -60,8 +60,8 @@ migra a código y se aloja en este mismo proyecto de Railway.
 - **El ingreso a los paneles**: Google o enlace por correo, con la sesión
   real de `GET /yo`. **Una sola URL, `/panel`**, que muestra la vista según el
   rol; el admin puede mirar las otras dos. Los datos de la persona ya son
-  reales; lo de adentro de cada panel todavía es de ejemplo. El enlace por
-  correo funciona en producción; Google todavía no (ver §11).
+  reales; lo de adentro de cada panel todavía es de ejemplo. Los dos
+  métodos de ingreso funcionan en producción desde el 9/10.
 - **Concursos anteriores**: sección en la landing y página
   `/concursos-anteriores` con los tres proyectos de la 1ª edición (2025-I):
   el ganador, *Tres Horizontes*, y dos finalistas, con galería y visor de la
@@ -441,13 +441,12 @@ que muestra la vista según el rol. Todo está en producción y probado con un
 participante y con un admin. El detalle está en
 `backendGonzalo/docs/12-ingreso-por-enlace.md`.
 
-1. **Habilitar Google en producción** — hoy da `Error 400:
-   redirect_uri_mismatch`. En la consola de Google, proyecto
-   `habisite-challenge`, cliente OAuth `259278501857-mo1b…`:
-   - [ ] Agregar en *URIs de redireccionamiento autorizados*:
+1. **Google en producción** — **ya funciona** (9/10, lo hizo Tomás en la
+   consola, cliente OAuth `259278501857-mo1b…`; probado con `zengatomi@` y
+   `growthimbar@`). Queda lo de antes de abrir la inscripción:
+   - [x] *URIs de redireccionamiento autorizados*:
          `https://api.challenge.habisite.com/auth/google/callback`
-   - [ ] Agregar en *Orígenes de JavaScript autorizados*:
-         `https://challenge.habisite.com`
+   - [x] *Orígenes de JavaScript autorizados*: `https://challenge.habisite.com`
    - [x] Usuarios de prueba (modo *Testing*): `gonzalomaurino@gmail.com`,
          `zengatomi@gmail.com` y `growthimbar@gmail.com` (la cuenta del equipo
          para probar como participante, cargada por Tomás el 9/10).
