@@ -364,6 +364,15 @@ Consecuencia: los pedidos a la API no pasan por Cloudflare, así que no llega
 la cabecera `CF-Connecting-IP`. La IP del cliente sale de `X-Forwarded-For`
 con `trust proxy`, que es lo que pone el proxy de Railway.
 
+**Y por eso `ipDelCliente` solo cree en `CF-Connecting-IP` si el pedido llega
+desde un rango de Cloudflare** (o desde loopback, para las pruebas locales).
+Hasta el 09.10 la creía siempre: con la nube gris cualquiera podía mandarla
+inventada y esquivar el límite por IP del formulario y del enlace de ingreso.
+Si algún día `api.challenge` pasa a naranja, la cabecera empieza a valer sola;
+ignorarla siempre habría hecho que todos los visitantes contaran como unas
+pocas IP de Cloudflare y se bloquearan entre ellos. Los rangos están en
+`src/comun/red/ip-del-cliente.ts`, sacados de cloudflare.com/ips.
+
 ### Comprobado en producción
 
 `/salud` por HTTPS, `/docs`, `/edicion/publica` (lee la base con la migración

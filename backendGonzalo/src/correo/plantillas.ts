@@ -159,7 +159,7 @@ function marco(titulo: string, cuerpo: string, pie: string = PIE_CONCURSANTE.htm
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#FFFFFF;border-radius:24px;overflow:hidden;">
         <tr><td style="background:${TINTA};padding:24px 32px;">
           <span style="font-family:${FUENTE};font-size:20px;font-weight:700;color:#FFFFFF;letter-spacing:-0.01em;">Habi<span style="color:${NARANJA};">site</span></span>
-          <span style="display:block;margin-top:4px;font-family:${FUENTE};font-size:11px;font-weight:600;letter-spacing:0.18em;color:${CREMA};">DESIGN CHALLENGE 2026</span>
+          <span style="display:block;margin-top:4px;font-family:${FUENTE};font-size:11px;font-weight:600;letter-spacing:0.18em;color:${CREMA};">CHALLENGE 2026-II</span>
         </td></tr>
         <tr><td style="padding:32px;">
           <h1 style="margin:0 0 20px;font-family:${FUENTE};font-size:24px;line-height:1.25;font-weight:700;color:${TINTA};">${esc(titulo)}</h1>
@@ -178,7 +178,7 @@ function marco(titulo: string, cuerpo: string, pie: string = PIE_CONCURSANTE.htm
 
 /** El texto plano: mismo contenido, sin formato. */
 const plano = (titulo: string, ...renglones: (string | null | false)[]) =>
-  [titulo, '', ...renglones.filter((r): r is string => typeof r === 'string'), '', '—', 'Habisite Design Challenge 2026', PIE_CONCURSANTE.texto].join('\n');
+  [titulo, '', ...renglones.filter((r): r is string => typeof r === 'string'), '', '—', 'Habisite Challenge 2026-II', PIE_CONCURSANTE.texto].join('\n');
 
 const saludo = (nombre: string | null) => (nombre ? `Hola, ${nombre}:` : 'Hola:');
 
@@ -188,15 +188,15 @@ const PUESTOS: Record<number, string> = { 1: 'primer', 2: 'segundo', 3: 'tercer'
 
 const plantillas: { [C in CodigoCorreo]: (d: DatosPorCodigo[C]) => CorreoArmado } = {
   c1: (d) => {
-    const titulo = 'Ya estás inscrito en el Design Challenge';
+    const titulo = 'Ya estás inscrito en el Habisite Challenge';
     return {
-      asunto: 'Ya estás inscrito en el Habisite Design Challenge 2026',
+      asunto: 'Ya estás inscrito en el Habisite Challenge 2026-II',
       html: marco(
         titulo,
         parrafo(esc(saludo(d.nombre))) +
           parrafo('Tu inscripción quedó registrada. En el grupo oficial compartimos las bases, el calendario y el acceso a la plataforma.') +
           boton('Entrar al grupo oficial', d.enlaceGrupo) +
-          nota('<strong>Importante:</strong> para subir tu propuesta vas a entrar a la plataforma con tu cuenta de Google. Tiene que ser <strong>este mismo correo</strong>.') +
+          nota('<strong>Importante:</strong> a la plataforma vas a entrar con <strong>este mismo correo</strong>: con su cuenta de Google o con un enlace que te enviamos acá.') +
           (d.terminosUrl ? nota(`Puedes volver a leer ${enlaceSecundario('las bases del concurso', d.terminosUrl)} cuando quieras.`) : ''),
       ),
       texto: plano(
@@ -206,7 +206,7 @@ const plantillas: { [C in CodigoCorreo]: (d: DatosPorCodigo[C]) => CorreoArmado 
         '',
         `Entrar al grupo oficial: ${d.enlaceGrupo}`,
         '',
-        'Importante: para subir tu propuesta vas a entrar a la plataforma con tu cuenta de Google. Tiene que ser este mismo correo.',
+        'Importante: a la plataforma vas a entrar con este mismo correo: con su cuenta de Google o con un enlace que te enviamos acá.',
         d.terminosUrl ? `Las bases: ${d.terminosUrl}` : null,
       ),
     };
@@ -215,7 +215,7 @@ const plantillas: { [C in CodigoCorreo]: (d: DatosPorCodigo[C]) => CorreoArmado 
   c2: (d) => {
     const titulo = 'Te falta un paso';
     return {
-      asunto: 'Te falta un paso para el Habisite Design Challenge',
+      asunto: 'Te falta un paso para el Habisite Challenge',
       html: marco(
         titulo,
         parrafo('Hola:') +
@@ -239,11 +239,11 @@ const plantillas: { [C in CodigoCorreo]: (d: DatosPorCodigo[C]) => CorreoArmado 
   c3: (d) => {
     const titulo = '¿Te sumaste al grupo?';
     return {
-      asunto: 'Recordatorio: el grupo oficial del Habisite Design Challenge',
+      asunto: 'Recordatorio: el grupo oficial del Habisite Challenge',
       html: marco(
         titulo,
         parrafo('Hola:') +
-          parrafo('Hace un par de días te anotaste en el Habisite Design Challenge 2026. Todo lo importante pasa en el grupo oficial: las bases, el calendario y el acceso a la plataforma.') +
+          parrafo('Hace un par de días te anotaste en el Habisite Challenge 2026-II. Todo lo importante pasa en el grupo oficial: las bases, el calendario y el acceso a la plataforma.') +
           boton('Entrar al grupo oficial', d.enlaceGrupo) +
           nota(`Y si quieres dejar lista tu inscripción: ${enlaceSecundario('completar mis datos', d.enlaceCompletar)}.`) +
           nota('Es el único recordatorio que te vamos a mandar.'),
@@ -251,7 +251,7 @@ const plantillas: { [C in CodigoCorreo]: (d: DatosPorCodigo[C]) => CorreoArmado 
       texto: plano(
         titulo,
         'Hola:',
-        'Hace un par de días te anotaste en el Habisite Design Challenge 2026. Todo lo importante pasa en el grupo oficial: las bases, el calendario y el acceso a la plataforma.',
+        'Hace un par de días te anotaste en el Habisite Challenge 2026-II. Todo lo importante pasa en el grupo oficial: las bases, el calendario y el acceso a la plataforma.',
         '',
         `Entrar al grupo oficial: ${d.enlaceGrupo}`,
         `Completar mis datos: ${d.enlaceCompletar}`,
@@ -265,11 +265,11 @@ const plantillas: { [C in CodigoCorreo]: (d: DatosPorCodigo[C]) => CorreoArmado 
     const equipo = d.equipo ? ` «${d.equipo}»` : '';
     const titulo = `${d.lider} te invitó a su equipo`;
     return {
-      asunto: `${d.lider} te invitó a su equipo del Habisite Design Challenge`,
+      asunto: `${d.lider} te invitó a su equipo del Habisite Challenge`,
       html: marco(
         titulo,
         parrafo('Hola:') +
-          parrafo(`<strong>${esc(d.lider)}</strong> te sumó a su equipo${esc(equipo)} para presentar una propuesta en el Habisite Design Challenge 2026, el concurso de arquitectura para estudiantes y jóvenes profesionales de Latinoamérica.`) +
+          parrafo(`<strong>${esc(d.lider)}</strong> te sumó a su equipo${esc(equipo)} para presentar una propuesta en el Habisite Challenge 2026-II, el concurso de arquitectura para estudiantes y jóvenes profesionales de Latinoamérica.`) +
           boton('Confirmar mi participación', d.enlace) +
           nota('Vas a entrar con tu cuenta de Google. Puede ser cualquiera: el enlace te reconoce igual.') +
           (d.terminosUrl
@@ -279,7 +279,7 @@ const plantillas: { [C in CodigoCorreo]: (d: DatosPorCodigo[C]) => CorreoArmado 
       texto: plano(
         titulo,
         'Hola:',
-        `${d.lider} te sumó a su equipo${equipo} para presentar una propuesta en el Habisite Design Challenge 2026.`,
+        `${d.lider} te sumó a su equipo${equipo} para presentar una propuesta en el Habisite Challenge 2026-II.`,
         '',
         `Confirmar mi participación: ${d.enlace}`,
         '',
@@ -297,7 +297,7 @@ const plantillas: { [C in CodigoCorreo]: (d: DatosPorCodigo[C]) => CorreoArmado 
       ? `Como era quien armó el equipo, ahora la persona responsable es <strong>${esc(d.nuevoLider)}</strong>.`
       : null;
     return {
-      asunto: `${d.quienSeFue} dejó tu equipo del Habisite Design Challenge`,
+      asunto: `${d.quienSeFue} dejó tu equipo del Habisite Challenge`,
       html: marco(
         titulo,
         parrafo('Hola:') +
@@ -319,23 +319,23 @@ const plantillas: { [C in CodigoCorreo]: (d: DatosPorCodigo[C]) => CorreoArmado 
   c7: (d) => {
     const titulo = 'Te invitamos a ser jurado';
     return {
-      asunto: 'Te invitamos a ser jurado del Habisite Design Challenge 2026',
+      asunto: 'Te invitamos a ser jurado del Habisite Challenge 2026-II',
       html: marco(
         titulo,
         parrafo(esc(saludo(d.nombre))) +
-          parrafo('Te sumamos como jurado del Habisite Design Challenge 2026. Desde la plataforma vas a poder leer las propuestas sin descargar nada y cargar tu evaluación.') +
+          parrafo('Te sumamos como jurado del Habisite Challenge 2026-II. Desde la plataforma vas a poder leer las propuestas sin descargar nada y cargar tu evaluación.') +
           boton('Entrar a la plataforma', d.enlaceIngreso) +
-          nota('<strong>Importante:</strong> entra con la cuenta de Google de <strong>este mismo correo</strong>. Con otra cuenta, la plataforma no te va a reconocer.'),
+          nota('<strong>Importante:</strong> entra con <strong>este mismo correo</strong>: con su cuenta de Google o pidiendo un enlace que te llega acá. Con otro correo, la plataforma no te va a reconocer.'),
         PIE_JURADO.html,
       ),
       texto: plano(
         titulo,
         saludo(d.nombre),
-        'Te sumamos como jurado del Habisite Design Challenge 2026. Desde la plataforma vas a poder leer las propuestas sin descargar nada y cargar tu evaluación.',
+        'Te sumamos como jurado del Habisite Challenge 2026-II. Desde la plataforma vas a poder leer las propuestas sin descargar nada y cargar tu evaluación.',
         '',
         `Entrar a la plataforma: ${d.enlaceIngreso}`,
         '',
-        'Importante: entra con la cuenta de Google de este mismo correo. Con otra cuenta, la plataforma no te va a reconocer.',
+        'Importante: entra con este mismo correo: con su cuenta de Google o pidiendo un enlace que te llega acá. Con otro correo, la plataforma no te va a reconocer.',
       ).replace(PIE_CONCURSANTE.texto, PIE_JURADO.texto),
     };
   },
@@ -347,8 +347,8 @@ const plantillas: { [C in CodigoCorreo]: (d: DatosPorCodigo[C]) => CorreoArmado 
       : 'Tu equipo confirmó la entrega. Este es tu comprobante:';
     return {
       asunto: d.reemplazo
-        ? 'Nuevo comprobante de entrega · Habisite Design Challenge'
-        : 'Comprobante de entrega · Habisite Design Challenge',
+        ? 'Nuevo comprobante de entrega · Habisite Challenge'
+        : 'Comprobante de entrega · Habisite Challenge',
       html: marco(
         titulo,
         parrafo('Hola:') +
@@ -381,7 +381,7 @@ const plantillas: { [C in CodigoCorreo]: (d: DatosPorCodigo[C]) => CorreoArmado 
   c9: (d) => {
     const titulo = 'Tu propuesta quedó entregada';
     return {
-      asunto: 'Tu propuesta quedó entregada · Habisite Design Challenge',
+      asunto: 'Tu propuesta quedó entregada · Habisite Challenge',
       html: marco(
         titulo,
         parrafo('Hola:') +
@@ -415,14 +415,14 @@ const plantillas: { [C in CodigoCorreo]: (d: DatosPorCodigo[C]) => CorreoArmado 
       html: marco(
         titulo,
         parrafo('Hola:') +
-          parrafo(`Se publicaron los resultados del Habisite Design Challenge 2026 y la propuesta de tu equipo, <strong>«${esc(d.titulo || 'Sin título')}»</strong>, obtuvo el <strong>${esc(puesto)} puesto</strong>.`) +
+          parrafo(`Se publicaron los resultados del Habisite Challenge 2026-II y la propuesta de tu equipo, <strong>«${esc(d.titulo || 'Sin título')}»</strong>, obtuvo el <strong>${esc(puesto)} puesto</strong>.`) +
           parrafo('En los próximos días te contactamos para coordinar la entrega del premio.') +
           boton('Ver en la plataforma', d.enlacePanel),
       ),
       texto: plano(
         titulo,
         'Hola:',
-        `Se publicaron los resultados del Habisite Design Challenge 2026 y la propuesta de tu equipo, «${d.titulo || 'Sin título'}», obtuvo el ${puesto} puesto.`,
+        `Se publicaron los resultados del Habisite Challenge 2026-II y la propuesta de tu equipo, «${d.titulo || 'Sin título'}», obtuvo el ${puesto} puesto.`,
         'En los próximos días te contactamos para coordinar la entrega del premio.',
         '',
         `Ver en la plataforma: ${d.enlacePanel}`,
@@ -434,17 +434,17 @@ const plantillas: { [C in CodigoCorreo]: (d: DatosPorCodigo[C]) => CorreoArmado 
   c13b: (d) => {
     const titulo = 'Ya se publicaron los resultados';
     return {
-      asunto: 'Ya se publicaron los resultados del Habisite Design Challenge',
+      asunto: 'Ya se publicaron los resultados del Habisite Challenge',
       html: marco(
         titulo,
         parrafo('Hola:') +
-          parrafo('Se publicaron los resultados del Habisite Design Challenge 2026. Gracias por presentar tu propuesta: fue un placer ver tu trabajo.') +
+          parrafo('Se publicaron los resultados del Habisite Challenge 2026-II. Gracias por presentar tu propuesta: fue un placer ver tu trabajo.') +
           boton('Ver los resultados', d.enlacePanel),
       ),
       texto: plano(
         titulo,
         'Hola:',
-        'Se publicaron los resultados del Habisite Design Challenge 2026. Gracias por presentar tu propuesta: fue un placer ver tu trabajo.',
+        'Se publicaron los resultados del Habisite Challenge 2026-II. Gracias por presentar tu propuesta: fue un placer ver tu trabajo.',
         '',
         `Ver los resultados: ${d.enlacePanel}`,
       ),

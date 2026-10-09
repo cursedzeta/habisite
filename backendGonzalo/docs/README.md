@@ -1,4 +1,4 @@
-# Backend del Design Challenge — bitácora
+# Backend del Habisite Challenge — bitácora
 
 Registro de lo que se va configurando, con los valores reales que quedaron.
 La idea es que cualquiera pueda rehacer el entorno sin adivinar nada.
@@ -46,15 +46,23 @@ dónde*, no *cuál es la clave*.
 - **08.10 · Desplegado en Railway.** `challenge-api` en
   `https://api.challenge.habisite.com` y Postgres en la red privada. Ver
   [02](02-arquitectura.md#el-despliegue-en-railway--0810).
-- **Pendiente.** El enlace del grupo de WhatsApp, el texto de las bases y que
-  el front conecte el formulario.
+- **09.10 · Ingreso por enlace (Tomás) y su revisión.** `POST /auth/enlace`,
+  el canje, el correo C14 y la migración `004`. En la revisión se cerró un
+  redirector abierto en el `retorno`, el token deja de quedar en
+  `envios.datos` y un C14 vencido ya no sale. Ver [12](12-ingreso-por-enlace.md).
+- **09.10 · Correos al panel y nombre nuevo.** Los botones «ir al panel» y el
+  del jurado llevan a `/panel`; el respaldo del grupo, a la landing. Todo
+  dice **Habisite Challenge 2026-II**, también la fila de `edicion`
+  (migración `005`) y el título del contrato.
+- **Pendiente.** El enlace del grupo de WhatsApp y el texto de las bases.
 
 ## Decisiones ya cerradas
 
 Salen de `CLAUDE.md` y de las reuniones del 07 y 08 de septiembre.
 
 - **Stack:** NestJS + PostgreSQL.
-- **Login:** solo con Google, para los tres roles. Sin contraseñas.
+- **Login:** con Google o con un enlace por correo (09.10), para los tres
+  roles. Sin contraseñas.
 - **El jurado ve al autor.** La evaluación no es a ciegas.
 - **Entrega:** un único PDF por concursante, tope de 30 MB.
 - **Los PDF se guardan dentro de Postgres**, no en disco ni en S3.

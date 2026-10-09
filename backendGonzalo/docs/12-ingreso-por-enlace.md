@@ -45,13 +45,23 @@ sequenceDiagram
   `update … where usado_en is null and vence_en > now() returning`: dos canjes
   simultáneos no pueden ganar los dos.
 - **Se guarda el sha256 del token**, nunca el token. Con una copia de la base
-  no se entra como nadie.
+  no se entra como nadie. El correo C14 sí lo lleva en `envios.datos` para
+  poder armarse, pero solo mientras está pendiente: al salir se borra, y si
+  no salió antes de vencer queda `omitido` (doc 10).
 - **Hasta 3 enlaces por persona cada 15 minutos**, y el límite por IP del
   formulario (20 cada 15 minutos, contador propio).
 - **El canje es un POST desde el front, no un GET a la API.** Los antivirus de
   correo (Outlook, Gmail) abren los enlaces para revisarlos; si el enlace
   fuera directo a la API, lo gastarían antes que la persona.
 - **Entrar por primera vez pasa el perfil a `activo`**, igual que con Google.
+- **`retorno` es solo una ruta interna.** La API rechaza lo que empiece con
+  `//`, y también barras invertidas y espacios en cualquier lugar: el
+  navegador lee `/\otro.com` y `/<tab>/otro.com` como `//otro.com`. Importa
+  porque el retorno lo elige quien *pide* el enlace, que puede ser cualquiera
+  que sepa un correo inscripto, y el que lo abre es la víctima. El front
+  (`destinoTrasEntrar()` en `web/src/sesion/sesion.js`) además descarta
+  cualquier destino de otro origen. Al canjear, la API vuelve a validar el
+  retorno guardado (`RUTA_INTERNA`) y, si no pasa, devuelve `/panel`.
 
 ## Lo que se agregó
 
@@ -72,3 +82,33 @@ sequenceDiagram
   Si ya hay sesión, manda a `/panel`.
 - El admin entra a su vista y desde ahí puede mirar la de concursante y la de
   jurado, con un botón para volver.
+
+## La revisión de Gonzalo · 09.10
+
+Tres correcciones sobre lo que sumó Tomás, desplegadas juntas:
+
+1. **Redirector abierto.** El `retorno` se validaba con `^\/(?!\/)`, que deja
+   pasar `/\otro.com`. Como el front navegaba a ese retorno tal cual, un
+   enlace legítimo de `noreply@habisite.com` podía terminar en otro sitio ya
+   con la sesión iniciada. Se cerró en la API y en el front.
+2. **El token quedaba en `envios.datos`**, a pesar de que la tabla del enlace
+   solo guardara el hash. Ahora se borra cuando el correo sale.
+3. **Un C14 podía salir vencido**: la tarea periódica reintenta durante tres
+   días. Ahora, pasados sus 15 minutos, queda `omitido`.
+
+Y dos que aparecieron en las pruebas:
+
+4. **Un `CF-Connecting-IP` que no era una IP daba 500** al guardarlo en la
+   columna `inet`. Como eso solo pasaba con correos inscriptos (los demás no
+   llegan al insert), delataba quién se anotó. `ipDelCliente` ahora ignora la
+   cabecera si no es una IP, y además solo la cree si el pedido viene de un
+   rango de Cloudflare: con la nube gris de `api.challenge`, cualquiera podía
+   inventarla para esquivar el límite por IP (doc 02).
+5. **El canje devolvía el retorno guardado sin validarlo.** Ahora pasa por la
+   misma regla que el pedido.
+
+Las pruebas están en `pruebas/ingreso-por-enlace.mjs` (`npm run
+pruebas:enlace`).
+
+Además, el botón del correo al jurado (C7) y los «ir al panel» (C8, C9, C13)
+llevan a `/panel`, donde se elige Google o enlace (doc 10).

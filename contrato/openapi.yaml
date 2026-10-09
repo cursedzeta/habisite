@@ -175,8 +175,9 @@ paths:
       tags: *a2
   /admin/jurados:
     post:
-      description: Se invita uno por uno. Le llega un correo con el enlace para entrar
-        con Google; tiene que usar la cuenta de ESE correo.
+      description: Se invita uno por uno. Le llega un correo (C7) con el botón al
+        panel, donde entra con Google o con un enlace por correo; tiene que ser
+        ESE correo.
       operationId: PerfilesController_invitarJurado
       parameters: []
       requestBody:
@@ -766,7 +767,7 @@ paths:
       tags:
         - Administración
 info:
-  title: Habisite Design Challenge 2026 — API
+  title: Habisite Challenge 2026-II — API
   description: >-
     API del concurso. Tres roles y tres superficies: la inscripción pública, el
     panel
@@ -777,12 +778,18 @@ info:
     ## Sesión
 
 
-    Se entra con Google. El navegador tiene que **navegar** a `GET /auth/google`
+    Se entra con Google o con un enlace por correo, sin contraseñas.
 
-    (un enlace, no un fetch); de ahí en más la sesión viaja en una cookie
-    `HttpOnly`
 
-    que el navegador manda sola.
+    - **Google:** el navegador tiene que **navegar** a `GET /auth/google` (un
+    enlace, no un fetch).
+
+    - **Enlace por correo:** `POST /auth/enlace` lo manda, y el front lo canjea
+    desde
+      `/ingresar?enlace=…` con `POST /auth/enlace/canjear`.
+
+    De ahí en más la sesión viaja en una cookie `HttpOnly` que el navegador
+    manda sola.
 
 
     Todas las llamadas tienen que ir con `credentials: "include"`, o la cookie

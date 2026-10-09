@@ -24,7 +24,7 @@ vuelta, una llamada a `/yo`.
 | Qué | Valor |
 |---|---|
 | Project ID | `habisite-challenge` |
-| Nombre de la app en la pantalla de consentimiento | `habisite-challenge-dev` — **a cambiar por `Habisite Design Challenge`**, ver abajo |
+| Nombre de la app en la pantalla de consentimiento | `habisite-challenge-dev` — **a cambiar por `Habisite Challenge`**, ver abajo |
 | Tipo de usuario | Externo |
 | Estado de publicación | Testing |
 | Nombre del cliente OAuth | `habisite-challenge-dev` |
@@ -60,7 +60,7 @@ El nombre de la pantalla de consentimiento es literalmente el que aparece en el
 cartel de Google: *«¿Querés continuar con habisite-challenge-dev?»*. Un estudiante
 que ve un nombre así asume que se equivocó de enlace.
 
-Tiene que decir **Habisite Design Challenge**. Se puede cambiar cuando sea y con
+Tiene que decir **Habisite Challenge**. Se puede cambiar cuando sea y con
 permisos no sensibles no dispara ninguna revisión. El sufijo `-dev` va en el
 nombre del **cliente OAuth**, que es interno y no lo ve nadie de afuera.
 
@@ -117,6 +117,6 @@ Van al `.env`, que no se sube al repo. Ver `backendGonzalo/.env.example`.
 - [ ] Registrar la URI de redireccionamiento real
       (`https://api.challenge.habisite.com/auth/google/callback`, si se confirma
       ese dominio).
-- [ ] **Cambiar el nombre de la app a `Habisite Design Challenge`.**
+- [ ] **Cambiar el nombre de la app a `Habisite Challenge`.**
 - [ ] **Pasar el proyecto a *En producción*** antes de abrir la inscripción.
 - [ ] Cargar el client ID y el secret en las variables de Railway.

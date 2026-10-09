@@ -14,6 +14,16 @@ export interface Envio {
 /** Cuántas veces se reintenta un correo antes de darlo por perdido. */
 export const MAX_INTENTOS = 5;
 
+/*
+ * El C14 lleva un enlace de ingreso, que es una llave (docs/12): de ese
+ * enlace la base guarda solo el hash. El correo lo necesita en `datos` para
+ * armarse, así que se borra apenas sale. Y pasado su vencimiento no se manda:
+ * llegaría un enlace que ya no abre.
+ */
+const SIN_LLAVE = `datos = case when codigo = 'c14' then datos - 'enlace' else datos end`;
+const LLAVE_VENCIDA = `(codigo = 'c14'
+  and creado_en < now() - interval '1 minute' * coalesce((datos->>'minutos')::numeric, 15))`;
+
 @Injectable()
 export class CorreoRepository {
   constructor(private readonly db: BaseDeDatos) {}
@@ -42,9 +52,18 @@ export class CorreoRepository {
 
   /**
    * Toma el envío para mandarlo. Sumar el intento en la misma consulta hace
-   * que un envío que falla siempre deje de reintentarse solo.
+   * que un envío que falla siempre deje de reintentarse solo. Un C14 vencido
+   * no se toma: queda `omitido`.
    */
   async tomar(id: string): Promise<Envio | null> {
+    await this.db.consultar(
+      `update envios
+          set estado = 'omitido', error = 'El enlace venció antes de salir', enviado_en = now(), ${SIN_LLAVE}
+        where id = $1
+          and estado in ('pendiente', 'fallido')
+          and ${LLAVE_VENCIDA}`,
+      [id],
+    );
     const { rows } = await this.db.consultar<Envio>(
       `update envios
           set intentos = intentos + 1
@@ -59,7 +78,7 @@ export class CorreoRepository {
 
   async marcarEnviado(id: string, resendId: string | null): Promise<void> {
     await this.db.consultar(
-      `update envios set estado = 'enviado', resend_id = $2, error = null, enviado_en = now()
+      `update envios set estado = 'enviado', resend_id = $2, error = null, enviado_en = now(), ${SIN_LLAVE}
         where id = $1`,
       [id, resendId],
     );
@@ -67,7 +86,7 @@ export class CorreoRepository {
 
   async marcarOmitido(id: string): Promise<void> {
     await this.db.consultar(
-      `update envios set estado = 'omitido', enviado_en = now() where id = $1`,
+      `update envios set estado = 'omitido', enviado_en = now(), ${SIN_LLAVE} where id = $1`,
       [id],
     );
   }

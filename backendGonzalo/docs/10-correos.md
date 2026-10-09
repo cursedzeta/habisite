@@ -1,9 +1,12 @@
 # 10 · Los correos de la plataforma
 
-**Implementados el 08.10, los diez.** Las plantillas están en
+**Implementados el 08.10, los diez; el C14 se sumó el 09.10.** Las plantillas están en
 `src/correo/plantillas.ts`. Todos salen por **Resend**, desde
-`Habisite Design Challenge <noreply@habisite.com>`, **sin dirección de
-respuesta** (decidido el 08.10). Las consultas van al grupo de WhatsApp, que es
+`Habisite Challenge <noreply@habisite.com>`, **sin dirección de
+respuesta** (decidido el 08.10). Desde el 09.10 los correos usan el nombre
+nuevo de la edición, **Habisite Challenge 2026-II**, en el encabezado y en los
+textos. Los asuntos que ya llevaban el año (C1 y C7) dicen «2026-II»; el resto
+sigue sin año, para que sean cortos. Las consultas van al grupo de WhatsApp, que es
 el canal oficial; el pie de cada correo lo dice. Lo que alguien responda igual
 lo descarta una regla de Cloudflare Email Routing, sin rebote. Al jurado, que
 no está en ese grupo, el pie le dice que contacte a la organización.
@@ -54,11 +57,12 @@ flowchart LR
 | C3 | Recordatorio | La tarea periódica, 2 días después de C2, si no hizo clic | Quien se inscribió | **Pedido** · doc 09 |
 | C4 | Invitación al equipo | `POST /mi-equipo/invitaciones` | Cada correo invitado | **Pedido** · req-concursantes §3 |
 | C5 | Alguien se dio de baja | `DELETE /mi-equipo/miembros/yo` | El resto del equipo | **Pedido** · doc 05 |
-| C7 | Invitación al jurado | El admin suma un jurado | El jurado | **Pedido** · req-jurado §1, **falta el endpoint** |
+| C7 | Invitación al jurado | `POST /admin/jurados` | El jurado | **Pedido** · req-jurado §1 |
 | C13a | Ganaste | `POST /admin/resultados/publicar` | Los equipos del podio | **Pedido** · resuelto 08.10 |
 | C13b | Ya se publicaron los resultados | `POST /admin/resultados/publicar` | El resto de los equipos que entregaron | **Pedido** · resuelto 08.10 |
 | C8 | Entrega confirmada | `POST /mi-propuesta/entregar` | Todo el equipo | **Aprobado** 08.10 |
 | C9 | Entrega automática | El cierre pasa el borrador a entregado | Todo el equipo | **Aprobado** 08.10 |
+| C14 | Tu enlace para entrar | `POST /auth/enlace` | Quien lo pidió, si tiene perfil | **Implementado** 09.10 · doc 12 |
 
 ---
 
@@ -68,11 +72,12 @@ flowchart LR
 
 - **Cuándo:** la inscripción llega con nombre, apellido, tipo, institución y
   país. También cuando alguien del camino B vuelve y completa lo que faltaba.
-- **Asunto:** «Ya estás inscrito en el Habisite Design Challenge 2026» (los
+- **Asunto:** «Ya estás inscrito en el Habisite Challenge 2026-II» (los
   correos van en «tú» neutro, como la landing)
 - **Lleva:**
   - el botón al grupo de WhatsApp, por `/r/{token}`;
-  - el recordatorio de entrar con **ese mismo correo de Google**;
+  - el recordatorio de entrar con **ese mismo correo**, con Google o con un
+    enlace por correo (doc 12);
   - el enlace a las bases.
 - **Por qué existe:** la pantalla ya lo redirigió al grupo; el correo cubre al
   que cerró la pestaña antes de entrar.
@@ -80,7 +85,7 @@ flowchart LR
 ### C2 · Inscripción incompleta (la alerta)
 
 - **Cuándo:** la inscripción llega solo con el correo, o con correo y teléfono.
-- **Asunto:** «Te falta un paso para el Habisite Design Challenge»
+- **Asunto:** «Te falta un paso para el Habisite Challenge»
 - **Lleva:**
   - el botón **«Completar mi inscripción»**, que abre el formulario de la
     landing ya cargado por medio de un token;
@@ -100,7 +105,7 @@ flowchart LR
 ### C4 · Invitación al equipo
 
 - **Cuándo:** el líder carga correos en la card «Añadir miembro».
-- **Asunto:** «{Nombre del líder} te invitó a su equipo del Habisite Design
+- **Asunto:** «{Nombre del líder} te invitó a su equipo del Habisite
   Challenge»
 - **Lleva** (req-concursantes §15 y §16):
   - el botón **«Confirmar mi participación»**;
@@ -125,12 +130,13 @@ flowchart LR
 ### C7 · Invitación al jurado
 
 - **Cuándo:** el admin suma a un jurado. req-jurado §1: «se invita uno por uno».
-- **Asunto:** «Te invitamos a ser jurado del Habisite Design Challenge 2026»
+- **Asunto:** «Te invitamos a ser jurado del Habisite Challenge 2026-II»
 - **Lleva:**
-  - el botón para entrar con Google;
+  - el botón **«Entrar a la plataforma»**, que va a `/panel` (09.10). Sin
+    sesión, ahí elige Google o enlace por correo: no queda trabado si su
+    correo no es de Google;
   - el aviso de que tiene que ser **exactamente ese correo**.
-- ⚠ **No existe el endpoint** para que el admin invite jurados. El repositorio
-  ya tiene `asegurarPorCorreo(correo, 'jurado')`, pero ninguna ruta lo usa.
+- **Lo dispara** `POST /admin/jurados`.
 
 ### C13 · Resultados publicados
 
@@ -153,6 +159,13 @@ Lo pide la persona desde la pantalla de ingreso, en vez de entrar con Google
 lleva el pie neutro del jurado y no manda al grupo. Vence a los 15 minutos y
 sirve una vez. La clave es la del enlace (`c14:{id}`), no la de la persona:
 cada pedido es un correo distinto.
+
+- **El enlace no se queda en la base.** Mientras el correo está pendiente,
+  `envios.datos` lo necesita para armarse; cuando sale (o queda `omitido`) se
+  borra. De la tabla `enlaces_ingreso` solo existe el hash.
+- **Vencido, no sale.** Si un C14 no salió dentro de sus 15 minutos (Resend
+  caído, cola larga), queda `omitido` con el motivo en `error`, en vez de
+  llegar horas después con un enlace que ya no abre.
 
 ---
 
@@ -185,7 +198,7 @@ No se hacen en esta etapa. Si hacen falta, se suman con el mismo servicio.
 | C6 | Alguien se sumó → al líder |
 | C10 | Se acerca el cierre |
 | C11 | Descalificación |
-| C14 | Empieza una vuelta → a los jurados |
+| C15 | Empieza una vuelta → a los jurados (antes numerado C14; el número quedó para el enlace de ingreso) |
 
 ## Lo que queda afuera a propósito
 
@@ -226,5 +239,9 @@ No se hacen en esta etapa. Si hacen falta, se suman con el mismo servicio.
   verdad, solo queda anotado.
 - **La clave de cada envío incluye al destinatario**, porque cada fila es un
   correo a una persona: por ejemplo `c8:{propuesta}:{versión del PDF}:{perfil}`.
+- **A dónde lleva cada botón** (`src/correo/enlaces.ts`): «ir al panel» (C7,
+  C8, C9, C13) va a `{FRONTEND_URL}/panel`, la URL única de los tres roles.
+  El grupo de WhatsApp pasa por `/r/{token}`, y si `WHATSAPP_URL` está vacía
+  cae en la landing, no en el panel.
 - **Para ver las plantillas sin mandar nada**: armarlas con `armarCorreo()`
   desde `dist/correo/plantillas.js` y abrir el HTML.

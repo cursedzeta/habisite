@@ -10,7 +10,7 @@ import { DocumentBuilder, SwaggerModule, type OpenAPIObject } from '@nestjs/swag
  */
 export function construirDocumento(app: INestApplication): OpenAPIObject {
   const config = new DocumentBuilder()
-    .setTitle('Habisite Design Challenge 2026 — API')
+    .setTitle('Habisite Challenge 2026-II — API')
     .setDescription(
       [
         'API del concurso. Tres roles y tres superficies: la inscripción pública, el panel',
@@ -18,9 +18,13 @@ export function construirDocumento(app: INestApplication): OpenAPIObject {
         '',
         '## Sesión',
         '',
-        'Se entra con Google. El navegador tiene que **navegar** a `GET /auth/google`',
-        '(un enlace, no un fetch); de ahí en más la sesión viaja en una cookie `HttpOnly`',
-        'que el navegador manda sola.',
+        'Se entra con Google o con un enlace por correo, sin contraseñas.',
+        '',
+        '- **Google:** el navegador tiene que **navegar** a `GET /auth/google` (un enlace, no un fetch).',
+        '- **Enlace por correo:** `POST /auth/enlace` lo manda, y el front lo canjea desde',
+        '  `/ingresar?enlace=…` con `POST /auth/enlace/canjear`.',
+        '',
+        'De ahí en más la sesión viaja en una cookie `HttpOnly` que el navegador manda sola.',
         '',
         'Todas las llamadas tienen que ir con `credentials: "include"`, o la cookie no viaja.',
         '',

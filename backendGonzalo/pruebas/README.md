@@ -4,7 +4,8 @@ Un recorrido de humo que le pega a la API de verdad —con Postgres, los guards 
 el cierre puestos— y comprueba los 35 endpoints de punta a punta: inscripción,
 equipo, PDF, entrega, las dos vueltas de evaluación y la publicación.
 
-**123 comprobaciones.** Tarda unos segundos.
+**127 comprobaciones.** Tarda unos segundos. Desde el 09.10 también
+comprueba que los correos C7, C8, C9 y C13 lleven a `{FRONTEND_URL}/panel`.
 
 **Ningún correo sale de verdad.** La API de pruebas arranca sin
 `RESEND_API_KEY`: los correos quedan anotados en `envios` como «omitido» y el
@@ -18,7 +19,18 @@ npm run build            # el recorrido pega contra dist/
 npm run pruebas:preparar # esquema limpio + migraciones + 7 perfiles
 npm run pruebas:api      # levanta la API en el 3999 (dejar corriendo)
 npm run pruebas:recorrido
+npm run pruebas:enlace   # el ingreso por enlace (docs/12), 89 comprobaciones
 ```
+
+El recorrido necesita un esquema recién preparado y una API recién
+levantada (el límite por IP vive en memoria). `pruebas:enlace` no: crea su
+propia gente con la marca de la corrida y usa IPs inventadas
+(`CF-Connecting-IP`), así que se puede repetir contra la misma API. La API
+cree en esa cabecera porque el pedido sale de loopback; en producción solo
+la cree si viene de Cloudflare (`src/comun/red/ip-del-cliente.ts`).
+
+Los ayudantes comunes (`pedir`, `comprobar`, la conexión a la base) están en
+`ayudantes.mjs`.
 
 ## No toca la base de desarrollo
 
@@ -46,6 +58,20 @@ Las sesiones quedan en `.tmp-sesiones.json`, ignorado por git.
 | `ana`, `bruno`, `carla` | participante |
 | `j1`, `j2`, `j3` | jurado |
 | `admin` | admin |
+
+## El ingreso por enlace
+
+`ingreso-por-enlace.mjs` cubre el doc 12 de punta a punta: el 204 idéntico
+para inscripto, inexistente y bloqueado; que se guarde solo el hash; que el
+C14 pierda `datos.enlace` al procesarse; la validación de `retorno`; los
+límites por persona (3) y por IP (20); el canje (cookie `HttpOnly`, un solo
+uso, vencido, bloqueado, `habilitado` → `activo`, canjes simultáneos); el C14
+que vence en la cola, y que `/r/{token}` sin `WHATSAPP_URL` vaya a la landing.
+
+Tiene un atajo más, del mismo tipo que el de `preparar`: la API nunca expone
+el token en claro, así que para probar el canje inserta en `enlaces_ingreso`
+una fila con el sha256 de un token generado por el script. El canje corre
+entero por la API.
 
 ## Qué cubre, y qué no
 

@@ -4,8 +4,8 @@ Este archivo es la fuente de verdad para cualquiera que agarre el repo: personas
 o sesiones de Claude Code. Si algo cambia y contradice lo de acá, **actualizá
 este archivo en el mismo commit.**
 
-Última actualización: 8 de octubre de 2026 (llegó el back de Gonzalo, el
-documento de Jarod y el formulario conectado a la API).
+Última actualización: 9 de octubre de 2026 (Gonzalo revisó el ingreso por
+enlace, pasó los correos a `/panel` y al nombre nuevo; ver «Para Tomás» en §11).
 
 ---
 
@@ -68,6 +68,10 @@ migra a código y se aloja en este mismo proyecto de Railway.
   lámina con zoom. Todos los datos en `web/src/ediciones/edicion-2025-i.js`;
   lo que falta (fotos, universidades, jurado, cifras) figura ahí en `null`
   y se ve como «próximamente». El 2º y el 3º puesto no se conocen.
+- **Los correos llevan al panel y dicen el nombre nuevo** (9/10, Gonzalo):
+  «ir al panel» y el botón del jurado van a `/panel`; todo dice «Habisite
+  Challenge 2026-II», también la fila de `edicion` en la base (migración
+  `005`) y el remitente («Habisite Challenge <noreply@habisite.com>»).
 
 **No existe todavía:**
 
@@ -178,7 +182,10 @@ institucional migrado.
 ⚠️ **`api.challenge` va con la nube GRIS (DNS only), no naranja.** El
 certificado gratis de Cloudflare cubre un solo nivel (`*.habisite.com`) y
 `api.challenge.habisite.com` tiene dos: con proxy, el navegador da error de
-certificado. En gris, el certificado lo emite Railway.
+certificado. En gris, el certificado lo emite Railway. Por lo mismo, la API no cree en la
+cabecera `CF-Connecting-IP` salvo que el pedido venga de un rango de
+Cloudflare (`backendGonzalo/docs/02`): si algún día pasa a naranja, funciona
+sin tocar nada.
 
 ### El proyecto viejo (borrado)
 
@@ -453,22 +460,58 @@ participante y con un admin. El detalle está en
    - [ ] Cambiar el nombre de la app a «Habisite Challenge» y **pasar el
          proyecto a *En producción*** antes de abrir la inscripción. Ver el
          checklist de `backendGonzalo/docs/01-google-oauth.md`, «Producción».
-2. **Revisar lo que se sumó a su back** (`docs/12`): la migración
+2. ~~**Revisar lo que se sumó a su back** (`docs/12`): la migración
    `004-enlace-de-ingreso.sql` (ya aplicada en producción), `POST /auth/enlace`,
-   `POST /auth/enlace/canjear`, `src/auth/enlace-ingreso.*` y el correo `c14`.
+   `POST /auth/enlace/canjear`, `src/auth/enlace-ingreso.*` y el correo `c14`.~~
+   **Hecho el 9/10.** Tres correcciones, en «La revisión de Gonzalo» de
+   `docs/12`: un redirector abierto en `retorno`, el token que quedaba en
+   `envios.datos` y un C14 que podía salir vencido. Las pruebas sumaron
+   dos más: un `CF-Connecting-IP` inválido daba 500 solo con correos
+   inscriptos, y el canje no revalidaba el retorno guardado. Y la API ya no
+   cree en `CF-Connecting-IP` salvo que el pedido venga de Cloudflare (§4):
+   con la nube gris, cualquiera la inventaba para esquivar el límite por IP.
 3. **Los enlaces de `src/correo/enlaces.ts` apuntan a la landing y no al panel:**
-   - [ ] `ingreso()` (el botón del correo de invitación al jurado, C7) manda a
+   - [x] `ingreso()` (el botón del correo de invitación al jurado, C7) manda a
          `/auth/google?retorno=/`. Mejor `{FRONTEND_URL}/panel`: ahí el jurado
          elige Google o enlace por correo, y no queda trabado si Google falla.
-   - [ ] `panel()` devuelve `{FRONTEND_URL}/`. Lo usan C8, C9 y C13 como «ir al
+   - [x] `panel()` devuelve `{FRONTEND_URL}/`. Lo usan C8, C9 y C13 como «ir al
          panel», así que tendría que ser `/panel`. **Ojo:** `destinoGrupo()`
          también usa `panel()` como respaldo cuando no hay grupo, y ahí sí
-         corresponde la landing: separarlos.
-4. **Nombre de la edición en los correos:** el encabezado de todas las
+         corresponde la landing: separarlos. *(Hecho el 9/10: `destinoGrupo()`
+         usa `landing()`. Las notas de C1 y C7 ya no dicen «solo con Google».)*
+4. ~~**Nombre de la edición en los correos:** el encabezado de todas las
    plantillas dice «DESIGN CHALLENGE 2026» y los textos «Habisite Design
    Challenge 2026». Pasarlos a «Habisite Challenge 2026-II» (CLAUDE.md §1), y
-   también `CORREO_REMITENTE` en Railway.
+   también `CORREO_REMITENTE` en Railway.~~ **Hecho el 9/10**, junto con el
+   título del contrato, `docs/01` y la fila de `edicion` (migración `005`,
+   la aplica el pre-deploy). Los asuntos que ya tenían el año (C1 y C7) dicen
+   «2026-II»; el resto sigue sin año, para que sean cortos.
 5. **`WHATSAPP_URL` en Railway** cuando exista el grupo. Hasta entonces, el
    enlace al grupo de los correos y de la pantalla de gracias vuelve a la
    landing.
 
+### Para Tomás — lo que cambió del lado tuyo (9/10, Gonzalo)
+
+- **`web/src/sesion/sesion.js` tiene `destinoTrasEntrar(retorno)`**, y
+  `entrar()` de `Ingreso.jsx` la usa. Antes navegaba a lo que devolvía
+  `POST /auth/enlace/canjear` tal cual, y un `retorno` como `/\otro.com`
+  (el navegador lo lee como `//otro.com`) sacaba a la persona del sitio ya
+  con sesión. Ahora todo destino de otro origen, la landing y `/ingresar`
+  terminan en `/panel`. La API también rechaza esos retornos (400).
+- **Los correos mandan a `/panel` sin sesión**: el jurado (C7) llega ahí y
+  elige Google o enlace. `/panel` tiene que seguir mostrando el ingreso
+  cuando `GET /yo` da 401, como hoy.
+- **La edición en la base se llama «Habisite Challenge 2026-II»**: es lo que
+  devuelve la API donde aparezca `nombre` de la edición.
+- **`contrato/openapi.yaml` regenerado**: cambian el título y la descripción
+  de la sesión, no hay endpoints nuevos.
+- **Dos arreglos en `paneles.css`**, que encontraron las pruebas de interfaz:
+  - El texto de «Entrar con Google» no se veía: `.ing a` lo pintaba naranja
+    sobre el fondo naranja del botón. Ahora es `.ing a:not(.hs-btn)`.
+  - La tarjeta de ingreso era más ancha que un teléfono (401 px en 390): en
+    menos de 520 px se achican los márgenes y los botones pueden partir el
+    texto.
+- **Queda de tu lado:** en el teléfono, **el panel** (con sesión) también
+  desborda: a 390 px el documento mide 465 y «Salir» queda fuera de
+  pantalla. Es `.crm-top` (flex sin wrap) y `.crm-cuerpo`. No lo toqué
+  porque es el prototipo.

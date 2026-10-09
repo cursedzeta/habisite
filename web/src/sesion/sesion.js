@@ -24,6 +24,23 @@ export function urlGoogle(retorno) {
   return `${API}/auth/google?retorno=${encodeURIComponent(retorno)}`
 }
 
+/* A dónde ir después de entrar. La landing ('/') o /ingresar no tienen
+   sentido: va al panel. Algo fuera de este sitio, tampoco: el navegador
+   lee `/\otro.com` como `//otro.com`, y el retorno del enlace por correo
+   lo elige quien lo pide, no quien lo abre. La API ya rechaza esos
+   retornos; esto es la segunda barrera. */
+export function destinoTrasEntrar(retorno, origen = window.location.origin) {
+  let url
+  try {
+    url = new URL(retorno || RUTA_PANEL, origen)
+  } catch {
+    return RUTA_PANEL
+  }
+  if (url.origin !== origen) return RUTA_PANEL
+  if (url.pathname === '/' || url.pathname === '/ingresar') return RUTA_PANEL
+  return url.pathname + url.search + url.hash
+}
+
 export function nombreCompleto(yo) {
   return [yo.nombre, yo.apellido].filter(Boolean).join(' ') || yo.correo
 }

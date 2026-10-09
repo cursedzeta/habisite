@@ -38,9 +38,13 @@ export class Enlaces {
     return `${this.front}/equipo/sumarme/${token}`;
   }
 
-  /** Directo al login con Google: el jurado no tiene nada que ver antes. */
+  /**
+   * El botón del correo al jurado (C7). Al panel y no directo a Google: sin
+   * sesión, el panel le ofrece Google o un enlace por correo (docs/12), y no
+   * queda trabado si su correo no es de Google.
+   */
   ingreso(): string {
-    return `${this.api}/auth/google?retorno=/`;
+    return this.panel();
   }
 
   /** El enlace del correo de ingreso (docs/12). Lo canjea el front con un POST:
@@ -50,7 +54,12 @@ export class Enlaces {
     return `${this.front}/ingresar?enlace=${token}`;
   }
 
+  /** Una sola URL para los tres roles: el front muestra la vista según quién entró. */
   panel(): string {
+    return `${this.front}/panel`;
+  }
+
+  landing(): string {
     return `${this.front}/`;
   }
 
@@ -58,6 +67,6 @@ export class Enlaces {
   destinoGrupo(): string {
     // `||` y no `??`: con la variable vacía en el .env, ConfigService devuelve
     // '' en vez de undefined, y '' ?? x se queda con el vacío.
-    return this.config.get('WHATSAPP_URL', { infer: true }) || this.panel();
+    return this.config.get('WHATSAPP_URL', { infer: true }) || this.landing();
   }
 }

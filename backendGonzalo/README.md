@@ -1,6 +1,6 @@
 # habisite-api
 
-Backend del Habisite Design Challenge 2026. NestJS 12 + PostgreSQL, con SQL
+Backend del Habisite Challenge 2026-II. NestJS 12 + PostgreSQL, con SQL
 plano y migraciones a mano — sin ORM.
 
 La documentación vive en [`docs/`](docs/README.md): arquitectura, modelo de

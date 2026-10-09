@@ -1,7 +1,7 @@
 {
   "name": "habisite-api",
   "version": "0.0.1",
-  "description": "API del Habisite Design Challenge 2026",
+  "description": "API del Habisite Challenge 2026-II",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
@@ -26,6 +26,7 @@
     "pruebas:preparar": "node --env-file=.env pruebas/preparar.mjs",
     "pruebas:api": "node --env-file=.env pruebas/api-de-pruebas.mjs",
     "pruebas:recorrido": "node --env-file=.env pruebas/recorrido.mjs",
+    "pruebas:enlace": "node --env-file=.env pruebas/ingreso-por-enlace.mjs",
     "migrar": "node --env-file-if-exists=.env src/migrador/migrar.ts",
     "contrato": "node --env-file-if-exists=.env dist/generar-contrato.js"
   },

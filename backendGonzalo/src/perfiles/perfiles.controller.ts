@@ -108,8 +108,8 @@ export class PerfilesController {
   @ApiOperation({
     summary: 'Invita a un jurado',
     description:
-      'Se invita uno por uno. Le llega un correo con el enlace para entrar con Google; ' +
-      'tiene que usar la cuenta de ESE correo.',
+      'Se invita uno por uno. Le llega un correo (C7) con el botón al panel, donde entra con ' +
+      'Google o con un enlace por correo; tiene que ser ESE correo.',
   })
   @ApiOkResponse({ type: JuradoDto })
   @ApiConflictResponse({ description: 'El correo es de un admin o de alguien inscripto como concursante' })

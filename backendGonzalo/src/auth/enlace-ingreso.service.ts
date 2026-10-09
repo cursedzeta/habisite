@@ -6,6 +6,7 @@ import { Enlaces } from '../correo/enlaces.js';
 import type { Perfil } from '../perfiles/perfil.entity.js';
 import { LimitadorInscripcion } from '../perfiles/limitador.js';
 import { PerfilesRepository } from '../perfiles/perfiles.repository.js';
+import { RUTA_INTERNA } from './dto/enlace-ingreso.dto.js';
 import { EnlaceIngresoRepository } from './enlace-ingreso.repository.js';
 
 /** Cuánto dura un enlace. Corto: es una llave que viaja por correo. */
@@ -78,6 +79,9 @@ export class EnlaceIngresoService {
     if (perfil.estado === 'bloqueado') throw new ForbiddenException('Tu cuenta está bloqueada');
 
     await this.repo.marcarActivo(perfil.id);
-    return { perfil, retorno: canje.retorno };
+    // Se valida de nuevo al salir: la regla de la base solo exige que empiece
+    // con `/`, y una fila vieja o cargada a mano no pasó por el DTO.
+    const retorno = RUTA_INTERNA.test(canje.retorno) ? canje.retorno : '/panel';
+    return { perfil, retorno };
   }
 }

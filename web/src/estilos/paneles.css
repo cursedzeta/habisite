@@ -58,7 +58,16 @@
 .ing__form{align-self:stretch;display:flex;flex-direction:column;gap:var(--space-4);text-align:left}
 .ing__form .hs-btn{justify-content:center}
 .ing__listo{align-self:stretch;text-align:left}
-.ing a{color:var(--orange);font-weight:var(--weight-semibold)}
+/* Sin el :not, el «Entrar con Google» —un <a> con .hs-btn--primary— queda
+   con texto naranja sobre fondo naranja: esta regla le gana en especificidad. */
+.ing a:not(.hs-btn){color:var(--orange);font-weight:var(--weight-semibold)}
+/* En un teléfono los botones del ingreso pueden partir el texto, y los
+   márgenes se achican: si no, la tarjeta es más ancha que la pantalla. */
+.ing .hs-btn{white-space:normal;text-align:center}
+@media (max-width:520px){
+  .pnl-acceso{padding:var(--space-4);grid-template-columns:minmax(0,1fr)}
+  .pnl-acceso__card{padding:var(--space-6) var(--space-5)}
+}
 
 /* ==========================================================
    Cáscara CRM: barra superior con pestañas + sidebar

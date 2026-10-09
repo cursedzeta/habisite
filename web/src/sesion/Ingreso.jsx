@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Button, Field, Input } from '../ds'
 import { pedir } from '../api'
-import { RUTA_PANEL, urlGoogle } from './sesion'
+import { destinoTrasEntrar, RUTA_PANEL, urlGoogle } from './sesion'
 
 /* ==========================================================
    La pantalla de ingreso: Google o un enlace por correo.
@@ -137,9 +137,6 @@ export default function PaginaIngreso() {
   return <Ingreso retorno={RUTA_PANEL} aviso={aviso} />
 }
 
-/* Un retorno a la landing ('/') o a /ingresar no tiene sentido después de
-   entrar: va al panel. */
 function entrar(retorno) {
-  const destino = !retorno || retorno === '/' || retorno === '/ingresar' ? RUTA_PANEL : retorno
-  window.location.replace(destino)
+  window.location.replace(destinoTrasEntrar(retorno))
 }

@@ -9,63 +9,17 @@
  * Es de humo, no exhaustivo: comprueba que el camino feliz ande y que los
  * permisos corten. Los casos de borde van en los *.e2e-spec.ts.
  */
-import { readFileSync } from 'node:fs';
 import { PDFDocument } from 'pdf-lib';
-import pg from 'pg';
+import { comprobar, conectarBase, esperar, fase, FRONT, pedir, recorte, terminar } from './ayudantes.mjs';
 
-const API = process.env.URL_RECORRIDO ?? 'http://localhost:3999';
-
-// Acceso directo a la base de pruebas, solo para LEER lo que la API no expone
-// (los correos anotados, los tokens que viajan por correo) y para adelantar
-// el reloj del recordatorio. Nunca para saltear una regla de la API.
-const db = new pg.Client({
-  connectionString: `${process.env.DATABASE_URL.split('?')[0]}?options=-c%20search_path%3Dpruebas,public`,
-});
-await db.connect();
-const sql = async (texto, valores = []) => (await db.query(texto, valores)).rows;
+const { db, sql } = await conectarBase();
 const correosA = async (codigo, destinatario) =>
   Number((await sql('select count(*)::int as n from envios where codigo = $1 and destinatario = $2', [codigo, destinatario]))[0].n);
 const perfilDe = async (correo) => (await sql('select * from perfiles where correo = $1', [correo]))[0];
-const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
-const sesiones = JSON.parse(readFileSync(process.env.SESIONES_JSON ?? '.tmp-sesiones.json', 'utf8'));
-
-let ok = 0;
-let fallos = 0;
-const rotos = [];
-
-function comprobar(etiqueta, condicion, detalle = '') {
-  if (condicion) {
-    ok++;
-    console.log(`  ok    ${etiqueta}`);
-  } else {
-    fallos++;
-    rotos.push(etiqueta);
-    console.log(`  FALLA ${etiqueta}  ${detalle}`);
-  }
-}
-
-async function pedir(metodo, ruta, opciones = {}) {
-  const { como, cuerpo, formData, cabeceras = {} } = opciones;
-  const h = { ...cabeceras };
-  if (como) h.Cookie = sesiones[como].cookie;
-  let body;
-  if (formData) {
-    body = formData;
-  } else if (cuerpo !== undefined) {
-    h['Content-Type'] = 'application/json';
-    body = JSON.stringify(cuerpo);
-  }
-  const r = await fetch(`${API}${ruta}`, { method: metodo, headers: h, body, redirect: 'manual' });
-  const tipo = r.headers.get('content-type') ?? '';
-  let datos = null;
-  if (tipo.includes('json')) datos = await r.json().catch(() => null);
-  else if (tipo.includes('pdf')) datos = Buffer.from(await r.arrayBuffer());
-  else datos = await r.text().catch(() => null);
-  return { estado: r.status, datos, cabeceras: r.headers };
-}
-
-const recorte = (x, n = 160) => String(JSON.stringify(x) ?? '').slice(0, n);
-const fase = (n) => console.log(`\n-- ${n} ${'-'.repeat(Math.max(0, 58 - n.length))}`);
+const datosDe = async (codigo, destinatario) =>
+  (await sql('select datos from envios where codigo = $1 and destinatario = $2 order by id', [codigo, destinatario])).map((f) => f.datos);
+// Los correos llevan al panel: una sola URL para los tres roles (docs/12).
+const PANEL = `${FRONT}/panel`;
 
 // === 1 · Público y sesión ===
 fase('1 · Publico y sesion');
@@ -196,6 +150,8 @@ const marca = Date.now();
   const jur = await pedir('POST', '/admin/jurados', { como: 'admin', cuerpo: { correo: `Jurado-${marca}@Test.local`, nombre: 'Sol' } });
   comprobar('POST /admin/jurados -> crea el jurado', jur.estado < 300 && jur.datos?.correo === `jurado-${marca}@test.local`, `(${jur.estado}) ${recorte(jur.datos)}`);
   comprobar('C7 · le llega la invitacion al jurado', (await correosA('c7', `jurado-${marca}@test.local`)) === 1);
+  const datosC7 = await datosDe('c7', `jurado-${marca}@test.local`);
+  comprobar('C7 · el boton lleva a /panel (no directo a Google)', datosC7.length === 1 && datosC7[0]?.enlaceIngreso === PANEL && datosC7[0].enlaceIngreso.endsWith('/panel'), recorte(datosC7));
   const jurConcursante = await pedir('POST', '/admin/jurados', { como: 'admin', cuerpo: { correo: 'ana@test.local' } });
   comprobar('un concursante NO puede ser jurado -> 409', jurConcursante.estado === 409, `(${jurConcursante.estado})`);
 }
@@ -344,6 +300,8 @@ fase('4 · Propuesta y PDF');
   comprobar('POST /mi-propuesta/entregar -> estado entregada', entregada.estado < 300 && entregada.datos?.estado === 'entregada', `(${entregada.estado}) ${recorte(entregada.datos)}`);
   comprobar('formaEntrega = confirmada', entregada.datos?.formaEntrega === 'confirmada', String(entregada.datos?.formaEntrega));
   comprobar('C8 · comprobante a cada integrante (ana, bruno, carla)', (await correosA('c8', 'ana@test.local')) === 1 && (await correosA('c8', 'bruno@test.local')) === 1 && (await correosA('c8', 'carla@test.local')) === 1);
+  const datosC8 = (await Promise.all(['ana', 'bruno', 'carla'].map((n) => datosDe('c8', `${n}@test.local`)))).flat();
+  comprobar('C8 · enlacePanel termina en /panel', datosC8.length === 3 && datosC8.every((d) => d?.enlacePanel === PANEL && d.enlacePanel.endsWith('/panel')), recorte(datosC8.map((d) => d?.enlacePanel)));
   await pedir('POST', '/mi-propuesta/entregar', { como: 'ana' });
   comprobar('C8 · entregar dos veces no repite el comprobante', (await correosA('c8', 'ana@test.local')) === 1);
 
@@ -384,6 +342,8 @@ fase('5 · El cierre se aplica en el servidor');
   comprobar('el borrador con PDF queda entregado (automatica)', propDario.datos?.estado === 'entregada' && propDario.datos?.formaEntrega === 'automatica', recorte(propDario.datos));
   comprobar('la fecha de entrega es la del cierre, no la de la tarea', Math.abs(new Date(propDario.datos?.entregadaEn) - new Date(ayer)) < 5000, `${propDario.datos?.entregadaEn} vs ${ayer}`);
   comprobar('C9 · a dario le avisa que compite igual', (await correosA('c9', 'dario@test.local')) === 1);
+  const datosC9 = await datosDe('c9', 'dario@test.local');
+  comprobar('C9 · enlacePanel termina en /panel', datosC9.length === 1 && datosC9[0]?.enlacePanel === PANEL && datosC9[0].enlacePanel.endsWith('/panel'), recorte(datosC9));
   comprobar('C9 · a quien confirmo no le llega', (await correosA('c9', 'ana@test.local')) === 0);
 }
 
@@ -478,6 +438,8 @@ fase('7 · Resultados');
   comprobar('C13a al podio y C13b al resto', cuenta.c13a >= 1 && cuenta.c13b >= 1, recorte(cuenta));
   const conNumeros = await sql(`select count(*)::int as n from envios where codigo in ('c13a','c13b') and datos::text ~* 'puntaje|nota|promedio'`);
   comprobar('NINGUN correo de resultados lleva puntaje', conNumeros[0].n === 0);
+  const datosC13 = await sql(`select codigo, datos->>'enlacePanel' as enlace from envios where codigo in ('c13a', 'c13b')`);
+  comprobar('C13a/C13b · enlacePanel termina en /panel', datosC13.length >= 2 && datosC13.every((f) => f.enlace === PANEL && f.enlace.endsWith('/panel')), recorte(datosC13));
 }
 
 // === 8 · Límite y correos ===
@@ -497,13 +459,4 @@ fase('8 · Limite por IP y correos');
   comprobar('en pruebas NINGUN correo sale de verdad (todos "omitido")', !estados.enviado && !estados.fallido && !estados.pendiente && estados.omitido > 0, recorte(estados));
 }
 
-await db.end();
-
-console.log(`\n${'='.repeat(62)}`);
-console.log(`  ${ok} comprobaciones OK · ${fallos} fallidas`);
-if (rotos.length) {
-  console.log('\n  Fallan:');
-  rotos.forEach((r) => console.log(`   · ${r}`));
-}
-console.log('='.repeat(62));
-process.exit(fallos ? 1 : 0);
+await terminar(db);

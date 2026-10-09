@@ -134,7 +134,7 @@ export class Entorno {
   RESEND_API_KEY?: string;
 
   @IsNotEmpty()
-  CORREO_REMITENTE = 'Habisite Design Challenge <noreply@habisite.com>';
+  CORREO_REMITENTE = 'Habisite Challenge <noreply@habisite.com>';
 
   // Vacía: los correos no llevan dirección de respuesta. Es lo que se usa: las
   // consultas van al grupo de WhatsApp y lo que llegue a noreply@ lo descarta

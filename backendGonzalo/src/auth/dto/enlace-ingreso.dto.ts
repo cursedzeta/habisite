@@ -2,6 +2,13 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsEmail, IsOptional, IsString, Matches, MaxLength } from 'class-validator';
 
+/**
+ * Una ruta interna del front. No alcanza con prohibir `//`: el navegador lee
+ * `/\otro.com` y `/<tab>/otro.com` como `//otro.com`, así que tampoco van
+ * barras invertidas ni espacios. La usan el pedido y el canje (docs/12).
+ */
+export const RUTA_INTERNA = /^\/(?![/\\])[^\\\s]*$/;
+
 export class PedirEnlaceDto {
   @ApiProperty({ description: 'El correo con el que se inscribió.', example: 'ana@estudio.com' })
   @Transform(({ value }) => (typeof value === 'string' ? value.trim().toLowerCase() : value))
@@ -15,9 +22,9 @@ export class PedirEnlaceDto {
   })
   @IsOptional()
   @IsString()
-  @MaxLength(200)
+  @MaxLength(200, { message: 'El retorno no puede tener más de 200 caracteres' })
   // Sin esto el enlace del correo serviría de redirector abierto.
-  @Matches(/^\/(?!\/)/, { message: 'El retorno tiene que ser una ruta interna' })
+  @Matches(RUTA_INTERNA, { message: 'El retorno tiene que ser una ruta interna' })
   retorno?: string;
 }
 
