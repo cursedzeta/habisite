@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Button, Field, Input } from '../ds'
 import { pedir } from '../api'
-import { PANEL_DEL_ROL, urlGoogle } from './sesion'
+import { RUTA_PANEL, urlGoogle } from './sesion'
 
 /* ==========================================================
    La pantalla de ingreso: Google o un enlace por correo.
@@ -98,7 +98,7 @@ export function Ingreso({ retorno, aviso = null, titulo = 'Entrar a la plataform
 /* La ruta /ingresar. Tres casos:
    - ?enlace=…  viene del correo: canjea el enlace y entra.
    - ?error=…   vuelve de Google sin éxito: muestra por qué.
-   - nada       si ya hay sesión, va directo a su panel. */
+   - nada       si ya hay sesión, va directo al panel. */
 export default function PaginaIngreso() {
   const params = new URLSearchParams(window.location.search)
   const enlace = params.get('enlace')
@@ -120,7 +120,7 @@ export default function PaginaIngreso() {
     if (errorGoogle) return
 
     pedir('/yo')
-      .then((yo) => entrar('/', yo))
+      .then(() => entrar(RUTA_PANEL))
       .catch(() => setEstado('formulario'))
   }, [enlace, errorGoogle])
 
@@ -134,16 +134,12 @@ export default function PaginaIngreso() {
     )
   }
 
-  // Después de entrar desde acá, /ingresar vuelve a mirar el rol y manda al panel que toca.
-  return <Ingreso retorno="/ingresar" aviso={aviso} />
+  return <Ingreso retorno={RUTA_PANEL} aviso={aviso} />
 }
 
-/* `retorno` '/' o '/ingresar' no dicen a qué panel ir: lo decide el rol. */
-async function entrar(retorno, yo) {
-  if (retorno && retorno !== '/' && retorno !== '/ingresar') {
-    window.location.replace(retorno)
-    return
-  }
-  const quien = yo ?? (await pedir('/yo').catch(() => null))
-  window.location.replace(quien ? (PANEL_DEL_ROL[quien.rol] ?? '/') : '/ingresar')
+/* Un retorno a la landing ('/') o a /ingresar no tiene sentido después de
+   entrar: va al panel. */
+function entrar(retorno) {
+  const destino = !retorno || retorno === '/' || retorno === '/ingresar' ? RUTA_PANEL : retorno
+  window.location.replace(destino)
 }

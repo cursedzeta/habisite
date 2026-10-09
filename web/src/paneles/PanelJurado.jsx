@@ -5,7 +5,7 @@ import MisDatos from './MisDatos'
 import { SinDefinir, VisorPdf } from './Piezas'
 import { criteriosProvisorios, propuestasDemo } from './datos-demo'
 
-export default function PanelJurado({ yo }) {
+export default function PanelJurado({ yo, onVolver }) {
   const [seccion, setSeccion] = useState('pendientes')
   const [abierta, setAbierta] = useState(null)
 
@@ -25,6 +25,7 @@ export default function PanelJurado({ yo }) {
   return (
     <Shell
       yo={yo}
+      onVolver={onVolver}
       pestanas={[
         { id: 'evaluar', texto: 'Evaluar' },
         { id: 'perfil', texto: 'Mi perfil' },

@@ -65,8 +65,10 @@ sequenceDiagram
 
 ## Del lado del front
 
-- `/panel`, `/jurado` y `/admin` preguntan `GET /yo`. Sin sesión muestran el
-  ingreso, que vuelve a esa misma ruta.
-- `/ingresar` canjea `?enlace=`, muestra los errores de Google (`?error=`) y,
-  si ya hay sesión, manda a cada uno a su panel según el rol.
-- El admin puede abrir los tres paneles.
+- **Una sola URL para los tres roles: `/panel`** (decidido el 09.10). Pregunta
+  `GET /yo` y muestra la vista del rol. Sin sesión, el ingreso, que vuelve a
+  `/panel`. `/jurado` y `/admin` redirigen a `/panel`.
+- `/ingresar` canjea `?enlace=` y muestra los errores de Google (`?error=`).
+  Si ya hay sesión, manda a `/panel`.
+- El admin entra a su vista y desde ahí puede mirar la de concursante y la de
+  jurado, con un botón para volver.

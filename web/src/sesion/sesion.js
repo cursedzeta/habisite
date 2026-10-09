@@ -8,12 +8,9 @@ import { API, pedir } from '../api'
    GET /yo (backendGonzalo/docs/07).
    ========================================================== */
 
-/* El panel de cada rol. El admin puede abrir los tres. */
-export const PANEL_DEL_ROL = {
-  participante: '/panel',
-  jurado: '/jurado',
-  admin: '/admin',
-}
+/* Una sola URL para todos: /panel muestra la vista del rol de quien
+   entró. El admin además puede ver las de los otros dos. */
+export const RUTA_PANEL = '/panel'
 
 export const NOMBRE_DEL_ROL = {
   participante: 'Participante',

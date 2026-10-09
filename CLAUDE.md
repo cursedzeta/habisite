@@ -57,9 +57,11 @@ migra a código y se aloja en este mismo proyecto de Railway.
 - `contrato/openapi.yaml` — generado desde el back.
 - **El formulario de la landing conectado a la API** (`POST /inscripcion`, con
   Turnstile). Hecho el 8/10.
-- **El ingreso a los paneles** (`/panel`, `/jurado`, `/admin`, `/ingresar`):
-  Google o enlace por correo, con la sesión real de `GET /yo`. Los datos de la
-  persona ya son reales; lo de adentro de cada panel todavía es de ejemplo.
+- **El ingreso a los paneles**: Google o enlace por correo, con la sesión
+  real de `GET /yo`. **Una sola URL, `/panel`**, que muestra la vista según el
+  rol; el admin puede mirar las otras dos. Los datos de la persona ya son
+  reales; lo de adentro de cada panel todavía es de ejemplo. El enlace por
+  correo funciona en producción; Google todavía no (ver §11).
 
 **No existe todavía:**
 
@@ -82,7 +84,7 @@ migra a código y se aloja en este mismo proyecto de Railway.
 habisite/
 ├─ web/            front — React + Vite. ESTO es lo que está desplegado.
 │  ├─ src/
-│  │  ├─ App.jsx           enrutador mínimo: /, /ingresar, /panel, /jurado, /admin
+│  │  ├─ App.jsx           enrutador mínimo: /, /ingresar y /panel (vista según el rol)
 │  │  ├─ Landing.jsx       la landing
 │  │  ├─ Inscripcion.jsx   el formulario, contra la API
 │  │  ├─ api.js            dirección de la API y pedir()
@@ -406,3 +408,49 @@ En desarrollo hay que levantar la API local (`backendGonzalo/README.md` y
 `challenge.habisite.com`, y así tampoco se cargan inscripciones de prueba en
 la base real. Para el captcha en local, Cloudflare tiene claves de prueba
 (ver `backendGonzalo/docs/11`).
+
+---
+
+## 11. Para Gonzalo — lo que quedó de su lado
+
+Escrito por Tomás el 9/10 para que Gonzalo retome desde acá. Tachar lo que se
+vaya haciendo y borrar la sección cuando esté todo.
+
+**Contexto:** el 9/10 Tomás le sumó al back el **ingreso con un enlace por
+correo** (sin contraseñas) y unificó los paneles en **una sola URL, `/panel`**,
+que muestra la vista según el rol. Todo está en producción y probado con un
+participante y con un admin. El detalle está en
+`backendGonzalo/docs/12-ingreso-por-enlace.md`.
+
+1. **Habilitar Google en producción** — hoy da `Error 400:
+   redirect_uri_mismatch`. En la consola de Google, proyecto
+   `habisite-challenge`, cliente OAuth `259278501857-mo1b…`:
+   - [ ] Agregar en *URIs de redireccionamiento autorizados*:
+         `https://api.challenge.habisite.com/auth/google/callback`
+   - [ ] Agregar en *Orígenes de JavaScript autorizados*:
+         `https://challenge.habisite.com`
+   - [ ] Mientras siga en *Testing*, cargar como usuarios de prueba las
+         cuentas que vayan a probar (hoy solo están `gonzalomaurino@gmail.com`
+         y `zengatomi@gmail.com`).
+   - [ ] Cambiar el nombre de la app a «Habisite Challenge» y **pasar el
+         proyecto a *En producción*** antes de abrir la inscripción. Ver el
+         checklist de `backendGonzalo/docs/01-google-oauth.md`, «Producción».
+2. **Revisar lo que se sumó a su back** (`docs/12`): la migración
+   `004-enlace-de-ingreso.sql` (ya aplicada en producción), `POST /auth/enlace`,
+   `POST /auth/enlace/canjear`, `src/auth/enlace-ingreso.*` y el correo `c14`.
+3. **Los enlaces de `src/correo/enlaces.ts` apuntan a la landing y no al panel:**
+   - [ ] `ingreso()` (el botón del correo de invitación al jurado, C7) manda a
+         `/auth/google?retorno=/`. Mejor `{FRONTEND_URL}/panel`: ahí el jurado
+         elige Google o enlace por correo, y no queda trabado si Google falla.
+   - [ ] `panel()` devuelve `{FRONTEND_URL}/`. Lo usan C8, C9 y C13 como «ir al
+         panel», así que tendría que ser `/panel`. **Ojo:** `destinoGrupo()`
+         también usa `panel()` como respaldo cuando no hay grupo, y ahí sí
+         corresponde la landing: separarlos.
+4. **Nombre de la edición en los correos:** el encabezado de todas las
+   plantillas dice «DESIGN CHALLENGE 2026» y los textos «Habisite Design
+   Challenge 2026». Pasarlos a «Habisite Challenge 2026-II» (CLAUDE.md §1), y
+   también `CORREO_REMITENTE` en Railway.
+5. **`WHATSAPP_URL` en Railway** cuando exista el grupo. Hasta entonces, el
+   enlace al grupo de los correos y de la pantalla de gracias vuelve a la
+   landing.
+

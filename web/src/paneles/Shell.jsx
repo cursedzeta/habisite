@@ -9,6 +9,7 @@ import { NOMBRE_DEL_ROL, nombreCompleto, salir } from '../sesion/sesion'
 
 export default function Shell({
   yo,
+  onVolver,
   pestanas = [],
   pestanaActiva,
   onPestana,
@@ -51,6 +52,12 @@ export default function Shell({
           <span className="crm-top__correo">{yo.correo}</span>
           <span className="crm-top__rol">{NOMBRE_DEL_ROL[yo.rol]}</span>
         </div>
+        {/* Solo para el admin que está mirando la vista de otro rol. */}
+        {onVolver && (
+          <button type="button" className="crm-top__salir" onClick={onVolver}>
+            Volver a administración
+          </button>
+        )}
         <button type="button" className="crm-top__salir" onClick={salir}>
           Salir
         </button>

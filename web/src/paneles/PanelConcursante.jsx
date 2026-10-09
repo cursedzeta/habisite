@@ -5,7 +5,7 @@ import MisDatos from './MisDatos'
 import { Modal, SinDefinir, VisorPdf } from './Piezas'
 import { CIERRE, MAX_MIEMBROS, devolucionDemo, propuestaDemo } from './datos-demo'
 
-export default function PanelConcursante({ yo }) {
+export default function PanelConcursante({ yo, onVolver }) {
   const [seccion, setSeccion] = useState('propuesta')
   // La propuesta todavía es de ejemplo, pero quien la creó es quien entró.
   const [propuesta, setPropuesta] = useState(() => ({
@@ -30,6 +30,7 @@ export default function PanelConcursante({ yo }) {
   return (
     <Shell
       yo={yo}
+      onVolver={onVolver}
       pestanas={[
         { id: 'concurso', texto: 'Habisite Challenge 2026-II' },
         { id: 'perfil', texto: 'Mi perfil' },

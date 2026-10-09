@@ -2,21 +2,21 @@ import { useEffect, useState } from 'react'
 import { Button } from '../ds'
 import { pedir } from '../api'
 import { Ingreso } from './Ingreso'
-import { NOMBRE_DEL_ROL, PANEL_DEL_ROL, nombreCompleto, salir } from './sesion'
+import { RUTA_PANEL } from './sesion'
 
 /* ==========================================================
-   La puerta de cada panel.
+   La puerta del panel.
 
    Pregunta GET /yo y decide:
-   - sin sesión        → la pantalla de ingreso, que vuelve acá
-   - rol que no toca   → aviso y enlace a su panel
-   - todo bien         → el panel, con los datos reales de la persona
+   - sin sesión  → la pantalla de ingreso, que vuelve al panel
+   - con sesión  → el panel, con los datos reales de la persona
 
-   Es solo comodidad: quien decide qué puede ver cada uno es la API,
-   que valida la cookie y el rol en cada pedido.
+   Qué vista ve cada rol lo decide quien la usa (App.jsx). Es solo
+   comodidad: lo que puede hacer cada uno lo controla la API, que
+   valida la cookie y el rol en cada pedido.
    ========================================================== */
 
-export default function ConSesion({ roles, titulo, children }) {
+export default function ConSesion({ children }) {
   const [estado, setEstado] = useState({ cargando: true })
 
   useEffect(() => {
@@ -36,50 +36,20 @@ export default function ConSesion({ roles, titulo, children }) {
   }
 
   if (estado.error) {
-    if (estado.error.estado === 401) {
-      return <Ingreso retorno={window.location.pathname} titulo={titulo} />
-    }
+    if (estado.error.estado === 401) return <Ingreso retorno={RUTA_PANEL} />
     return (
-      <Aviso titulo="No pudimos cargar tu sesión">
-        <p>Algo falló de nuestro lado. Vuelve a intentarlo en unos minutos.</p>
-        <Button variant="primary" onClick={() => window.location.reload()}>
-          Reintentar
-        </Button>
-      </Aviso>
-    )
-  }
-
-  const { yo } = estado
-  if (yo.rol !== 'admin' && !roles.includes(yo.rol)) {
-    const suyo = PANEL_DEL_ROL[yo.rol]
-    return (
-      <Aviso titulo="Este panel no es para tu cuenta">
-        <p>
-          Entraste como <b>{nombreCompleto(yo)}</b> ({NOMBRE_DEL_ROL[yo.rol]?.toLowerCase()}).
-        </p>
-        {suyo && (
-          <Button variant="primary" href={suyo}>
-            Ir a mi panel
+      <div className="pnl-acceso">
+        <div className="pnl-acceso__card">
+          <span className="hs-eyebrow hs-eyebrow--brand">Habisite Challenge 2026-II</span>
+          <h1>No pudimos cargar tu sesión</h1>
+          <p>Algo falló de nuestro lado. Vuelve a intentarlo en unos minutos.</p>
+          <Button variant="primary" onClick={() => window.location.reload()}>
+            Reintentar
           </Button>
-        )}
-        <Button variant="ghost" onClick={salir}>
-          Entrar con otra cuenta
-        </Button>
-      </Aviso>
+        </div>
+      </div>
     )
   }
 
-  return children(yo)
-}
-
-function Aviso({ titulo, children }) {
-  return (
-    <div className="pnl-acceso">
-      <div className="pnl-acceso__card">
-        <span className="hs-eyebrow hs-eyebrow--brand">Habisite Challenge 2026-II</span>
-        <h1>{titulo}</h1>
-        {children}
-      </div>
-    </div>
-  )
+  return children(estado.yo)
 }

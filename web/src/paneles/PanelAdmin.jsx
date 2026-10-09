@@ -19,7 +19,7 @@ const PROXIMAMENTE = [
   ['Resultados', 'Calcular el ranking, cerrar la evaluación y publicar. /admin/resultados.'],
 ]
 
-export default function PanelAdmin({ yo }) {
+export default function PanelAdmin({ yo, onVer }) {
   const [seccion, setSeccion] = useState('inicio')
 
   return (
@@ -53,11 +53,11 @@ export default function PanelAdmin({ yo }) {
             Como administrador puedes abrir los otros paneles para ver lo que ve cada rol.
           </p>
           <div className="pnl-acciones">
-            <Button variant="primary" href="/panel">
-              Ver el panel de concursantes
+            <Button variant="primary" onClick={() => onVer('participante')}>
+              Ver como concursante
             </Button>
-            <Button variant="outline" href="/jurado">
-              Ver el panel de jurado
+            <Button variant="outline" onClick={() => onVer('jurado')}>
+              Ver como jurado
             </Button>
           </div>
 
