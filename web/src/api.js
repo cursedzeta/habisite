@@ -28,13 +28,15 @@ export class ErrorApi extends Error {
   }
 }
 
-/* Sin sesión: las rutas de la landing son públicas. Las de los
-   paneles van a necesitar credentials: 'include'. */
+/* Siempre con credentials: 'include': la sesión viaja en una cookie
+   HttpOnly y sin esto el navegador no la manda. En las rutas públicas
+   no molesta. */
 export async function pedir(ruta, { metodo = 'GET', cuerpo } = {}) {
   let r
   try {
     r = await fetch(`${API}${ruta}`, {
       method: metodo,
+      credentials: 'include',
       headers: cuerpo ? { 'Content-Type': 'application/json' } : undefined,
       body: cuerpo ? JSON.stringify(cuerpo) : undefined,
     })

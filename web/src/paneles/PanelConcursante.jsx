@@ -1,16 +1,18 @@
 import { useState } from 'react'
 import { Button, Field, Input } from '../ds'
 import Shell from './Shell'
-import { Acceso, Modal, SinDefinir, VisorPdf } from './Piezas'
-import { CIERRE, MAX_MIEMBROS, devolucionDemo, propuestaDemo, usuarioDemo } from './datos-demo'
+import MisDatos from './MisDatos'
+import { Modal, SinDefinir, VisorPdf } from './Piezas'
+import { CIERRE, MAX_MIEMBROS, devolucionDemo, propuestaDemo } from './datos-demo'
 
-export default function PanelConcursante() {
-  const [dentro, setDentro] = useState(false)
+export default function PanelConcursante({ yo }) {
   const [seccion, setSeccion] = useState('propuesta')
-  const [propuesta, setPropuesta] = useState(propuestaDemo)
+  // La propuesta todavía es de ejemplo, pero quien la creó es quien entró.
+  const [propuesta, setPropuesta] = useState(() => ({
+    ...propuestaDemo,
+    miembros: [{ correo: yo.correo, estado: 'creador' }, ...propuestaDemo.miembros.slice(1)],
+  }))
   const [modalEquipo, setModalEquipo] = useState(false)
-
-  if (!dentro) return <Acceso rol="participante" onEntrar={() => setDentro(true)} />
 
   const entregada = propuesta.estado === 'entregada'
   const libres = MAX_MIEMBROS - propuesta.miembros.length
@@ -27,18 +29,19 @@ export default function PanelConcursante() {
 
   return (
     <Shell
-      rol="Participante"
-      persona={`${usuarioDemo.nombre} ${usuarioDemo.apellido}`}
+      yo={yo}
       pestanas={[
         { id: 'concurso', texto: 'Habisite Challenge 2026-II' },
         { id: 'perfil', texto: 'Mi perfil' },
       ]}
-      pestanaActiva="concurso"
-      onPestana={() => {}}
+      pestanaActiva={seccion === 'perfil' ? 'perfil' : 'concurso'}
+      onPestana={(id) => setSeccion(id === 'perfil' ? 'perfil' : 'propuesta')}
       secciones={secciones}
       seccionActiva={seccion}
       onSeccion={setSeccion}
     >
+      {seccion === 'perfil' && <MisDatos yo={yo} />}
+
       {seccion === 'propuesta' && (
         <>
           <CabeceraSeccion

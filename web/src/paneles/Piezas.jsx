@@ -1,31 +1,8 @@
 import { useState } from 'react'
-import { Button } from '../ds'
 
 /* ==========================================================
    Piezas compartidas por los dos paneles del prototipo.
    ========================================================== */
-
-/* Acceso simulado. El login real lo resuelve el backend con Google
-   (req-*.md punto 1); acá solo se representa la pantalla. */
-export function Acceso({ rol, onEntrar }) {
-  return (
-    <div className="pnl-acceso">
-      <div className="pnl-acceso__card">
-        <span className="hs-eyebrow hs-eyebrow--brand">Habisite Challenge 2026-II</span>
-        <h1>{rol === 'jurado' ? 'Panel de jurado' : 'Panel de concursantes'}</h1>
-        <p>
-          {rol === 'jurado'
-            ? 'Acceso por invitación. Cada jurado se da de alta uno por uno.'
-            : 'Ingresá con la cuenta con la que te pre-registraste.'}
-        </p>
-        <Button variant="ink" size="lg" onClick={onEntrar} className="pnl-google">
-          Entrar con Google
-        </Button>
-        <span className="pnl-nota">Simulado: no valida nada todavía.</span>
-      </div>
-    </div>
-  )
-}
 
 /* Visor de PDF con zoom (req-concursantes.md, punto 6).
 

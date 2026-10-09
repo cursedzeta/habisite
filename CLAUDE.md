@@ -56,13 +56,17 @@ migra a código y se aloja en este mismo proyecto de Railway.
   vueltas, resultados y diez correos por Resend.
 - `contrato/openapi.yaml` — generado desde el back.
 - **El formulario de la landing conectado a la API** (`POST /inscripcion`, con
-  Turnstile). Hecho el 8/10; ver §10 para probarlo en local.
+  Turnstile). Hecho el 8/10.
+- **El ingreso a los paneles** (`/panel`, `/jurado`, `/admin`, `/ingresar`):
+  Google o enlace por correo, con la sesión real de `GET /yo`. Los datos de la
+  persona ya son reales; lo de adentro de cada panel todavía es de ejemplo.
 
 **No existe todavía:**
 
-- Los paneles conectados a la API: hoy son un prototipo con `datos-demo.js`.
+- El contenido de los paneles conectado a la API (propuesta, equipo,
+  evaluación): hoy sale de `datos-demo.js`.
 - La página pública de jurados y ediciones.
-- El panel de admin.
+- Las acciones del panel de admin (existe la pantalla, no las acciones).
 - El sitio institucional migrado.
 
 **Reparto de trabajo:** Tomás hace el front (`web/`). Gonzalo hace el back
@@ -78,10 +82,12 @@ migra a código y se aloja en este mismo proyecto de Railway.
 habisite/
 ├─ web/            front — React + Vite. ESTO es lo que está desplegado.
 │  ├─ src/
-│  │  ├─ App.jsx           enrutador mínimo: /, /panel, /jurado
+│  │  ├─ App.jsx           enrutador mínimo: /, /ingresar, /panel, /jurado, /admin
 │  │  ├─ Landing.jsx       la landing
 │  │  ├─ Inscripcion.jsx   el formulario, contra la API
 │  │  ├─ api.js            dirección de la API y pedir()
+│  │  ├─ listas.js         países y tipos, compartidos por formulario y paneles
+│  │  ├─ sesion/           ingreso (Google o enlace) y la puerta de los paneles
 │  │  ├─ paneles/          prototipo de los paneles (datos inventados)
 │  │  ├─ index.css         importa los 4 CSS en orden
 │  │  ├─ ds/               el sistema de diseño (13 componentes)
@@ -263,7 +269,9 @@ Las preguntas para cerrar esto se le mandaron a Jarod el 8/10.
 
 - **El backend del concurso es nuevo**, no reutiliza el repo Java viejo.
   NestJS + PostgreSQL.
-- **El login es con Google** para los tres roles, sin contraseñas.
+- **Se entra con Google o con un enlace por correo**, para los tres roles.
+  **Sin contraseñas** (decidido el 9/10; `backendGonzalo/docs/12`). El
+  enlace vence a los 15 minutos y sirve una vez.
 - **Un solo repo** con `web/` y `backendGonzalo/`, un servicio de Railway por
   carpeta.
 - **Subdominio, no ruta**: `challenge.habisite.com` y

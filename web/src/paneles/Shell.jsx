@@ -1,11 +1,14 @@
+import { NOMBRE_DEL_ROL, nombreCompleto, salir } from '../sesion/sesion'
+
 /* ==========================================================
    Cáscara tipo CRM: barra superior con pestañas + sidebar.
-   La usan los dos paneles para que compartan el mismo esqueleto.
+   La usan los tres paneles para que compartan el mismo esqueleto.
+
+   `yo` es la respuesta de GET /yo: quién está adentro de verdad.
    ========================================================== */
 
 export default function Shell({
-  rol,
-  persona,
+  yo,
   pestanas = [],
   pestanaActiva,
   onPestana,
@@ -16,8 +19,11 @@ export default function Shell({
 }) {
   return (
     <div className="crm">
+      {/* Tu sesión ya es real; lo de adentro del panel todavía no. Se va
+          cuando cada sección lea de la API. */}
       <div className="crm-cinta">
-        Prototipo — datos inventados, sin backend. Nada de lo que hagas acá se guarda.
+        En construcción: tu cuenta es real, pero la propuesta, el equipo y las evaluaciones
+        todavía son de ejemplo.
       </div>
 
       <header className="crm-top">
@@ -41,9 +47,13 @@ export default function Shell({
         </nav>
 
         <div className="crm-top__user">
-          <span className="crm-top__nombre">{persona}</span>
-          <span className="crm-top__rol">{rol}</span>
+          <span className="crm-top__nombre">{nombreCompleto(yo)}</span>
+          <span className="crm-top__correo">{yo.correo}</span>
+          <span className="crm-top__rol">{NOMBRE_DEL_ROL[yo.rol]}</span>
         </div>
+        <button type="button" className="crm-top__salir" onClick={salir}>
+          Salir
+        </button>
       </header>
 
       <div className="crm-cuerpo">

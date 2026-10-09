@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Button, Eyebrow, SectionHeader, Field, Input, Select, Checkbox } from './ds'
 import { pedir, TURNSTILE_SITIO } from './api'
+import { PAISES, TIPOS } from './listas'
 
 /* ==========================================================
    El formulario de inscripción, contra la API real.
@@ -9,29 +10,6 @@ import { pedir, TURNSTILE_SITIO } from './api'
    deja a la persona habilitada para entrar con Google. Todo lo que
    pide el back está en backendGonzalo/docs/11-formulario-para-el-front.md.
    ========================================================== */
-
-/* El país viaja como código ISO. El prefijo sirve para armar el
-   teléfono en E.164 y se precarga al elegir país. */
-const PAISES = [
-  ['AR', 'Argentina', '+54'],
-  ['BO', 'Bolivia', '+591'],
-  ['BR', 'Brasil', '+55'],
-  ['CL', 'Chile', '+56'],
-  ['CO', 'Colombia', '+57'],
-  ['CR', 'Costa Rica', '+506'],
-  ['EC', 'Ecuador', '+593'],
-  ['MX', 'México', '+52'],
-  ['PY', 'Paraguay', '+595'],
-  ['PE', 'Perú', '+51'],
-  ['UY', 'Uruguay', '+598'],
-  ['ZZ', 'Otro', ''],
-]
-
-const TIPOS = [
-  ['universidad', 'Estudio en una universidad', 'Facultad o escuela'],
-  ['trabajo', 'Trabajo en un estudio o empresa', 'Estudio o empresa'],
-  ['independiente', 'Trabajo por mi cuenta', 'Profesión o especialidad'],
-]
 
 const VACIO = {
   correo: '',

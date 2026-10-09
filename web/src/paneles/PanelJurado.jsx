@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { Button, Checkbox } from '../ds'
 import Shell from './Shell'
-import { Acceso, SinDefinir, VisorPdf } from './Piezas'
+import MisDatos from './MisDatos'
+import { SinDefinir, VisorPdf } from './Piezas'
 import { criteriosProvisorios, propuestasDemo } from './datos-demo'
 
-export default function PanelJurado() {
-  const [dentro, setDentro] = useState(false)
+export default function PanelJurado({ yo }) {
   const [seccion, setSeccion] = useState('pendientes')
   const [abierta, setAbierta] = useState(null)
 
@@ -18,22 +18,22 @@ export default function PanelJurado() {
      puntuaron los demas (req-jurado.md punto 5). */
   const [cerrada, setCerrada] = useState(false)
 
-  if (!dentro) return <Acceso rol="jurado" onEntrar={() => setDentro(true)} />
-
   const pendientes = propuestasDemo.filter((p) => !p.evaluada)
   const evaluadas = propuestasDemo.filter((p) => p.evaluada)
   const lista = seccion === 'evaluadas' ? evaluadas : seccion === 'todas' ? propuestasDemo : pendientes
 
   return (
     <Shell
-      rol="Jurado"
-      persona="Ana Restrepo"
+      yo={yo}
       pestanas={[
         { id: 'evaluar', texto: 'Evaluar' },
-        { id: 'criterios', texto: 'Criterios' },
+        { id: 'perfil', texto: 'Mi perfil' },
       ]}
-      pestanaActiva="evaluar"
-      onPestana={() => {}}
+      pestanaActiva={seccion === 'perfil' ? 'perfil' : 'evaluar'}
+      onPestana={(id) => {
+        setSeccion(id === 'perfil' ? 'perfil' : 'pendientes')
+        setAbierta(null)
+      }}
       secciones={[
         { id: 'nav', texto: 'Propuestas', separador: true },
         { id: 'pendientes', texto: 'Pendientes', contador: pendientes.length },
@@ -48,6 +48,10 @@ export default function PanelJurado() {
         setAbierta(null)
       }}
     >
+      {seccion === 'perfil' ? (
+        <MisDatos yo={yo} />
+      ) : (
+      <>
       <div className="crm-interruptores">
         <label>
           <input type="checkbox" checked={verAutor} onChange={(e) => setVerAutor(e.target.checked)} />
@@ -70,6 +74,8 @@ export default function PanelJurado() {
         />
       ) : (
         <Listado propuestas={lista} verAutor={verAutor} onAbrir={setAbierta} />
+      )}
+      </>
       )}
     </Shell>
   )
