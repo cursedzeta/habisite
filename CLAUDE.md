@@ -4,32 +4,35 @@ Este archivo es la fuente de verdad para cualquiera que agarre el repo: personas
 o sesiones de Claude Code. Si algo cambia y contradice lo de acá, **actualizá
 este archivo en el mismo commit.**
 
-Última actualización: 8 de septiembre de 2026 (requerimientos de los paneles).
+Última actualización: 8 de octubre de 2026 (llegó el back de Gonzalo, el
+documento de Jarod y el formulario conectado a la API).
 
 ---
 
 ## 1. Qué es esto
 
 **Habisite** es un estudio latinoamericano de diseño de espacios. Organiza el
-**Habisite Design Challenge 2026**, un concurso internacional de arquitectura
-para estudiantes de últimos años y egresados de Latinoamérica.
+**Habisite Challenge 2026-II** (antes «Habisite Design Challenge 2026»), un
+concurso internacional de arquitectura para estudiantes de últimos años y
+egresados de Latinoamérica. **El nombre nuevo va en todo el sitio**: hay
+partes de la landing y de los paneles que todavía dicen el viejo.
 
-Hay que construir **tres superficies**, y son **una sola aplicación**, no tres
-proyectos:
+Son **cinco superficies** y son **una sola aplicación**, no proyectos separados:
 
-| Superficie | Quién entra | Para qué |
-|---|---|---|
-| **Landing del concurso** | Público | Se pre-registra y cae en el grupo de WhatsApp |
-| **Panel de concursantes** | Inscriptos, login con Google | Su equipo sube un PDF |
-| **Panel de jurado** | Jurados, invitados uno por uno | Puntúan y dejan devolución |
+| Superficie | Quién entra | Para qué | Estado |
+|---|---|---|---|
+| **Landing del concurso** | Público | Se inscribe y cae en el grupo de WhatsApp | En producción |
+| **Jurados y ediciones** | Público | Memoria de la 1ª edición y jurado 2026-II. Sin puntajes | Sin construir · pedido de Jarod |
+| **Panel de concursantes** | Inscriptos, login con Google | Su equipo sube un PDF | Prototipo con datos inventados |
+| **Panel de jurado** | Jurados, invitados uno por uno | Califican | Prototipo con datos inventados |
+| **Panel de admin** | Habisite | Admite propuestas, cierra la evaluación, publica | Sin construir |
 
-La devolución del jurado tiene que impactar de vuelta en el concursante, que
-recibe un aviso cuando se publica. **Ese es el motivo de que sea una sola app
-con una sola base**: si fueran tres proyectos separados, pasar la devolución del
-jurado al participante sería trabajo real en vez de una consulta.
+Todo comparte una sola base: lo que carga el jurado y lo que publica el admin
+le llega al concursante con una consulta, no con una integración entre sistemas.
 
 **El puntaje del jurado nunca sale de adentro del sistema**: ordena y define el
-podio, pero el concursante solo ve la devolución escrita.
+podio, pero el concursante no ve ningún número. Si ve o no la devolución
+escrita está **en disputa** (ver §6.2).
 
 A futuro, el sitio institucional (`habisite.com`, hoy en WordPress) también se
 migra a código y se aloja en este mismo proyecto de Railway.
@@ -40,23 +43,30 @@ migra a código y se aloja en este mismo proyecto de Railway.
 
 **En producción:**
 
-- **https://challenge.habisite.com** — la landing del concurso, desplegada y
-  con certificado válido. Ver §5 para cómo está montada.
+- **https://challenge.habisite.com** — la landing del concurso. Ver §5.
+- **https://api.challenge.habisite.com** — la API del concurso, con su Postgres
+  en la red privada. Desplegada por Gonzalo el 8/10.
 
 **Hecho:**
 
-- `web/` — React 19 + Vite 8. **Sin Tailwind** (ver §9).
-- El sistema de diseño, exportado desde Claude Design y portado a código.
+- `web/` — React 19 + Vite 8. **Sin Tailwind** (ver §9). El sistema de diseño
+  exportado desde Claude Design y portado a código.
+- `backendGonzalo/` — NestJS + PostgreSQL. 42 endpoints: login con Google,
+  inscripción, equipos e invitaciones, propuesta y PDF, evaluación en dos
+  vueltas, resultados y diez correos por Resend.
+- `contrato/openapi.yaml` — generado desde el back.
+- **El formulario de la landing conectado a la API** (`POST /inscripcion`, con
+  Turnstile). Hecho el 8/10; ver §10 para probarlo en local.
 
 **No existe todavía:**
 
-- `api/` — el backend del concurso.
-- `contrato/openapi.yaml` — la frontera entre front y back.
-- Los paneles de concursantes y de jurado.
+- Los paneles conectados a la API: hoy son un prototipo con `datos-demo.js`.
+- La página pública de jurados y ediciones.
+- El panel de admin.
 - El sitio institucional migrado.
 
-**Reparto de trabajo:** Tomás hace el front (`web/`). Su compañero hace el back
-(`api/`), incluido el login con Google.
+**Reparto de trabajo:** Tomás hace el front (`web/`). Gonzalo hace el back
+(`backendGonzalo/`).
 
 ---
 
@@ -68,7 +78,11 @@ migra a código y se aloja en este mismo proyecto de Railway.
 habisite/
 ├─ web/            front — React + Vite. ESTO es lo que está desplegado.
 │  ├─ src/
-│  │  ├─ App.jsx           la landing entera
+│  │  ├─ App.jsx           enrutador mínimo: /, /panel, /jurado
+│  │  ├─ Landing.jsx       la landing
+│  │  ├─ Inscripcion.jsx   el formulario, contra la API
+│  │  ├─ api.js            dirección de la API y pedir()
+│  │  ├─ paneles/          prototipo de los paneles (datos inventados)
 │  │  ├─ index.css         importa los 4 CSS en orden
 │  │  ├─ ds/               el sistema de diseño (13 componentes)
 │  │  │  ├─ base.jsx       Icon · Button · IconButton · Badge · Eyebrow · Card · SectionHeader
@@ -80,30 +94,40 @@ habisite/
 │  │     ├─ pagina.css        estilos de la landing
 │  │     └─ interacciones.css NUESTRAS modificaciones (ver §9)
 │  └─ package.json
-├─ api/            back — no existe todavía
+├─ backendGonzalo/ back — NestJS. Su documentación está en docs/ adentro
 ├─ contrato/
-│  └─ openapi.yaml la frontera entre los dos — no existe todavía
+│  └─ openapi.yaml la frontera entre los dos, generada desde el back
+├─ docs/           los documentos que manda la organización, con la fecha
+│                  en que llegaron: AAAA-MM-DD - Quién - Qué.pdf
 ├─ reference/      identidad extraída del WordPress viejo
 ├─ prototipo/      prototipos HTML previos, superados por web/
-├─ plan/           plan técnico inicial (ver §8, tiene partes vencidas)
+├─ plan/           plan técnico inicial (tiene partes vencidas)
 ├─ req-concursantes.md
-└─ req-jurado.md   ← LOS DOS MANDAN SOBRE §6 DE ESTE ARCHIVO
+└─ req-jurado.md
 ```
 
-**Leé `req-concursantes.md` y `req-jurado.md` antes que la §6.** Son la
-definición vigente de los dos paneles, tomada con Tomás el 8/9/2026. Donde
-contradigan a la §6, ganan ellos: la §6 quedó escrita antes y todavía conserva
-partes superadas, señaladas más abajo.
+**Dónde está la definición de cada cosa.** Hay tres fuentes y hoy **no
+coinciden del todo**:
+
+1. **`backendGonzalo/docs/`** — lo que está implementado. Sale de lo que
+   definió **Sol** el 7 y 8/9 (`docs/2026-09-08 - Sol - …`). Para el front, los
+   que importan son el **07** (qué endpoint usa cada pantalla) y el **11** (el
+   formulario).
+2. **`docs/2026-10-08 - Jarod - Ajustes a la plataforma 2026-II.pdf`** — lo que
+   pide Jarod, más nuevo, y que contradice varias cosas de Sol. Ver §6.2.
+3. **`req-concursantes.md` y `req-jurado.md`** — lo que se habló con Tomás el
+   8/9, actualizado el 8/10 con el estado de cada punto.
+
+**Cuando choquen, no se implementa ninguna de las dos versiones** hasta que la
+organización decida. La tabla de §6.2 dice cuáles están en esa situación.
 
 **Un solo repo, un servicio de Railway por carpeta.** Railway soporta monorepos:
-cada servicio apunta al mismo repo con su propio *Root Directory*. El front ya
-está así (`web/`); el back va a ser igual con `api/`.
+cada servicio apunta al mismo repo con su propio *Root Directory*: `web/` y
+`backendGonzalo/`.
 
-**`contrato/openapi.yaml` es la pieza clave del reparto.** Con el back en Java no
-se pueden compartir tipos de TypeScript. El contrato lo escribe el back primero;
-de ahí el front genera sus tipos y puede programar pantallas contra datos de
-prueba sin esperar que la API exista. **Sin esa carpeta, uno de los dos vive
-bloqueado esperando al otro.**
+**`contrato/openapi.yaml` es la frontera.** Lo genera el back; de ahí el front
+saca sus tipos (`npx openapi-typescript ../contrato/openapi.yaml -o
+src/api/tipos.ts`) y puede programar pantallas sin esperar a la API.
 
 ---
 
@@ -193,116 +217,94 @@ only*), esperar a que Railway emita, y volver a naranja.
 
 ---
 
-## 6. Lo que tiene que hacer el back
+## 6. Reglas del concurso
 
-### 6.1 Primero de todo: el contrato de autenticación
+El detalle de cómo está hecho el back está en `backendGonzalo/docs/`: modelo
+de datos (03), máquinas de estado (04), equipos (05), evaluación (06), API
+(07), correos (10). Esta sección resume las reglas, no las repite.
 
-Es lo que más bloquea al front. Antes que cualquier otra cosa, definir en
-`contrato/openapi.yaml`:
+### 6.1 En lo que todos coinciden
 
-- Qué endpoint inicia el login con Google
-- A dónde vuelve el usuario después
-- Cómo el front sabe **quién está logueado y con qué rol** (algo tipo `GET /yo`)
-- Cómo se cierra sesión
-
-Sin eso el front no puede construir ni la primera pantalla de los paneles.
-
-### 6.2 Modelo de datos
-
-El corazón del sistema es la separación entre **propuesta**, **puntaje** y
-**resultado publicado**. Los jurados cargan puntajes cuando quieren; el
-participante no ve nada hasta que un administrador publica.
-
-| Tabla | Qué guarda |
-|---|---|
-| `profiles` | Nombre, apellido, correo, universidad, país y **rol** (`participante` · `jurado` · `admin`). Se crea sola en el primer login. |
-| `submissions` | Una propuesta **por equipo**: título, memoria, estado (`borrador` / `entregada`), fecha de entrega. |
-| `submission_members` | Los integrantes del equipo y las invitaciones pendientes. **Máximo 5** (provisorio, va como constante de configuración). |
-| `submission_file` | **Un único PDF** por propuesta. Ya no hay láminas, memoria y renders por separado. |
-| `criteria` | Los criterios con su peso. **Todavía sin confirmar** — ver `req-jurado.md` §3.2. Por eso van en base de datos y la pantalla de puntuación se genera desde acá, nunca contra campos fijos. |
-| `scores` | Un puntaje por criterio, por jurado, por propuesta. **Clave única sobre los tres.** **El puntaje es interno**: sirve para ordenar y sacar el podio, y el concursante nunca lo ve. |
-| `feedback` | Devolución escrita del jurado, con interruptor de visibilidad hacia el participante. **Es lo único que el concursante recibe.** |
-| `results` | Posición y fecha de publicación. **Mientras no tenga fecha, no existe para el participante.** |
-
-**Criterios de evaluación y pesos** — ⚠️ **sin confirmar**, salieron de las bases
-del sitio viejo y el equipo todavía no habló con la gente del jurado:
-
-| Criterio | Peso |
-|---|---|
-| Creatividad y originalidad | 35% |
-| Narrativa arquitectónica y experiencia | 20% |
-| Integración espacial con el entorno | 20% |
-| Sostenibilidad | 10% |
-| Viabilidad técnica | 5% |
-| Calidad de presentación | 5% |
-| Cumplimiento de entregables | 5% |
-
-Puntaje final = suma ponderada de los criterios, promediada entre jurados.
-
-### 6.3 Permisos
-
-| Rol | Puede | No puede |
-|---|---|---|
-| `participante` | Ver y editar la propuesta **de su equipo**, hasta el cierre. Ver su **devolución** una vez publicada, y si entró al podio. | Ver otras propuestas. Ver **ningún puntaje, nunca**. Editar después del cierre. |
-| `jurado` | Cargar y corregir **sus propios** puntajes y devoluciones. | Modificar propuestas. Ver puntajes de otros jurados antes del cierre. |
-| `admin` | Todo, más las dos acciones que nadie más tiene: **cerrar evaluación** y **publicar resultados**. | — |
-
-Dos reglas que no son capricho técnico:
-
-- **El cierre de entregas se aplica en el servidor**, no en el botón. Con zona
-  horaria explícita.
+- **El concursante nunca ve un número.** Solo se publica el podio.
+- **El jurado puntúa por criterio, de 1 a 10.** Clave única sobre (propuesta,
+  jurado, criterio). Los criterios y sus pesos viven **en la tabla
+  `criterios`**: la pantalla de puntuación se genera desde `GET /criterios`,
+  nunca contra campos fijos.
 - **Un jurado no ve los puntajes de los otros hasta el cierre.** Si el segundo
   jurado ve el 9 que puso el primero, tiende a acercarse a ese número.
+- **El cierre de entregas se aplica en el servidor**, no en el botón, con zona
+  horaria explícita. Hay 15 minutos de gracia después del cierre (pedido de Sol).
+- **Una propuesta es de un equipo**, de hasta 5 integrantes (valor en
+  `edicion.max_integrantes`). Una persona no puede estar en dos equipos.
+- **Nadie entra sin inscribirse.** El perfil nace del formulario de la landing
+  o de una invitación, no del primer login.
+- **Un empate en el podio lo decide el jurado en reunión.**
+- **Solo `admin` cierra la evaluación y publica los resultados.**
 
-### 6.4 Avisos
+### 6.2 En disputa entre Sol y Jarod — no implementar todavía
 
-Cuando el admin publica: el sistema promedia y aplica los pesos **por dentro**
-para ordenar. Cada participante recibe un correo y ve **su devolución** en el
-panel — nunca un puntaje. A los tres primeros se les avisa por el panel y por
-los medios oficiales del concurso (el grupo de WhatsApp).
+| Tema | Sol (8/9) · **implementado** | Jarod (8/10) |
+|---|---|---|
+| ¿El jurado ve al autor? | Sí | No: anónimo hasta el cierre. Una propuesta identificable queda descalificada |
+| Reparto | Dos vueltas: cada jurado preselecciona un tercio, después los tres puntúan a los finalistas | Menos de ~100 propuestas: todos ven todas. Más: dos rondas |
+| Devolución escrita | Opcional e interna: el concursante no la ve | El concursante la recibe |
+| Corregir la calificación | Puede dejarla a medias y seguir otro día | Una sola vez: al enviar queda bloqueada |
+| Criterios | 7: 35/20/20/10/5/5/5, con «cumplimiento de entregables» | 6: Creatividad y concepto 30, Potencial de mercado y aprovechamiento 20, Narrativa 15, Entorno 15, Viabilidad 10, Sostenibilidad 10. «Cumplimiento» pasa a ser un filtro de admisión previo |
+| El PDF | Una sola lámina, 30 MB | Hasta 2 paneles (páginas), 40 MB |
+| Cuadro de áreas | — | Obligatorio: área construida, útil y de ocupación |
+| Aviso de resultados | Por el grupo de WhatsApp y redes | Por correo |
+| Hora del cierre | API en `America/Argentina/Buenos_Aires` | Hora de Colombia (GMT-5) |
+
+Las preguntas para cerrar esto se le mandaron a Jarod el 8/10.
 
 ---
 
 ## 7. Decisiones tomadas — no volver a discutirlas
 
 - **El backend del concurso es nuevo**, no reutiliza el repo Java viejo.
-- **El login es con Google** y lo resuelve el back.
-- **Un solo repo** con `web/` y `api/`, un servicio de Railway por carpeta.
-- **Subdominio, no ruta**: `challenge.habisite.com`.
-- **El formulario de la landing redirige al grupo de WhatsApp**, que es donde se
-  comparte el resto de la información y los enlaces a los paneles.
+  NestJS + PostgreSQL.
+- **El login es con Google** para los tres roles, sin contraseñas.
+- **Un solo repo** con `web/` y `backendGonzalo/`, un servicio de Railway por
+  carpeta.
+- **Subdominio, no ruta**: `challenge.habisite.com` y
+  `api.challenge.habisite.com` (este último para que la cookie de sesión sea
+  *same-site* con el front).
+- **El formulario de la landing es la inscripción**, no un pre-registro, y
+  termina en el **grupo de WhatsApp**: ahí se comparte el resto de la
+  información y los enlaces a los paneles. Es el único formulario del
+  concurso; todos los canales (LinkedIn, Instagram…) llevan a él.
+- **El enlace al grupo lo da la API** (`/r/{token}`, que registra el clic). El
+  front nunca lo tiene escrito.
+- **Los correos salen por Resend desde `noreply@habisite.com`.**
 - **El proyecto viejo de Railway se borró**, con su base de datos.
-- **Una propuesta es de un equipo**, no de una persona: hasta 5 miembros
-  invitados por correo.
-- **Se entrega un único PDF**, con visor y zoom en el panel.
-- **El concursante nunca ve un puntaje.** El jurado sí puntúa, pero es interno.
-
-⚠️ **Lo que el jurado ve del autor volvió a estar en duda.** Estuvo un tiempo
-acá como decidido a favor de mostrarlo; el equipo lo reabrió el 8/9. Ver
-`req-jurado.md` §3.3 — junto con otras dos definiciones pendientes de ese panel
-que **no hay que implementar** hasta que se cierren.
+- **Una propuesta es de un equipo** y **se entrega un único PDF**, con visor y
+  zoom en el panel.
+- **El concursante nunca ve un puntaje.**
 
 ---
 
 ## 8. Pendientes que bloquean
 
-1. **Las fechas reales del concurso.** Las que muestra la landing (24 mayo –
-   13 junio 2026) vienen del diseño y **no están confirmadas**.
-2. **El enlace del grupo de WhatsApp.**
-3. **Los montos de los premios.** La landing dice USD 5.000 / 2.000 / 1.000,
+1. **Quién decide entre Sol y Jarod** en los temas de §6.2. Es lo que más
+   frena los paneles.
+2. **Las fechas reales de la edición 2026-II.** Las que muestra la landing
+   (24 mayo – 13 junio 2026) ya pasaron y nunca estuvieron confirmadas.
+3. **El texto de las bases y términos.** El tilde del formulario es
+   obligatorio y el correo de invitación al equipo los enlaza; mientras no
+   existan, `GET /edicion/publica` devuelve `terminosUrl: null`.
+4. **El enlace del grupo de WhatsApp.** Vive en una variable de entorno de la
+   API, así que se cambia sin tocar código.
+5. **Cuántas propuestas llegaron en la 1ª edición.** Según Jarod, define si se
+   evalúa en una vuelta o en dos.
+6. **La lista y las fotos de los jurados 2026-II**, y el material de la 1ª
+   edición, para la página de jurados y ediciones.
+7. **Los montos de los premios.** La landing dice USD 5.000 / 2.000 / 1.000,
    pero salieron del diseño generado, no de una fuente oficial.
-4. **Los entregables y sus pesos máximos**, validados en el navegador y otra vez
-   en el servidor. Sin un tope, alguien sube un render de 400 MB el último día.
-5. **El texto de las bases**: qué se hace con los datos personales y qué derechos
-   tiene Habisite sobre las propuestas.
-6. **El link del menú de WordPress** apuntando a `challenge.habisite.com`, más
+8. **El link del menú de WordPress** apuntando a `challenge.habisite.com`, más
    una Redirect Rule 301 desde `habisite.com/habisite-design-challenge-2026/`.
-7. **Los términos y condiciones del concurso.** El correo de invitación al
-   equipo tiene que enlazarlos, así que sin ese texto no se puede cerrar el
-   flujo de invitación.
-8. **Tres definiciones del panel de jurado** que el equipo tiene que cerrar:
-   si cada jurado ve todas las propuestas, cuáles son los criterios, y si ve la
-   autoría. Detalle y consecuencias en `req-jurado.md` §3.
+9. **Pasar el proyecto de Google a «En producción»** antes de abrir la
+   inscripción: en modo *Testing* hay tope de 100 usuarios y las sesiones se
+   caen a los 7 días.
 
 ---
 
@@ -346,7 +348,9 @@ diseño original sin adivinar qué tocamos nosotros. Mantenerla.
 Hoy `interacciones.css` contiene: la escala al 90%, el degradé del hero sin el
 negro original, la deriva ambiental, la barra transparente sobre el hero, y tres
 arreglos de omisiones del sistema (fondo del `<button>` del pie, color de las
-`<option>` del select, y el `backdrop-filter` sin prefijo).
+`<option>` del select, y el `backdrop-filter` sin prefijo), y lo que sumó el
+formulario de inscripción (ayudas y errores legibles sobre naranja, la fila
+del teléfono).
 
 ### Idioma
 
@@ -384,3 +388,13 @@ npm run build
 npm run lint
 npm start        # sirve dist/ como en producción
 ```
+
+**A qué API habla el front.** En `npm run dev`, a `http://localhost:3000`; en
+el build, a `https://api.challenge.habisite.com`. `VITE_API_URL` pisa
+cualquiera de las dos. Está en `web/src/api.js`.
+
+En desarrollo hay que levantar la API local (`backendGonzalo/README.md` y
+`backendGonzalo/docs/08`): la de producción solo acepta pedidos desde
+`challenge.habisite.com`, y así tampoco se cargan inscripciones de prueba en
+la base real. Para el captcha en local, Cloudflare tiene claves de prueba
+(ver `backendGonzalo/docs/11`).

@@ -9,6 +9,41 @@ implementarse todavía**, ni siquiera "por las dudas".
 
 ---
 
+## 0. Estado al 8 de octubre
+
+Desde que se escribió este archivo llegaron dos definiciones, y **no
+coinciden**:
+
+- **Sol (7 y 8/9)**, que es lo que Gonzalo implementó en `backendGonzalo/`.
+  Ver `backendGonzalo/docs/06-evaluacion-en-dos-vueltas.md` y
+  `docs/2026-09-08 - Sol - …`.
+- **Jarod (8/10)**: `docs/2026-10-08 - Jarod - Ajustes a la plataforma 2026-II.pdf`.
+
+| Punto de este archivo | Sol · implementado | Jarod | Estado |
+|---|---|---|---|
+| §1.4 Corrige sus puntajes | Sí, puede dejarlo a medias | **No**: una sola revisión, bloqueada al enviar, con confirmación previa | ⚠️ En disputa |
+| §3.1 ¿Ve todas? | Dos vueltas: preselección por tercios y final | Menos de ~100: todas. Más: dos rondas | ⚠️ En disputa |
+| §3.2 Criterios | Los 7 de antes | 6 nuevos, «cumplimiento» como filtro de admisión | ⚠️ En disputa (no bloquea: viven en tabla) |
+| §3.3 ¿Ve al autor? | Sí | **No**, anónimo hasta el cierre | ⚠️ En disputa |
+| §4.1 Escala | **1 a 10, entera** | — | ✅ Resuelto |
+| §4.3 Podio | **Solo se publica el podio**; un empate lo decide el jurado en reunión | — | ✅ Resuelto |
+| §4.5 Devolución | Opcional e **interna**: el concursante no la ve | El concursante **la recibe** | ⚠️ En disputa |
+
+Lo que pide Jarod para la pantalla, si se adopta su versión:
+
+- **Pendientes**: el único lugar donde se califica. Al enviar pasa a Evaluadas.
+- **Evaluadas**: su puntaje y su devolución, sin poder editar.
+- **Todas**: solo previsualización, anónima.
+- **Avance del jurado**: queda como en el prototipo.
+- Encabezado «Habisite Challenge 2026-II», sin el banner de prototipo y sin el
+  interruptor «Mostrar la autoría».
+
+**Hasta que se resuelvan las disputas, se mantiene la regla de este archivo:
+no construir el listado ni la pantalla de puntuación contra ninguna de las dos
+versiones.**
+
+---
+
 ## 1. Confirmado
 
 1. Se entra con **Google**, con rol `jurado`. **Se invita uno por uno**, no hay
@@ -91,8 +126,8 @@ propuesta, así que no se pierde nada.
 Cambia cómo se construye la pantalla, así que conviene cerrarlo antes de
 escribirla.
 
-⚠️ **`CLAUDE.md` §7 lo lista entre las "decisiones tomadas — no volver a
-discutirlas". Eso ya no es cierto y hay que corregirlo.**
+*(Corregido el 8/10: `CLAUDE.md` ya no lo lista como decidido; está en su
+§6.2, entre los temas en disputa.)*
 
 ---
 

@@ -7,6 +7,38 @@ de concursantes: varios puntos de ahí quedaron **superados** por lo de acá.
 
 ---
 
+## 0. Estado al 8 de octubre
+
+El back ya está hecho (`backendGonzalo/`, definiciones de Sol del 8/9) y llegó
+el documento de Jarod (`docs/2026-10-08 - Jarod - …`). Cómo quedó cada punto:
+
+| Punto de este archivo | Ahora |
+|---|---|
+| §1.2 El perfil se crea solo en el primer ingreso | **Cambió.** Nace del formulario de la landing (o de una invitación). Una cuenta de Google que no se inscribió no entra. Si se inscribió solo con el correo, el panel le pide primero los datos que faltan (`perfilCompleto: false`) |
+| §4.18 Recibe la devolución del jurado | ⚠️ **En disputa.** Sol: no la ve, es interna. Jarod: la recibe |
+| §4.19 Aviso del podio por el panel y el grupo | ⚠️ **En disputa.** Jarod dice que los resultados van por correo. Se le preguntó |
+| Pregunta 2 · ¿5 incluye al creador? | Sigue abierta |
+| Pregunta 3 · ¿Una persona en dos propuestas? | ✅ **No.** Lo impone la base |
+| Pregunta 4 · ¿El invitado necesita Google? | ✅ Entra con **cualquier** cuenta de Google si viene con el enlace de la invitación |
+| Pregunta 5 · ¿Quitar miembros? ¿Vencen? | ✅ Cada uno se puede dar de baja hasta el cierre. Si un invitado nunca acepta, **el equipo compite igual** y él no figura como autor. Además de la card de correos, hay un **enlace del equipo** para sumarse |
+| Pregunta 6 · ¿Quién sube el PDF? | ✅ Cualquier integrante que aceptó |
+| Pregunta 7 · Peso máximo | ⚠️ Sol: 30 MB (implementado). Jarod: 40 MB |
+| Pregunta 8 · Páginas | ⚠️ Sol: una sola lámina. Jarod: hasta 2 paneles |
+
+Lo que agrega Jarod y no estaba acá:
+
+- **Cuadro de áreas obligatorio**: área construida, área útil y área de
+  ocupación. Falta definir si se carga en un formulario o va dentro del PDF.
+- **Filtro de admisión**: antes de la evaluación, Habisite revisa que la
+  propuesta cumpla las bases (PDF, paneles, cuadro de áreas, anonimato). Si no
+  cumple, no llega al jurado.
+- **La fecha de cierre en hora de Colombia (GMT-5).** La API hoy usa
+  `America/Argentina/Buenos_Aires`.
+- Sacar los ejemplos de 4 láminas del prototipo y pasar los textos a español
+  neutro.
+
+---
+
 ## 1. Acceso y perfil
 
 1. Se entra con **Google**. El login lo resuelve el backend.

@@ -63,7 +63,7 @@ Salen de `CLAUDE.md` y de las reuniones del 07 y 08 de septiembre.
 ## Cambios de la reunión con Sol · 08.09
 
 Reemplazan decisiones anteriores. El PDF con sus anotaciones está en
-`docs/Habisite Design Challenge 2026 - Plataforma correciones.pdf`.
+`docs/2026-09-08 - Sol - Correcciones al recorrido de la plataforma.pdf`.
 
 - **Participación por equipos**, no individual. Una persona anota al resto con
   sus correos y cada invitado acepta por su cuenta. Reemplaza el modelo
