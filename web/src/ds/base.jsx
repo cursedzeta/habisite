@@ -22,6 +22,11 @@ const ICONOS = {
   'arrow-left': mascara('<path d="M19 12H5"/><path d="M11 18l-6-6 6-6"/>'),
   'chevron-down': mascara('<path d="M6 9l6 6 6-6"/>'),
   check: mascara('<path d="M4 12.5l5.5 5.5L20 7"/>'),
+  // Agregados para el visor de láminas de /concursos-anteriores.
+  plus: mascara('<path d="M12 5v14"/><path d="M5 12h14"/>'),
+  minus: mascara('<path d="M5 12h14"/>'),
+  close: mascara('<path d="M6 6l12 12"/><path d="M18 6L6 18"/>'),
+  expand: mascara('<path d="M14 4h6v6"/><path d="M10 20H4v-6"/><path d="M20 4l-7 7"/><path d="M4 20l7-7"/>'),
 }
 
 export function Icon({ name, size = 20, className = '', ...props }) {

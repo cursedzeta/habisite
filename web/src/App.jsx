@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import Landing from './Landing'
+import PaginaConcursosAnteriores from './ediciones/ConcursosAnteriores'
+import { RUTA_ANTERIORES } from './ediciones/SeccionAnteriores'
 import PanelAdmin from './paneles/PanelAdmin'
 import PanelConcursante from './paneles/PanelConcursante'
 import PanelJurado from './paneles/PanelJurado'
@@ -24,6 +26,7 @@ export default function App() {
     return null
   }
   if (ruta === '/ingresar') return <PaginaIngreso />
+  if (ruta === RUTA_ANTERIORES) return <PaginaConcursosAnteriores />
   if (ruta === RUTA_PANEL) return <ConSesion>{(yo) => <PanelSegunRol yo={yo} />}</ConSesion>
   return <Landing />
 }

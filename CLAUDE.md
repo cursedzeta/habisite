@@ -62,12 +62,19 @@ migra a código y se aloja en este mismo proyecto de Railway.
   rol; el admin puede mirar las otras dos. Los datos de la persona ya son
   reales; lo de adentro de cada panel todavía es de ejemplo. El enlace por
   correo funciona en producción; Google todavía no (ver §11).
+- **Concursos anteriores**: sección en la landing y página
+  `/concursos-anteriores` con los tres proyectos de la 1ª edición (2025-I):
+  el ganador, *Tres Horizontes*, y dos finalistas, con galería y visor de la
+  lámina con zoom. Todos los datos en `web/src/ediciones/edicion-2025-i.js`;
+  lo que falta (fotos, universidades, jurado, cifras) figura ahí en `null`
+  y se ve como «próximamente». El 2º y el 3º puesto no se conocen.
 
 **No existe todavía:**
 
 - El contenido de los paneles conectado a la API (propuesta, equipo,
   evaluación): hoy sale de `datos-demo.js`.
-- La página pública de jurados y ediciones.
+- El jurado 2026-II en la landing (hoy son perfiles sin nombre) y el
+  jurado de la 1ª edición.
 - Las acciones del panel de admin (existe la pantalla, no las acciones).
 - El sitio institucional migrado.
 
@@ -84,8 +91,11 @@ migra a código y se aloja en este mismo proyecto de Railway.
 habisite/
 ├─ web/            front — React + Vite. ESTO es lo que está desplegado.
 │  ├─ src/
-│  │  ├─ App.jsx           enrutador mínimo: /, /ingresar y /panel (vista según el rol)
+│  │  ├─ App.jsx           enrutador mínimo: /, /concursos-anteriores, /ingresar y /panel
 │  │  ├─ Landing.jsx       la landing
+│  │  ├─ barra.js          la barra sobre el hero y los anclas, para landing y ediciones
+│  │  ├─ ediciones/        concursos anteriores: sección, página y visor
+│  │  │  └─ edicion-2025-i.js  TODOS los datos de la 1ª edición
 │  │  ├─ Inscripcion.jsx   el formulario, contra la API
 │  │  ├─ api.js            dirección de la API y pedir()
 │  │  ├─ listas.js         países y tipos, compartidos por formulario y paneles
@@ -100,8 +110,12 @@ habisite/
 │  │     ├─ tokens.css        colores, tipografía, espaciado, radios
 │  │     ├─ componentes.css   los estilos hs-* del sistema
 │  │     ├─ pagina.css        estilos de la landing
-│  │     └─ interacciones.css NUESTRAS modificaciones (ver §9)
+│  │     ├─ interacciones.css NUESTRAS modificaciones (ver §9)
+│  │     ├─ paneles.css       los paneles
+│  │     └─ ediciones.css     concursos anteriores y el visor
+│  ├─ public/ediciones/  imágenes de cada edición, en WebP
 │  └─ package.json
+├─ material/       originales pesados de la organización (láminas PDF). Fuera de git
 ├─ backendGonzalo/ back — NestJS. Su documentación está en docs/ adentro
 ├─ contrato/
 │  └─ openapi.yaml la frontera entre los dos, generada desde el back
@@ -360,7 +374,12 @@ negro original, la deriva ambiental, la barra transparente sobre el hero, y tres
 arreglos de omisiones del sistema (fondo del `<button>` del pie, color de las
 `<option>` del select, y el `backdrop-filter` sin prefijo), y lo que sumó el
 formulario de inscripción (ayudas y errores legibles sobre naranja, la fila
-del teléfono).
+del teléfono), y el color de texto en hover de los `Button` con `href`.
+
+Después de esos cuatro, con estilos nuevos y no modificaciones:
+`paneles.css` y `ediciones.css` (concursos anteriores y su visor). Los
+valores que `ediciones.css` necesitó y no estaban van con nombre `--ed-*`
+arriba del archivo.
 
 ### Idioma
 

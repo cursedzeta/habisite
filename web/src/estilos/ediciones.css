@@ -1,0 +1,703 @@
+/* ==========================================================
+   Concursos anteriores: la sección de la landing y la página
+   /concursos-anteriores con su visor.
+
+   Igual que interacciones.css y paneles.css, es nuestro: no viene
+   de Claude Design. Todo sale de los tokens; los pocos valores que
+   no existían tienen nombre acá abajo, con prefijo --ed-.
+   ========================================================== */
+
+:root{
+  /* Proporciones de recorte de las imágenes. La foto entera se ve
+     siempre en el visor; acá solo se encuadra. */
+  --ed-proporcion-portada:16/9;
+  --ed-proporcion-portada-movil:4/3;
+  --ed-proporcion-destacada:3/2;
+  --ed-proporcion-tarjeta:16/10;
+  --ed-proporcion-lamina:707/1000;   /* A1: 1 a raíz de 2 */
+  --ed-proporcion-retrato:4/5;       /* la del retrato de jurado de la landing */
+
+  /* Ancho mínimo de columna de las galerías y las claves. */
+  --ed-columna-galeria:280px;
+  --ed-columna-galeria-chica:220px;
+  --ed-columna-clave:180px;
+
+  /* Lo que crece una imagen al pasar el cursor. */
+  --ed-escala-hover:1.03;
+
+  /* Un control deshabilitado (la misma que .hs-btn[disabled]) y una
+     miniatura que no es la actual. */
+  --ed-opacidad-inactiva:.38;
+  --ed-opacidad-miniatura:.56;
+
+  /* El visor tapa todo, barra fija incluida (z-index 60). */
+  --ed-capa-visor:100;
+}
+
+/* ==========================================================
+   Landing: sección «Concursos anteriores»
+   ========================================================== */
+.ed-anteriores__cabeza .hs-card__text{max-width:var(--measure)}
+
+.ed-anteriores{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:var(--space-8) var(--space-6);
+  margin-top:var(--space-7);
+}
+@media (max-width:640px){
+  .ed-anteriores{grid-template-columns:1fr;gap:var(--space-7)}
+}
+
+/* La tarjeta entera es el enlace: se anula el subrayado de los <a>. */
+.ed-tarjeta{
+  display:flex;
+  flex-direction:column;
+  gap:var(--space-5);
+  color:var(--text-body);
+  border:0;
+}
+.ed-tarjeta:hover{color:var(--text-body)}
+
+/* El ganador ocupa la fila de arriba: foto grande y texto al lado. */
+.ed-tarjeta--destacada{
+  grid-column:1/-1;
+  display:grid;
+  grid-template-columns:minmax(0,2fr) minmax(0,1fr);
+  gap:var(--space-7);
+  align-items:end;
+}
+@media (max-width:900px){
+  .ed-tarjeta--destacada{grid-template-columns:1fr;gap:var(--space-5)}
+}
+
+.ed-tarjeta__media{
+  border-radius:var(--radius-card);
+  overflow:hidden;
+  background:var(--surface-inset);
+}
+.ed-tarjeta__media img{
+  display:block;
+  width:100%;
+  height:auto;
+  aspect-ratio:var(--ed-proporcion-tarjeta);
+  object-fit:cover;
+  transition:transform var(--dur-slow) var(--ease-standard);
+}
+.ed-tarjeta--destacada .ed-tarjeta__media img{aspect-ratio:var(--ed-proporcion-destacada)}
+.ed-tarjeta:hover .ed-tarjeta__media img{transform:scale(var(--ed-escala-hover))}
+
+.ed-tarjeta__texto{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:var(--space-3);
+}
+.ed-tarjeta__titulo{
+  font:var(--weight-semibold) var(--size-title-3)/var(--leading-tight) var(--font-core);
+  letter-spacing:var(--tracking-title);
+}
+.ed-tarjeta--destacada .ed-tarjeta__titulo{
+  font:var(--weight-bold) var(--size-title-1)/var(--leading-title) var(--font-core);
+  margin-top:var(--space-2);
+}
+.ed-tarjeta__lema{
+  font:var(--weight-regular) var(--size-body-lg)/var(--leading-tight) var(--font-core);
+  color:var(--text-muted);
+}
+.ed-tarjeta__meta{
+  font:var(--weight-regular) var(--size-body-sm)/var(--leading-body) var(--font-core);
+  color:var(--text-muted);
+}
+.ed-tarjeta__ir{
+  display:inline-flex;
+  align-items:center;
+  gap:var(--space-2);
+  margin-top:var(--space-2);
+  font:var(--type-label);
+  text-transform:uppercase;
+  letter-spacing:var(--tracking-label);
+  color:var(--orange);
+}
+.ed-tarjeta__ir .hs-icon{transition:transform var(--dur-base) var(--ease-standard)}
+.ed-tarjeta:hover .ed-tarjeta__ir .hs-icon{transform:translateX(var(--space-1))}
+
+.ed-anteriores__pie{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:var(--space-5);
+  margin-top:var(--space-8);
+  padding-top:var(--space-6);
+  border-top:1px solid var(--line-hairline);
+}
+.ed-anteriores__pie .fine{margin:0}
+
+/* ==========================================================
+   Página: hero
+   ========================================================== */
+/* El hero reutiliza .hero de la landing (degradé y deriva). Acá solo
+   se acomoda el rótulo de arriba del titular. */
+.ed-hero .hs-eyebrow{margin-top:var(--space-5)}
+
+/* ==========================================================
+   Página: ficha de proyecto
+   ========================================================== */
+.ed-ficha{
+  margin-top:var(--space-7);
+  scroll-margin-top:var(--alto-nav);
+}
+.ed-ficha + .ed-ficha{
+  margin-top:var(--space-9);
+  padding-top:var(--space-9);
+  border-top:1px solid var(--line-hairline);
+}
+
+/* La portada es un botón: abre el visor. */
+.ed-ficha__portada{
+  position:relative;
+  display:block;
+  width:100%;
+  padding:0;
+  border:0;
+  border-radius:var(--radius-card);
+  overflow:hidden;
+  background:var(--surface-inset);
+  cursor:zoom-in;
+}
+.ed-ficha__portada img{
+  display:block;
+  width:100%;
+  height:auto;
+  aspect-ratio:var(--ed-proporcion-portada);
+  object-fit:cover;
+  transition:transform var(--dur-slow) var(--ease-standard);
+}
+.ed-ficha__portada:hover img{transform:scale(var(--ed-escala-hover))}
+@media (max-width:640px){
+  .ed-ficha__portada img{aspect-ratio:var(--ed-proporcion-portada-movil)}
+}
+
+.ed-ficha__ampliar{
+  position:absolute;
+  right:var(--space-4);
+  bottom:var(--space-4);
+  display:grid;
+  place-items:center;
+  width:var(--space-7);
+  height:var(--space-7);
+  border-radius:var(--radius-pill);
+  background:var(--ink);
+  color:var(--cream);
+  transition:var(--transition-control);
+}
+.ed-ficha__portada:hover .ed-ficha__ampliar{background:var(--orange);color:var(--white)}
+
+.ed-ficha__cuerpo{
+  display:grid;
+  grid-template-columns:minmax(0,5fr) minmax(0,7fr);
+  gap:var(--space-8);
+  align-items:start;
+  margin-top:var(--space-7);
+}
+
+.ed-ficha__ident{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:var(--space-4);
+}
+.ed-ficha__titulo{
+  font:var(--weight-bold) var(--size-display-2)/var(--leading-display) var(--font-core);
+  letter-spacing:var(--tracking-display);
+  margin-top:var(--space-2);
+  text-wrap:balance;
+}
+.ed-ficha__lema{
+  font:var(--weight-regular) var(--size-title-3)/var(--leading-tight) var(--font-core);
+  color:var(--text-muted);
+  max-width:32ch;
+}
+
+.ed-ficha__relato{
+  display:flex;
+  flex-direction:column;
+  gap:var(--space-5);
+}
+.ed-ficha__relato p{
+  font:var(--type-body);
+  color:var(--ink-72);
+  max-width:var(--measure);
+}
+.ed-ficha__relato .ed-ficha__entrada{
+  font:var(--weight-regular) var(--size-title-3)/var(--leading-tight) var(--font-core);
+  letter-spacing:var(--tracking-title);
+  color:var(--text-body);
+}
+
+/* Compacta (finalistas): portada y texto lado a lado. El cuerpo
+   pasa a una sola columna y la portada acompaña al scroll. */
+.ed-ficha--compacta{
+  display:grid;
+  grid-template-columns:minmax(0,7fr) minmax(0,5fr);
+  gap:var(--space-7);
+  align-items:start;
+}
+.ed-ficha--compacta .ed-ficha__portada{
+  position:sticky;
+  top:var(--alto-nav);
+}
+.ed-ficha--compacta .ed-ficha__portada img{aspect-ratio:var(--ed-proporcion-portada-movil)}
+.ed-ficha--compacta .ed-ficha__cuerpo{
+  grid-template-columns:1fr;
+  gap:var(--space-6);
+  margin-top:0;
+}
+.ed-ficha--compacta .ed-ficha__titulo{
+  font:var(--weight-bold) var(--size-title-1)/var(--leading-title) var(--font-core);
+  letter-spacing:var(--tracking-title);
+}
+.ed-ficha--compacta .ed-ficha__relato .ed-ficha__entrada{
+  font:var(--weight-regular) var(--size-body-lg)/var(--leading-body) var(--font-core);
+}
+.ed-ficha--compacta .ed-galeria{
+  grid-column:1/-1;
+  columns:4 var(--ed-columna-galeria-chica);
+}
+.ed-ficha--invertida{grid-template-columns:minmax(0,5fr) minmax(0,7fr)}
+.ed-ficha--invertida .ed-ficha__portada{order:2}
+.ed-ficha--invertida .ed-ficha__cuerpo{order:1}
+.ed-ficha--invertida .ed-galeria{order:3}
+
+@media (max-width:900px){
+  .ed-ficha__cuerpo{grid-template-columns:1fr;gap:var(--space-7)}
+  .ed-ficha--compacta{grid-template-columns:1fr;gap:var(--space-6)}
+  .ed-ficha--compacta .ed-ficha__portada{position:relative;top:auto}
+  .ed-ficha--invertida .ed-ficha__portada{order:0}
+  .ed-ficha--invertida .ed-ficha__cuerpo{order:0}
+}
+
+/* ---------- autoría ---------- */
+.ed-autoria{
+  display:flex;
+  align-items:center;
+  gap:var(--space-4);
+  align-self:stretch;
+  margin-top:var(--space-3);
+  padding-top:var(--space-5);
+  border-top:1px solid var(--line-hairline);
+}
+.ed-autoria__foto{
+  flex:none;
+  width:var(--space-9);
+  height:var(--space-9);
+  border-radius:var(--radius-card);
+  object-fit:cover;
+}
+.ed-autoria__texto{display:flex;flex-direction:column;gap:var(--space-2);min-width:0}
+.ed-autoria__nombre{
+  font:var(--weight-semibold) var(--size-body-lg)/var(--leading-tight) var(--font-core);
+}
+.ed-autoria__detalle{
+  font:var(--weight-regular) var(--size-body-sm)/var(--leading-tight) var(--font-core);
+  color:var(--text-muted);
+}
+
+/* ---------- datos ---------- */
+.ed-datos{
+  align-self:stretch;
+  margin:0;
+  display:flex;
+  flex-direction:column;
+}
+.ed-datos div{
+  display:grid;
+  grid-template-columns:minmax(0,2fr) minmax(0,5fr);
+  gap:var(--space-4);
+  padding:var(--space-3) 0;
+  border-top:1px solid var(--line-hairline);
+}
+.ed-datos div:last-child{border-bottom:1px solid var(--line-hairline)}
+.ed-datos dt{
+  font:var(--type-label);
+  text-transform:uppercase;
+  letter-spacing:var(--tracking-label);
+  color:var(--text-muted);
+  padding-top:var(--space-1);
+}
+.ed-datos dd{
+  margin:0;
+  font:var(--weight-regular) var(--size-body-sm)/var(--leading-tight) var(--font-core);
+}
+
+/* ---------- acceso a la lámina ---------- */
+.ed-lamina{
+  align-self:stretch;
+  display:flex;
+  align-items:center;
+  gap:var(--space-5);
+  margin-top:var(--space-3);
+  padding:var(--space-4);
+  border:1px solid var(--line-hairline);
+  border-radius:var(--radius-card);
+  background:var(--surface-detail);
+  color:var(--text-body);
+  font:inherit;
+  text-align:left;
+  cursor:zoom-in;
+  transition:var(--transition-control);
+}
+.ed-lamina:hover{border-color:var(--line-strong)}
+.ed-lamina__miniatura{
+  flex:none;
+  width:var(--space-9);
+  border-radius:var(--radius-inset);
+  overflow:hidden;
+  box-shadow:var(--shadow-raised);
+}
+.ed-lamina__miniatura img{
+  display:block;
+  width:100%;
+  height:auto;
+  aspect-ratio:var(--ed-proporcion-lamina);
+  object-fit:cover;
+}
+.ed-lamina__texto{display:flex;flex-direction:column;gap:var(--space-2)}
+.ed-lamina__texto b{
+  font:var(--weight-semibold) var(--size-body-lg)/var(--leading-tight) var(--font-core);
+}
+.ed-lamina__texto span:last-child{
+  font:var(--weight-regular) var(--size-body-sm)/var(--leading-tight) var(--font-core);
+  color:var(--text-muted);
+}
+
+/* ---------- claves (los tres horizontes del ganador) ---------- */
+.ed-claves{
+  list-style:none;
+  margin:var(--space-2) 0 0;
+  padding:0;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(var(--ed-columna-clave),1fr));
+  gap:var(--space-4);
+}
+.ed-claves li{
+  display:flex;
+  flex-direction:column;
+  gap:var(--space-2);
+  padding:var(--space-5);
+  border-radius:var(--radius-card);
+  background:var(--surface-detail);
+}
+.ed-claves__rotulo{
+  font:var(--type-label);
+  text-transform:uppercase;
+  letter-spacing:var(--tracking-label);
+  color:var(--orange);
+}
+.ed-claves b{
+  font:var(--weight-semibold) var(--size-title-3)/var(--leading-tight) var(--font-core);
+  letter-spacing:var(--tracking-title);
+}
+.ed-ficha__relato .ed-claves p{
+  font:var(--weight-regular) var(--size-body-sm)/var(--leading-body) var(--font-core);
+  color:var(--text-muted);
+}
+
+/* ---------- cita ---------- */
+.ed-cita{
+  margin:var(--space-3) 0 0;
+  padding:0 0 0 var(--space-5);
+  border-left:2px solid var(--orange);
+}
+.ed-ficha__relato .ed-cita p{
+  font:var(--weight-regular) var(--size-title-2)/var(--leading-tight) var(--font-core);
+  letter-spacing:var(--tracking-title);
+  color:var(--text-body);
+  max-width:28ch;
+}
+.ed-ficha--compacta .ed-ficha__relato .ed-cita p{
+  font-size:var(--size-title-3);
+  max-width:none;
+}
+
+/* ---------- galería ----------
+   Columnas de CSS en vez de grilla: cada imagen conserva su
+   proporción. Un corte de 3:1 recortado a 4:3 deja de ser un corte. */
+.ed-galeria{
+  columns:3 var(--ed-columna-galeria);
+  column-gap:var(--space-5);
+  margin-top:var(--space-8);
+}
+.ed-galeria__item{
+  display:block;
+  width:100%;
+  margin:0 0 var(--space-5);
+  padding:0;
+  border:0;
+  background:none;
+  color:var(--text-body);
+  font:inherit;
+  text-align:left;
+  cursor:zoom-in;
+  break-inside:avoid;
+}
+.ed-galeria__marco{
+  display:block;
+  border-radius:var(--radius-card);
+  overflow:hidden;
+  background:var(--surface-inset);
+}
+.ed-galeria__marco img{
+  display:block;
+  width:100%;
+  height:auto;
+  transition:transform var(--dur-slow) var(--ease-standard);
+}
+.ed-galeria__item:hover .ed-galeria__marco img{transform:scale(var(--ed-escala-hover))}
+.ed-galeria__pie{
+  display:block;
+  margin-top:var(--space-3);
+  font:var(--type-label);
+  text-transform:uppercase;
+  letter-spacing:var(--tracking-label);
+  line-height:var(--leading-tight);
+  color:var(--text-muted);
+}
+
+/* ==========================================================
+   Pendientes: lo que la organización todavía no mandó
+   ========================================================== */
+.ed-pendiente{
+  display:grid;
+  place-items:center;
+  padding:var(--space-2);
+  text-align:center;
+  border:1px dashed var(--ink-24);
+  border-radius:var(--radius-card);
+  background:var(--surface-inset);
+}
+.ed-pendiente span{
+  font:var(--weight-semibold) var(--size-label-sm)/var(--leading-tight) var(--font-core);
+  text-transform:uppercase;
+  letter-spacing:var(--tracking-label);
+  color:var(--ink-40);
+}
+.ed-pendiente--bloque{
+  margin-top:var(--space-7);
+  padding:var(--space-9) var(--space-5);
+}
+.ed-pendiente--bloque span{font-size:var(--size-label);letter-spacing:var(--tracking-label-wide)}
+
+.ed-jurado{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(var(--ed-columna-galeria-chica),1fr));
+  gap:var(--space-6);
+  margin-top:var(--space-7);
+}
+.ed-jurado__foto{
+  display:block;
+  width:100%;
+  height:auto;
+  aspect-ratio:var(--ed-proporcion-retrato);
+  object-fit:cover;
+  border-radius:var(--radius-card);
+}
+
+/* ==========================================================
+   Cierre: llamado a la edición 2026-II
+   Sobre naranja: el botón principal va en tinta, nunca naranja.
+   ========================================================== */
+.ed-cierre{
+  margin-top:var(--space-10);
+  padding:var(--space-10) 0;
+  background:linear-gradient(
+    158deg,
+    var(--orange-light) 0%,
+    var(--orange) 60%,
+    var(--orange-press) 100%
+  );
+  color:var(--text-on-brand);
+}
+.ed-cierre__in{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:var(--space-7);
+  align-items:end;
+}
+@media (max-width:900px){
+  .ed-cierre__in{grid-template-columns:1fr}
+}
+.ed-cierre__titulo{
+  font:var(--weight-bold) var(--size-title-1)/var(--leading-title) var(--font-core);
+  letter-spacing:var(--tracking-title);
+  color:var(--white);
+  margin-top:var(--space-4);
+  max-width:18ch;
+  text-wrap:balance;
+}
+.ed-cierre__titulo em{font-style:normal;color:var(--text-on-brand-accent)}
+.ed-cierre__texto{
+  font:var(--weight-regular) var(--size-body-lg)/var(--leading-body) var(--font-core);
+  color:var(--white);
+  margin-top:var(--space-4);
+  max-width:46ch;
+}
+.ed-cierre__acciones{display:flex;flex-wrap:wrap;gap:var(--space-3)}
+
+/* ==========================================================
+   Visor a pantalla completa
+   ========================================================== */
+.ed-visor{
+  position:fixed;
+  inset:0;
+  z-index:var(--ed-capa-visor);
+  display:flex;
+  flex-direction:column;
+  background:var(--ink);
+  color:var(--cream);
+}
+
+.ed-visor__barra{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:var(--space-4);
+  padding:var(--space-3) var(--space-5);
+  border-bottom:1px solid var(--line-on-ink);
+}
+.ed-visor__titulo{
+  display:flex;
+  flex-direction:column;
+  gap:var(--space-1);
+  min-width:0;
+}
+.ed-visor__proyecto{
+  font:var(--type-label);
+  text-transform:uppercase;
+  letter-spacing:var(--tracking-label);
+  color:var(--white-72);
+}
+.ed-visor__imagen-titulo{
+  font:var(--weight-semibold) var(--size-body-sm)/var(--leading-tight) var(--font-core);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.ed-visor__cuenta{color:var(--white-72);font-variant-numeric:tabular-nums}
+.ed-visor__ayuda{
+  font:var(--weight-regular) var(--size-label)/var(--leading-tight) var(--font-core);
+  color:var(--white-72);
+  text-align:center;
+}
+.ed-visor__controles{
+  display:flex;
+  align-items:center;
+  gap:var(--space-2);
+  flex:none;
+}
+.ed-visor__zoom{
+  min-width:var(--space-8);
+  text-align:center;
+  font:var(--weight-semibold) var(--size-body-sm)/1 var(--font-core);
+  font-variant-numeric:tabular-nums;
+}
+
+/* El sistema no trae estado deshabilitado para IconButton. */
+.ed-visor .hs-iconbtn:disabled{opacity:var(--ed-opacidad-inactiva);cursor:default}
+.ed-visor .hs-iconbtn:disabled:hover{background:transparent;color:var(--white)}
+
+.ed-visor__escenario{
+  position:relative;
+  flex:1;
+  min-height:0;
+}
+/* margin:auto en la imagen la centra mientras entra, y cuando
+   crece no la recorta por arriba ni por la izquierda (cosa que sí
+   hace place-items:center con overflow). */
+.ed-visor__lienzo{
+  position:absolute;
+  inset:0;
+  display:flex;
+  overflow:hidden;
+}
+.ed-visor__lienzo--ampliado{overflow:auto;cursor:grab}
+.ed-visor__lienzo--ampliado:active{cursor:grabbing}
+.ed-visor__lienzo:focus-visible{outline-offset:calc(-1 * var(--space-1))}
+.ed-visor__imagen{
+  display:block;
+  flex:none;
+  margin:auto;
+  max-width:none;
+  user-select:none;
+}
+/* Hasta medir el escenario, la imagen se contiene sola. */
+.ed-visor__imagen:not([style]){
+  flex:initial;
+  max-width:100%;
+  max-height:100%;
+  width:auto;
+  height:auto;
+  object-fit:contain;
+}
+
+/* Las flechas flotan sobre la imagen: van con fondo para leerse
+   también sobre una planta blanca. */
+.ed-visor__paso{
+  position:absolute;
+  top:calc(50% - var(--space-5));
+}
+.ed-visor__paso--anterior{left:var(--space-4)}
+.ed-visor__paso--siguiente{right:var(--space-4)}
+.ed-visor__paso.hs-iconbtn--on-brand{background:var(--overlay-scrim)}
+.ed-visor__paso.hs-iconbtn--on-brand:hover{background:var(--white);color:var(--ink)}
+
+.ed-visor__tira{
+  display:flex;
+  justify-content:safe center;
+  gap:var(--space-2);
+  padding:var(--space-3) var(--space-5);
+  overflow-x:auto;
+  border-top:1px solid var(--line-on-ink);
+  scrollbar-width:thin;
+}
+.ed-visor__miniatura{
+  flex:none;
+  padding:0;
+  border:2px solid transparent;
+  border-radius:var(--radius-inset);
+  overflow:hidden;
+  background:none;
+  opacity:var(--ed-opacidad-miniatura);
+  cursor:pointer;
+  transition:var(--transition-control),opacity var(--dur-fast) var(--ease-standard);
+}
+.ed-visor__miniatura:hover{opacity:1}
+.ed-visor__miniatura[aria-current]{opacity:1;border-color:var(--orange)}
+.ed-visor__miniatura img{
+  display:block;
+  width:auto;
+  height:var(--space-8);
+}
+
+@media (max-width:820px){
+  .ed-visor__ayuda{display:none}
+}
+@media (max-width:560px){
+  .ed-visor__barra{padding:var(--space-2) var(--space-4)}
+  .ed-visor__ajustar,.ed-visor__zoom{display:none}
+  .ed-visor__paso{top:auto;bottom:var(--space-4)}
+  .ed-visor__miniatura img{height:var(--space-7)}
+}
+
+/* ==========================================================
+   Accesibilidad
+   pagina.css ya apaga las transiciones con reduced-motion; esto
+   asegura además que las imágenes no se queden escaladas.
+   ========================================================== */
+@media (prefers-reduced-motion:reduce){
+  .ed-tarjeta:hover .ed-tarjeta__media img,
+  .ed-ficha__portada:hover img,
+  .ed-galeria__item:hover .ed-galeria__marco img{transform:none}
+  .ed-tarjeta:hover .ed-tarjeta__ir .hs-icon{transform:none}
+}

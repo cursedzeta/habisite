@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef } from 'react'
 import {
   Button,
   Card,
@@ -9,11 +9,14 @@ import {
   Footer,
 } from './ds'
 import Inscripcion from './Inscripcion'
+import { irA as go, useAnclaInicial, useSobreHero } from './barra'
+import SeccionAnteriores from './ediciones/SeccionAnteriores'
 
 const NAV = [
   ['El reto', 'reto'],
   ['Jurado', 'jurado'],
   ['Premios', 'premios'],
+  ['Concursos anteriores', 'concursos-anteriores'],
   ['Inscripción', 'inscripcion'],
 ]
 
@@ -33,13 +36,6 @@ const FACTS = [
   ['Entrega', 'Un único PDF'],
   ['Calendario', 'Se comparte en el grupo oficial'],
 ]
-
-/* El desplazamiento lo resuelve el navegador con scroll-margin-top.
-   Restar pixeles a mano dejaba de ser correcto con el zoom del 90%. */
-function go(id) {
-  const el = document.getElementById(id)
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-}
 
 function Hero({ refHero }) {
   return (
@@ -244,45 +240,13 @@ function Premios() {
 
 export default function Landing() {
   const refHero = useRef(null)
-  const [sobreHero, setSobreHero] = useState(true)
+  const sobreHero = useSobreHero(refHero)
+  useAnclaInicial()
 
-  /* La barra cambia de aspecto segun este sobre el hero naranja o sobre
-     el fondo blanco.
-
-     Va con scroll y getBoundingClientRect, no con IntersectionObserver:
-     el contenido esta dentro de .escala (zoom .9) y el observador mezcla
-     coordenadas con y sin zoom, asi que el punto de cambio se corre.
-     getBoundingClientRect y el alto de la barra estan los dos en pixeles
-     de viewport, que es la unica comparacion que se sostiene. */
-  useEffect(() => {
-    let pendiente = false
-
-    function medir() {
-      const hero = refHero.current
-      if (!hero) return
-      const barra = document.querySelector('.topbar')
-      const altoNav = barra ? barra.getBoundingClientRect().height : 88
-      // Seguimos sobre el hero mientras su borde inferior pase la barra.
-      setSobreHero(hero.getBoundingClientRect().bottom > altoNav)
-    }
-
-    function alScrollear() {
-      if (pendiente) return
-      pendiente = true
-      requestAnimationFrame(() => {
-        pendiente = false
-        medir()
-      })
-    }
-
-    medir()
-    window.addEventListener('scroll', alScrollear, { passive: true })
-    window.addEventListener('resize', alScrollear)
-    return () => {
-      window.removeEventListener('scroll', alScrollear)
-      window.removeEventListener('resize', alScrollear)
-    }
-  }, [])
+  function navegar(label) {
+    const hit = NAV.find((n) => n[0] === label)
+    if (hit) go(hit[1])
+  }
 
   return (
     <>
@@ -294,10 +258,7 @@ export default function Landing() {
           links={NAV.map((n) => n[0])}
           cta="Inscribirme"
           onCta={() => go('inscripcion')}
-          onNavigate={(label) => {
-            const hit = NAV.find((n) => n[0] === label)
-            if (hit) go(hit[1])
-          }}
+          onNavigate={navegar}
         />
       </div>
 
@@ -306,6 +267,7 @@ export default function Landing() {
       <Jurado />
       <Reto />
       <Premios />
+      <SeccionAnteriores />
       <Inscripcion />
 
       <section className="footcta">
@@ -323,9 +285,13 @@ export default function Landing() {
         brand="Habisite"
         tagline="Estudio latinoamericano de arquitectura, interiorismo y paisaje. Enseñamos lo que hacemos."
         columns={[
-          { title: 'Concurso', links: ['El reto', 'Jurado', 'Premios', 'Inscripción'] },
+          {
+            title: 'Concurso',
+            links: ['El reto', 'Jurado', 'Premios', 'Concursos anteriores', 'Inscripción'],
+          },
           { title: 'Estudio', links: ['Proyectos', 'Talleres 2026', 'Publicaciones', 'Contacto'] },
         ]}
+        onNavigate={navegar}
         note="© 2026 Habisite · Challenge 2026-II"
       />
       </div>

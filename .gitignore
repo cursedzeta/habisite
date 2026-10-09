@@ -37,3 +37,8 @@ backendGonzalo/docs/dudas-para-sol.md
 
 # Las sesiones firmadas del recorrido de pruebas
 .tmp-sesiones.json
+
+# -- Material original de la organizacion -------------------
+# Las laminas A1 de la 1a edicion en PDF (~90 MB). Las imagenes que
+# usa el sitio salen de aca y viven en web/public/ediciones/.
+material/

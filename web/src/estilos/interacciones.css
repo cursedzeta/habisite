@@ -239,6 +239,19 @@ html{scroll-behavior:smooth}
 .signup .hs-check a{color:inherit;text-decoration:underline}
 
 /* ==========================================================
+   Botones que son enlaces
+
+   Button con href se dibuja como <a>, y a:hover de pagina.css
+   (especificidad 0,1,1) le gana a .hs-btn--primary (0,1,0): en
+   hover el texto se volvía naranja sobre naranja. Las variantes cuyo
+   hover solo cambia el fondo recuperan acá su color de texto.
+   ========================================================== */
+a.hs-btn--primary:hover{color:var(--control-fill-text)}
+a.hs-btn--ink:hover{color:var(--control-fill-inverse-text)}
+a.hs-btn--on-brand:hover{color:var(--ink)}
+a.hs-btn--ghost:hover{color:var(--text-body)}
+
+/* ==========================================================
    Accesibilidad
    ========================================================== */
 @media (prefers-reduced-motion:reduce){

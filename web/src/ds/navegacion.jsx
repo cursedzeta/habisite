@@ -47,7 +47,10 @@ export function Navbar({
   )
 }
 
-export function Footer({ brand, tagline, columns = [], note, className = '', ...props }) {
+/* onNavigate no venia en el sistema: sin el, los links del pie no
+   llevan a ningun lado. Es opcional, asi que el componente sigue
+   siendo el mismo para quien no lo pase. */
+export function Footer({ brand, tagline, columns = [], note, onNavigate, className = '', ...props }) {
   return (
     <footer className={`hs-footer ${className}`.trim()} {...props}>
       <span className="hs-footer__brand">
@@ -60,7 +63,12 @@ export function Footer({ brand, tagline, columns = [], note, className = '', ...
           <div className="hs-footer__col" key={col.title}>
             <span className="hs-eyebrow hs-eyebrow--on-ink">{col.title}</span>
             {col.links.map((link) => (
-              <button type="button" className="hs-footer__link" key={link}>
+              <button
+                type="button"
+                className="hs-footer__link"
+                key={link}
+                onClick={() => onNavigate && onNavigate(link)}
+              >
                 {link}
               </button>
             ))}
