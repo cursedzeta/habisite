@@ -79,8 +79,9 @@ migra a código y se aloja en este mismo proyecto de Railway.
   evaluación): hoy sale de `datos-demo.js`.
 - El resto del jurado. Hay uno cargado (13/10): el Arq. Joaquín, en la
   2026-II y en la 2025-I, **sin apellido ni país todavía**. Todo el jurado
-  vive en `web/src/jurado.js`; la landing completa con «por confirmar»
-  hasta llegar a seis lugares.
+  vive en `web/src/jurado.js`; la landing muestra tres lugares y completa
+  con «próximamente». Sin distintivo de «jurado de la 1ª edición» en la
+  landing: daba a entender que ya no lo era.
 - Las acciones del panel de admin (existe la pantalla, no las acciones).
 - El sitio institucional migrado.
 
@@ -218,6 +219,16 @@ pero Railway necesita un proceso escuchando en un puerto. Por eso existe:
 
 El `-s` hace que cualquier ruta desconocida caiga en `index.html`, que hoy no
 hace falta pero sí cuando los paneles tengan rutas.
+
+⚠️ **Nunca pidas la URL de un archivo nuevo antes de que termine el
+deploy.** `serve -s` responde a cualquier ruta que no existe con
+`index.html` y **código 200**, y Cloudflare cachea por extensión: si se
+pide `/jurado/foto.webp` antes de que exista, guarda ese HTML como la
+imagen por **4 horas** y la foto aparece rota aunque esté bien subida.
+Pasó el 13/10. Para comprobar un deploy, mirar primero que el bundle
+nuevo esté publicado y recién después pedir el archivo. Si ya pasó:
+renombrar el archivo o purgar esa URL en Cloudflare (*Caching →
+Configuration → Purge Cache → Custom Purge*).
 
 **Si creás un servicio nuevo, fijá el Root Directory ANTES del primer deploy.**
 Railway lanza un build automático al crear el servicio, y sin root configurado

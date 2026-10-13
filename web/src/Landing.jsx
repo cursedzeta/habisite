@@ -1,6 +1,5 @@
 import { useRef } from 'react'
 import {
-  Badge,
   Button,
   Card,
   Eyebrow,
@@ -82,8 +81,8 @@ function Hero({ refHero }) {
   )
 }
 
-/* La tarjeta que pidió Jarod: foto en blanco y negro, profesión · país,
-   enfoque, y un distintivo si también fue jurado de la 1ª edición. */
+/* La tarjeta que pidió Jarod: foto en blanco y negro, profesión · país
+   y enfoque. */
 function TarjetaJurado({ j }) {
   const lugar = [j.profesion, j.pais].filter(Boolean).join(' · ')
   return (
@@ -98,11 +97,6 @@ function TarjetaJurado({ j }) {
         height="500"
         loading="lazy"
       />
-      {j.ediciones.includes('2025-I') && (
-        <Badge tone="cream" className="juror__distintivo">
-          Jurado 1ª edición
-        </Badge>
-      )}
       <h3>{nombreJurado(j)}</h3>
       {lugar && <p className="juror__role">{lugar}</p>}
       {j.enfoque && (
@@ -156,7 +150,7 @@ function Jurado() {
           {Array.from({ length: porConfirmar }, (_, i) => (
             <article className="juror juror--pendiente" key={`pendiente-${i}`}>
               <div className="juror__ph">
-                <span>Por confirmar</span>
+                <span>Próximamente</span>
               </div>
               <h3>Próximamente</h3>
             </article>

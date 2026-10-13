@@ -256,10 +256,8 @@ a.hs-btn--ghost:hover{color:var(--text-body)}
 
    El diseño traía solo el recuadro gris de «Retrato». Con foto, la
    tarjeta suma lo que pidió Jarod (docs/2026-10-08): retrato en
-   blanco y negro con el mismo encuadre para todos, el enfoque y un
-   distintivo si también fue jurado de la 1ª edición.
+   blanco y negro con el mismo encuadre para todos y el enfoque.
    ========================================================== */
-.juror{position:relative}
 .juror__foto{
   display:block;
   width:100%;
@@ -268,11 +266,6 @@ a.hs-btn--ghost:hover{color:var(--text-body)}
   object-fit:cover;
   border-radius:var(--radius-card);
   filter:grayscale(1);
-}
-.juror__distintivo{
-  position:absolute;
-  top:var(--space-3);
-  left:var(--space-3);
 }
 .juror__enfoque{
   font:var(--weight-regular) var(--size-body-sm)/1.5 var(--font-core);
