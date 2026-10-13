@@ -1,5 +1,6 @@
 import { useRef } from 'react'
 import {
+  Badge,
   Button,
   Card,
   Eyebrow,
@@ -9,6 +10,7 @@ import {
   Footer,
 } from './ds'
 import Inscripcion from './Inscripcion'
+import { LUGARES_JURADO_2026_II, juradoDe, nombreJurado } from './jurado'
 import { irA as go, useAnclaInicial, useSobreHero } from './barra'
 import SeccionAnteriores from './ediciones/SeccionAnteriores'
 
@@ -18,15 +20,6 @@ const NAV = [
   ['Premios', 'premios'],
   ['Concursos anteriores', 'concursos-anteriores'],
   ['Inscripción', 'inscripcion'],
-]
-
-const JURY = [
-  { role: 'Dirección de proyecto', bio: 'Arquitecta de obra en vivienda colectiva y equipamiento público en México y Colombia.' },
-  { role: 'Paisaje', bio: 'Proyecto de paisaje y espacio abierto; docente de taller en escuelas del Cono Sur.' },
-  { role: 'Estructura y materialidad', bio: 'Ingeniero estructural especializado en madera laminada y tierra compactada.' },
-  { role: 'Curaduría', bio: 'Curador de exposiciones de arquitectura y editor de publicaciones de proyecto.' },
-  { role: 'Desarrollo', bio: 'Desarrollo inmobiliario y gestión de suelo; evalúa viabilidad y escala del proyecto.' },
-  { role: 'Sostenibilidad', bio: 'Consultora en energía, agua y ciclo de vida de materiales para vivienda de baja huella.' },
 ]
 
 /* Sin fechas a propósito: las que traía el diseño ya pasaron y nunca
@@ -89,8 +82,48 @@ function Hero({ refHero }) {
   )
 }
 
+/* La tarjeta que pidió Jarod: foto en blanco y negro, profesión · país,
+   enfoque, y un distintivo si también fue jurado de la 1ª edición. */
+function TarjetaJurado({ j }) {
+  const lugar = [j.profesion, j.pais].filter(Boolean).join(' · ')
+  return (
+    <article className="juror">
+      <img
+        className="juror__foto"
+        src={j.fotoChica}
+        srcSet={`${j.fotoChica} 400w, ${j.foto} 800w`}
+        sizes="300px"
+        alt={`Retrato de ${nombreJurado(j)}`}
+        width="400"
+        height="500"
+        loading="lazy"
+      />
+      {j.ediciones.includes('2025-I') && (
+        <Badge tone="cream" className="juror__distintivo">
+          Jurado 1ª edición
+        </Badge>
+      )}
+      <h3>{nombreJurado(j)}</h3>
+      {lugar && <p className="juror__role">{lugar}</p>}
+      {j.enfoque && (
+        <p className="juror__enfoque">
+          <b>Enfoque:</b> {j.enfoque}
+        </p>
+      )}
+      {j.bio && <p className="juror__bio">{j.bio}</p>}
+      {j.portafolio && (
+        <a className="juror__enlace" href={j.portafolio} target="_blank" rel="noreferrer">
+          Ver portafolio
+        </a>
+      )}
+    </article>
+  )
+}
+
 function Jurado() {
   const track = useRef(null)
+  const jurado = juradoDe('2026-II')
+  const porConfirmar = Math.max(0, LUGARES_JURADO_2026_II - jurado.length)
 
   function slide(dir) {
     const t = track.current
@@ -108,7 +141,7 @@ function Jurado() {
                 Quién lee tu <em>propuesta</em>
               </>
             }
-            text="Perfiles del oficio: proyecto, paisaje, estructura, curaduría, desarrollo y sostenibilidad."
+            text="Profesionales de la arquitectura y el desarrollo de América Latina. Presentamos al jurado de la 2026-II a medida que se confirma."
           />
           <div className="arrows">
             <IconButton icon="arrow-left" label="Anterior" onClick={() => slide(-1)} />
@@ -117,21 +150,20 @@ function Jurado() {
         </div>
 
         <div className="rail" ref={track}>
-          {JURY.map((j, i) => (
-            <article className="juror" key={i}>
+          {jurado.map((j) => (
+            <TarjetaJurado key={j.id} j={j} />
+          ))}
+          {Array.from({ length: porConfirmar }, (_, i) => (
+            <article className="juror juror--pendiente" key={`pendiente-${i}`}>
               <div className="juror__ph">
-                <span>Retrato</span>
+                <span>Por confirmar</span>
               </div>
-              <h3>Nombre Apellido</h3>
-              <p className="juror__role">{j.role}</p>
-              <p className="juror__bio">{j.bio}</p>
+              <h3>Próximamente</h3>
             </article>
           ))}
         </div>
 
-        <p className="fine">
-          Los nombres y retratos del jurado 2026-II se publican próximamente.
-        </p>
+        <p className="fine">El resto del jurado 2026-II se presenta a medida que se confirma.</p>
       </div>
     </section>
   )

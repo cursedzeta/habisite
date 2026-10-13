@@ -15,6 +15,8 @@
    <nombre>-600.webp. La lámina completa mide 2800 px de alto.
    ========================================================== */
 
+import { juradoDe, nombreJurado } from '../jurado'
+
 const BASE = '/ediciones/2025-i'
 
 /* Arma la ficha de una imagen. ancho y alto son los del archivo
@@ -50,8 +52,14 @@ export const EDICION_2025_I = {
   propuestasRecibidas: null,
   paisesParticipantes: null,
 
-  // PENDIENTE: el jurado de la 1ª edición. Cada uno: { nombre, rol, foto }.
-  jurado: [],
+  // El jurado sale de web/src/jurado.js (los que tienen '2025-I' en
+  // `ediciones`), para no cargar dos veces a quien repite en la 2026-II.
+  // PENDIENTE: el resto del jurado de la 1ª edición.
+  jurado: juradoDe('2025-I').map((j) => ({
+    nombre: nombreJurado(j),
+    rol: j.enfoque,
+    foto: j.fotoChica,
+  })),
 
   proyectos: [
     {

@@ -252,6 +252,44 @@ a.hs-btn--on-brand:hover{color:var(--ink)}
 a.hs-btn--ghost:hover{color:var(--text-body)}
 
 /* ==========================================================
+   Jurado: la tarjeta con persona real
+
+   El diseño traía solo el recuadro gris de «Retrato». Con foto, la
+   tarjeta suma lo que pidió Jarod (docs/2026-10-08): retrato en
+   blanco y negro con el mismo encuadre para todos, el enfoque y un
+   distintivo si también fue jurado de la 1ª edición.
+   ========================================================== */
+.juror{position:relative}
+.juror__foto{
+  display:block;
+  width:100%;
+  height:auto;
+  aspect-ratio:4/5;
+  object-fit:cover;
+  border-radius:var(--radius-card);
+  filter:grayscale(1);
+}
+.juror__distintivo{
+  position:absolute;
+  top:var(--space-3);
+  left:var(--space-3);
+}
+.juror__enfoque{
+  font:var(--weight-regular) var(--size-body-sm)/1.5 var(--font-core);
+  color:var(--text-body);
+  margin:var(--space-3) 0 0;
+}
+.juror__enfoque b{font-weight:var(--weight-semibold)}
+.juror__enlace{
+  display:inline-block;
+  margin-top:var(--space-3);
+  font:var(--weight-semibold) var(--size-body-sm)/1.4 var(--font-core);
+  color:var(--orange);
+}
+/* Los lugares sin confirmar no compiten con quien ya está. */
+.juror--pendiente h3{color:var(--text-muted)}
+
+/* ==========================================================
    Accesibilidad
    ========================================================== */
 @media (prefers-reduced-motion:reduce){

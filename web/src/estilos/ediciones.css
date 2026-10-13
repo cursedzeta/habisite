@@ -512,6 +512,9 @@
   aspect-ratio:var(--ed-proporcion-retrato);
   object-fit:cover;
   border-radius:var(--radius-card);
+  /* Mismo tratamiento para todos (pedido de Jarod): aunque llegue una
+     foto a color, se ve en blanco y negro. */
+  filter:grayscale(1);
 }
 
 /* ==========================================================

@@ -77,8 +77,10 @@ migra a código y se aloja en este mismo proyecto de Railway.
 
 - El contenido de los paneles conectado a la API (propuesta, equipo,
   evaluación): hoy sale de `datos-demo.js`.
-- El jurado 2026-II en la landing (hoy son perfiles sin nombre) y el
-  jurado de la 1ª edición.
+- El resto del jurado. Hay uno cargado (13/10): el Arq. Joaquín, en la
+  2026-II y en la 2025-I, **sin apellido ni país todavía**. Todo el jurado
+  vive en `web/src/jurado.js`; la landing completa con «por confirmar»
+  hasta llegar a seis lugares.
 - Las acciones del panel de admin (existe la pantalla, no las acciones).
 - El sitio institucional migrado.
 
@@ -100,6 +102,7 @@ habisite/
 │  │  ├─ barra.js          la barra sobre el hero y los anclas, para landing y ediciones
 │  │  ├─ ediciones/        concursos anteriores: sección, página y visor
 │  │  │  └─ edicion-2025-i.js  TODOS los datos de la 1ª edición
+│  │  ├─ jurado.js         el jurado de TODAS las ediciones, una vez por persona
 │  │  ├─ Inscripcion.jsx   el formulario, contra la API
 │  │  ├─ api.js            dirección de la API y pedir()
 │  │  ├─ listas.js         países y tipos, compartidos por formulario y paneles
@@ -118,6 +121,7 @@ habisite/
 │  │     ├─ paneles.css       los paneles
 │  │     └─ ediciones.css     concursos anteriores y el visor
 │  ├─ public/ediciones/  imágenes de cada edición, en WebP
+│  ├─ public/jurado/     retratos del jurado: blanco y negro, 4:5, WebP
 │  └─ package.json
 ├─ material/       originales pesados de la organización (láminas PDF). Fuera de git
 ├─ backendGonzalo/ back — NestJS. Su documentación está en docs/ adentro
