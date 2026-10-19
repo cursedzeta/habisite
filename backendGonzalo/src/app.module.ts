@@ -11,6 +11,7 @@ import { EdicionModule } from './edicion/edicion.module.js';
 import { EquiposModule } from './equipos/equipos.module.js';
 import { EvaluacionModule } from './evaluacion/evaluacion.module.js';
 import { PerfilesModule } from './perfiles/perfiles.module.js';
+import { PlanillaModule } from './planilla/planilla.module.js';
 import { PropuestasModule } from './propuestas/propuestas.module.js';
 import { ResultadosModule } from './resultados/resultados.module.js';
 import { SaludModule } from './salud/salud.module.js';
@@ -32,6 +33,7 @@ import { TareasModule } from './tareas/tareas.module.js';
     EvaluacionModule,
     ResultadosModule,
     TareasModule,
+    PlanillaModule,
   ],
   providers: [
     // El ORDEN importa: los guards globales corren en el orden en que se

@@ -163,6 +163,30 @@ export class Entorno {
   @IsInt()
   @Min(0)
   TAREA_INTERVALO_MINUTOS = 30;
+
+  // ── Planilla de Google ─────────────────────────────────────────────
+  // El JSON entero de la clave de la cuenta de servicio, y el ID de la
+  // planilla (lo que va entre /d/ y /edit en su enlace). Si falta cualquiera
+  // de las dos, la copia a la planilla no corre. La forma del JSON no se
+  // valida acá a propósito: una clave mal pegada no puede tumbar la API y
+  // con ella la inscripción. La revisa PlanillaService y lo dice en el log.
+  @Transform(vacioAIndefinido)
+  @IsOptional()
+  @IsString()
+  GOOGLE_SHEETS_CREDENCIALES?: string;
+
+  @Transform(vacioAIndefinido)
+  @IsOptional()
+  @Matches(/^[A-Za-z0-9_-]{20,}$/, {
+    message: 'PLANILLA_ID tiene que ser solo el ID (lo que va entre /d/ y /edit), no el enlace entero',
+  })
+  PLANILLA_ID?: string;
+
+  // Cada cuántos minutos se reescribe la planilla. 0 la apaga.
+  @Transform(aNumero)
+  @IsInt()
+  @Min(0)
+  PLANILLA_INTERVALO_MINUTOS = 5;
 }
 
 /** Lo llama ConfigModule con el .env ya mezclado con process.env. */

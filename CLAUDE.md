@@ -4,8 +4,8 @@ Este archivo es la fuente de verdad para cualquiera que agarre el repo: personas
 o sesiones de Claude Code. Si algo cambia y contradice lo de acá, **actualizá
 este archivo en el mismo commit.**
 
-Última actualización: 9 de octubre de 2026 (Gonzalo revisó el ingreso por
-enlace, pasó los correos a `/panel` y al nombre nuevo; ver «Para Tomás» en §11).
+Última actualización: 19 de octubre de 2026 (copia de las inscripciones a
+una planilla de Google y la posible entrada paga; ver §2, §8 y §11).
 
 ---
 
@@ -72,6 +72,13 @@ migra a código y se aloja en este mismo proyecto de Railway.
   «ir al panel» y el botón del jurado van a `/panel`; todo dice «Habisite
   Challenge 2026-II», también la fila de `edicion` en la base (migración
   `005`) y el remitente («Habisite Challenge <noreply@habisite.com>»).
+- **Las inscripciones se copian solas a una planilla de Google** (19/10,
+  pedido de Jarod): la API reescribe la pestaña «Inscripciones» cada 5
+  minutos. La base sigue siendo Postgres; la planilla es un espejo para el
+  equipo. La dueña es `challenge@habisite.com`. Todo en
+  `backendGonzalo/docs/13`.
+- **Nadie se inscribió todavía** (19/10): no hay inscriptos reales que
+  migrar si cambia el flujo.
 
 **No existe todavía:**
 
@@ -168,6 +175,10 @@ src/api/tipos.ts`) y puede programar pantallas sin esperar a la API.
   (`leonard.ns.cloudflare.com`, `annalise.ns.cloudflare.com`).
 - **`habisite.com` sigue en WordPress**, hosteado fuera de Railway. Cloudflare
   tapa el origen. Falta averiguar dónde se paga ese hosting.
+- **El correo de `@habisite.com` es Cloudflare Email Routing**: no hay
+  buzones, solo reenvíos. `noreply@` se descarta; `challenge@` reenvía a
+  `growthimbar@gmail.com` y es además una cuenta de Google (sin Gmail), dueña
+  de la planilla de inscripciones. Su contraseña no va en el repo.
 
 ### Railway
 
@@ -351,6 +362,13 @@ Las preguntas para cerrar esto se le mandaron a Jarod el 8/10.
 9. **Pasar el proyecto de Google a «En producción»** antes de abrir la
    inscripción: en modo *Testing* hay tope de 100 usuarios y las sesiones se
    caen a los 7 días.
+10. **¿La inscripción es paga?** Lo plantearon Sol y Edu el 16/10. El flujo
+    sería formulario → pago → correo con el enlace al grupo, que hoy se da
+    en el momento. Antes de programar falta saber: a qué cuenta y en qué
+    país va la plata (define el medio de pago), cuánto y en qué moneda, si
+    se paga por persona o por equipo (los equipos se arman después, por
+    invitación), si alguien sin pagar puede entrar al panel, y si hay
+    devoluciones, becas o descuentos. Preguntado al equipo el 19/10.
 
 ---
 
@@ -504,6 +522,11 @@ participante y con un admin. El detalle está en
 5. **`WHATSAPP_URL` en Railway** cuando exista el grupo. Hasta entonces, el
    enlace al grupo de los correos y de la pantalla de gracias vuelve a la
    landing.
+6. **Revisar `src/planilla/`** (19/10, Tomás): la copia de las inscripciones
+   a Google Sheets, con `docs/13`. Tres variables nuevas en `entorno.ts`;
+   `GOOGLE_SHEETS_CREDENCIALES` no se valida al arrancar a propósito (una
+   clave mal pegada no tiene que tumbar la inscripción). Sin endpoints
+   nuevos: el contrato no cambia.
 
 ### Para Tomás — lo que cambió del lado tuyo (9/10, Gonzalo)
 

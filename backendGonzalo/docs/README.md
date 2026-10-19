@@ -22,6 +22,7 @@ dónde*, no *cuál es la clave*.
 | [10 · Los correos](10-correos.md) | Catálogo de los correos de Resend: qué los dispara, a quién y qué llevan | Implementado |
 | [11 · El formulario · para Tomás](11-formulario-para-el-front.md) | **Para Tomás**: campos, validaciones, envío, respuestas y textos del formulario de inscripción | Implementado |
 | [12 · Ingreso por enlace](12-ingreso-por-enlace.md) | La alternativa a Google: un enlace por correo, sin contraseñas. Lo sumó Tomás | Implementado |
+| [13 · Planilla de Google](13-planilla-de-google.md) | Las inscripciones copiadas solas a Google Sheets para el equipo. Lo sumó Tomás | Implementado |
 
 ## Estado del código
 
