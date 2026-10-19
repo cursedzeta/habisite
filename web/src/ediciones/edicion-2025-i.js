@@ -70,10 +70,11 @@ export const EDICION_2025_I = {
       distincion: 'Ganador · 1er puesto',
       titulo: 'Tres Horizontes',
       lema: 'Arquitectura para habitar el tiempo',
-      autores: 'Arq. Jarod Daza',
-      // PENDIENTE: universidad y país del autor, y su foto.
+      // Jarod es hoy jurado de la 2026-II (jurado.js).
+      autores: 'Arq. Jarod Daza Fraile',
+      // PENDIENTE: universidad del autor y foto del equipo.
       universidad: null,
-      paisAutor: null,
+      paisAutor: 'Colombia',
       fotoEquipo: null,
       lugar: 'Valle del Cocora, Colombia',
       datos: [

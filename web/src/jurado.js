@@ -31,6 +31,24 @@ export const JURADO = [
     // PENDIENTE: enlace opcional a portafolio o LinkedIn.
     portafolio: null,
   },
+  {
+    id: 'jarod',
+    nombre: 'Jarod Daza Fraile',
+    titulo: 'Arq.',
+    profesion: 'Arquitecto',
+    pais: 'Colombia',
+    enfoque: 'Viabilidad normativa y urbana',
+    // Acortada del texto que mandó Jarod (19/10) para emparejar con la de
+    // Joaquín. Ganó la 1ª edición con Tres Horizontes (edicion-2025-i.js):
+    // en la 2025-I fue concursante, no jurado.
+    bio: 'Trabajó en licenciamiento urbanístico, planeación territorial y control urbano en entidades públicas, y en diseño, supervisión y dirección de obra. Se centra en la revisión técnica y la viabilidad normativa de proyectos. Ganó el primer puesto en la primera edición de Habisite.',
+    // Recortada a 4:5 de un retrato circular: las esquinas de arriba, que
+    // caían fuera del círculo, se rellenaron con el gris del fondo.
+    foto: '/jurado/jarod-retrato.webp',
+    fotoChica: '/jurado/jarod-retrato-400.webp',
+    ediciones: ['2026-II'],
+    portafolio: null,
+  },
 ]
 
 /* Cuántos lugares muestra la landing: el jurado 2026-II es chico. Los

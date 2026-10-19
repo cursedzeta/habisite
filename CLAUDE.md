@@ -84,10 +84,11 @@ migra a código y se aloja en este mismo proyecto de Railway.
 
 - El contenido de los paneles conectado a la API (propuesta, equipo,
   evaluación): hoy sale de `datos-demo.js`.
-- El resto del jurado. Hay uno cargado (13/10): el Arq. Joaquín, en la
-  2026-II y en la 2025-I, **sin apellido ni país todavía**. Todo el jurado
-  vive en `web/src/jurado.js`; la landing muestra tres lugares y completa
-  con «próximamente». Sin distintivo de «jurado de la 1ª edición» en la
+- El tercer jurado. Hay dos cargados: el Arq. Joaquín (13/10), en la
+  2026-II y en la 2025-I, **sin apellido ni país todavía**, y el Arq. Jarod
+  Daza Fraile (19/10), de Colombia, solo en la 2026-II: en la 1ª edición
+  ganó con *Tres Horizontes*. Todo el jurado vive en `web/src/jurado.js`; la
+  landing muestra tres lugares y completa con «próximamente». Sin distintivo de «jurado de la 1ª edición» en la
   landing: daba a entender que ya no lo era.
 - Las acciones del panel de admin (existe la pantalla, no las acciones).
 - El sitio institucional migrado.
