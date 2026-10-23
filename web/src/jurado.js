@@ -49,6 +49,27 @@ export const JURADO = [
     ediciones: ['2026-II'],
     portafolio: null,
   },
+  {
+    id: 'heidi',
+    nombre: 'Heidi de Cienfuegos',
+    titulo: 'Arq.',
+    profesion: 'Arquitecta',
+    // Deducido de la biografía (CLAUDE.md §2); confirmar.
+    pais: 'El Salvador',
+    enfoque: 'Arquitectura bioclimática y certificación sostenible',
+    // Resumida del texto que llegó el 23/10, para emparejar con las otras.
+    // Los premios dicen «este año» en el original: son de 2022.
+    bio: 'Cofundó B100 arquitectos, especializado en arquitectura bioclimática y certificaciones sostenibles como LEED y WELL, con más de 100 proyectos de sostenibilidad en la región, entre ellos el primer LEED platino de El Salvador. Es profesora de LEED LAB y de arquitectura bioclimática. En 2022 recibió el Women in Sustainability Award y el Living Future Hero.',
+    // Recortada a 4:5 de un retrato de cuerpo entero, a la altura de los
+    // brazos cruzados.
+    foto: '/jurado/heidi-retrato.webp',
+    fotoChica: '/jurado/heidi-retrato-400.webp',
+    ediciones: ['2026-II'],
+    // El Instagram del estudio. `textoPortafolio` es opcional: sin él, la
+    // tarjeta dice «Ver portafolio».
+    portafolio: 'https://www.instagram.com/b100arquitectos/',
+    textoPortafolio: 'Ver B100 arquitectos en Instagram',
+  },
 ]
 
 /* Cuántos lugares muestra la landing: el jurado 2026-II es chico. Los

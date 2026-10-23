@@ -107,7 +107,7 @@ function TarjetaJurado({ j }) {
       {j.bio && <p className="juror__bio">{j.bio}</p>}
       {j.portafolio && (
         <a className="juror__enlace" href={j.portafolio} target="_blank" rel="noreferrer">
-          Ver portafolio
+          {j.textoPortafolio ?? 'Ver portafolio'}
         </a>
       )}
     </article>
