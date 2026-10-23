@@ -1,16 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Badge, Button, Eyebrow, Footer, Icon, Navbar, SectionHeader } from '../ds'
 import { irA, useAnclaInicial, useSobreHero } from '../barra'
-import Carrusel3D from './Carrusel3D'
 import Foto from './Foto'
 import Visor from './Visor'
-import {
-  EDICION_2025_I as EDICION,
-  FINALISTAS,
-  GANADOR,
-  imagenesDe,
-  itemDeCarrusel,
-} from './edicion-2025-i'
+import { EDICION_2025_I as EDICION, FINALISTAS, GANADOR } from './edicion-2025-i'
 
 /* /concursos-anteriores — la memoria de la 1ª edición.
 
@@ -40,20 +33,12 @@ export default function PaginaConcursosAnteriores() {
   const sobreHero = useSobreHero(refHero)
   useAnclaInicial()
 
-  /* { titulo, imagenes, inicial, alCerrar } mientras el visor está
-     abierto. alCerrar recibe la imagen en la que se cerró: así la
-     galería de la ficha sigue donde la persona la dejó. */
+  // { titulo, imagenes, inicial } mientras el visor está abierto.
   const [visor, setVisor] = useState(null)
-  const abrir = useCallback((titulo, imagenes, inicial = 0, alCerrar = null) => {
-    setVisor({ titulo, imagenes, inicial, alCerrar })
+  const abrir = useCallback((titulo, imagenes, inicial = 0) => {
+    setVisor({ titulo, imagenes, inicial })
   }, [])
-  const cerrar = useCallback(
-    (indice) => {
-      visor?.alCerrar?.(indice)
-      setVisor(null)
-    },
-    [visor],
-  )
+  const cerrar = useCallback(() => setVisor(null), [])
 
   useEffect(() => {
     const anterior = document.title
@@ -217,8 +202,8 @@ export default function PaginaConcursosAnteriores() {
    portada a todo el ancho, texto a dos columnas y galería grande.
    Los finalistas, en compacto: portada y texto lado a lado. */
 function Ficha({ proyecto, destacada = false, invertida = false, onAbrir }) {
-  // La portada es la primera imagen del visor; la galería y la lámina siguen.
-  const imagenes = imagenesDe(proyecto)
+  // La portada es la primera imagen del visor; la galería sigue después.
+  const imagenes = [proyecto.portada, ...proyecto.galeria]
   const idTitulo = `${proyecto.id}-titulo`
 
   const clases = [
@@ -314,92 +299,30 @@ function Ficha({ proyecto, destacada = false, invertida = false, onAbrir }) {
         </div>
       </div>
 
-      <Galeria proyecto={proyecto} onAbrir={onAbrir} />
+      <div className="ed-galeria">
+        {proyecto.galeria.map((im, i) => (
+          <button
+            type="button"
+            key={im.src}
+            className="ed-galeria__item"
+            onClick={() => onAbrir(proyecto.titulo, imagenes, i + 1)}
+            aria-label={`Ampliar: ${im.titulo}`}
+          >
+            <span className="ed-galeria__marco">
+              <Foto
+                imagen={im}
+                sizes={
+                  destacada
+                    ? '(max-width: 640px) 100vw, (max-width: 1000px) 50vw, 420px'
+                    : '(max-width: 640px) 100vw, (max-width: 1000px) 50vw, 320px'
+                }
+              />
+            </span>
+            <span className="ed-galeria__pie">{im.titulo}</span>
+          </button>
+        ))}
+      </div>
     </article>
-  )
-}
-
-/* La galería de la ficha: un visor en línea con la imagen elegida
-   entera, sin recortar, y debajo el carrusel con todas las imágenes del
-   proyecto como selector. La imagen de arriba cambia cuando el
-   carrusel se asienta, no mientras se mueve. Un clic en ella (o en la
-   tarjeta central) la abre a pantalla completa.
-
-   Arranca en la primera de la galería: la portada ya está arriba, en
-   la ficha. */
-const INICIAL_GALERIA = 1
-
-function Galeria({ proyecto, onAbrir }) {
-  const imagenes = imagenesDe(proyecto)
-  const items = useMemo(
-    () =>
-      imagenesDe(proyecto).map((im, i) =>
-        itemDeCarrusel(proyecto, i, { categoria: proyecto.titulo, titulo: im.titulo }),
-      ),
-    [proyecto],
-  )
-  const [actual, setActual] = useState(INICIAL_GALERIA)
-  const [fallo, setFallo] = useState(null)
-  const refCarrusel = useRef(null)
-  const imagen = imagenes[actual]
-
-  function ampliar(i) {
-    onAbrir(proyecto.titulo, imagenes, i, (final) => {
-      if (typeof final !== 'number' || final === i) return
-      setActual(final)
-      refCarrusel.current?.irA(final, { inmediato: true })
-    })
-  }
-
-  return (
-    <div className="ed-galeria">
-      <figure className="ed-galeria__visor">
-        <button
-          type="button"
-          className="ed-galeria__marco"
-          onClick={() => ampliar(actual)}
-        >
-          {fallo === imagen.src ? (
-            <span className="ed-galeria__falta">La imagen no está disponible</span>
-          ) : (
-            <img
-              key={imagen.src}
-              className="ed-galeria__imagen"
-              src={imagen.src}
-              srcSet={`${imagen.srcChico} ${imagen.anchoChico}w, ${imagen.src} ${imagen.ancho}w`}
-              sizes="(max-width: 1280px) 100vw, 1220px"
-              width={imagen.ancho}
-              height={imagen.alto}
-              alt={imagen.alt}
-              decoding="async"
-              onError={() => setFallo(imagen.src)}
-            />
-          )}
-          <span className="ed-ficha__ampliar" aria-hidden="true">
-            <Icon name="expand" size={18} />
-          </span>
-          <span className="car__lector">Ampliar a pantalla completa</span>
-        </button>
-        <figcaption className="ed-galeria__pie">
-          <span>{imagen.titulo}</span>
-          <span className="ed-galeria__cuenta">
-            {actual + 1} / {imagenes.length}
-          </span>
-        </figcaption>
-      </figure>
-
-      <Carrusel3D
-        ref={refCarrusel}
-        className="ed-galeria__selector"
-        variante="selector"
-        items={items}
-        indiceInicial={INICIAL_GALERIA}
-        etiqueta={`Imágenes de ${proyecto.titulo}`}
-        instrucciones="Usa las flechas izquierda y derecha para elegir una imagen. Enter la amplía a pantalla completa."
-        onAsentar={setActual}
-        onActivar={ampliar}
-      />
-    </div>
   )
 }
 

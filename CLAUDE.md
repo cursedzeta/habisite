@@ -65,11 +65,11 @@ migra a código y se aloja en este mismo proyecto de Railway.
 - **Concursos anteriores**: sección en la landing y página
   `/concursos-anteriores` con los tres proyectos de la 1ª edición (2025-I):
   el ganador, *Tres Horizontes*, y dos finalistas, con galería y visor de la
-  lámina con zoom. Las dos usan un carrusel 3D en bucle
-  (`web/src/ediciones/Carrusel3D.jsx`, 23/10): en la landing, nueve
-  imágenes sobre una franja de tinta, y la central lleva a la ficha; en
-  cada ficha, como selector debajo de un visor en línea con la imagen
-  entera. Todos los datos en `web/src/ediciones/edicion-2025-i.js`;
+  lámina con zoom. La sección de la landing usa un carrusel 3D en bucle
+  (`web/src/ediciones/Carrusel3D.jsx`, 23/10): nueve imágenes sobre una
+  franja de tinta, y la central lleva a la ficha. **Solo en la landing:**
+  se probó también como selector de la galería de cada ficha y Tomás lo
+  descartó el 23/10; las fichas siguen con la galería en columnas. Todos los datos en `web/src/ediciones/edicion-2025-i.js`;
   lo que falta (fotos, universidades, jurado, cifras) figura ahí en `null`
   y se ve como «próximamente». El 2º y el 3º puesto no se conocen.
 - **Los correos llevan al panel y dicen el nombre nuevo** (9/10, Gonzalo):
@@ -117,7 +117,7 @@ habisite/
 │  │  ├─ Landing.jsx       la landing
 │  │  ├─ barra.js          la barra sobre el hero y los anclas, para landing y ediciones
 │  │  ├─ ediciones/        concursos anteriores: sección, página y visor
-│  │  │  ├─ Carrusel3D.jsx     el carrusel 3D de la landing y de cada ficha
+│  │  │  ├─ Carrusel3D.jsx     el carrusel 3D de la sección de la landing
 │  │  │  └─ edicion-2025-i.js  TODOS los datos de la 1ª edición
 │  │  ├─ jurado.js         el jurado de TODAS las ediciones, una vez por persona
 │  │  ├─ Inscripcion.jsx   el formulario, contra la API
