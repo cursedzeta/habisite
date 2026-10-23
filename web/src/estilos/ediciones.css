@@ -12,13 +12,10 @@
      siempre en el visor; acá solo se encuadra. */
   --ed-proporcion-portada:16/9;
   --ed-proporcion-portada-movil:4/3;
-  --ed-proporcion-destacada:3/2;
-  --ed-proporcion-tarjeta:16/10;
   --ed-proporcion-lamina:707/1000;   /* A1: 1 a raíz de 2 */
   --ed-proporcion-retrato:4/5;       /* la del retrato de jurado de la landing */
 
-  /* Ancho mínimo de columna de las galerías y las claves. */
-  --ed-columna-galeria:280px;
+  /* Ancho mínimo de columna del jurado y de las claves. */
   --ed-columna-galeria-chica:220px;
   --ed-columna-clave:180px;
 
@@ -32,6 +29,11 @@
 
   /* El visor tapa todo, barra fija incluida (z-index 60). */
   --ed-capa-visor:100;
+
+  /* Alto del visor en línea de la galería de cada ficha. La imagen
+     entra entera adentro, con su proporción. */
+  --ed-alto-visor:clamp(280px,64svh,760px);
+  --ed-alto-visor-movil:clamp(220px,48svh,420px);
 }
 
 /* ==========================================================
@@ -39,88 +41,10 @@
    ========================================================== */
 .ed-anteriores__cabeza .hs-card__text{max-width:var(--measure)}
 
-.ed-anteriores{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:var(--space-8) var(--space-6);
-  margin-top:var(--space-7);
-}
-@media (max-width:640px){
-  .ed-anteriores{grid-template-columns:1fr;gap:var(--space-7)}
-}
-
-/* La tarjeta entera es el enlace: se anula el subrayado de los <a>. */
-.ed-tarjeta{
-  display:flex;
-  flex-direction:column;
-  gap:var(--space-5);
-  color:var(--text-body);
-  border:0;
-}
-.ed-tarjeta:hover{color:var(--text-body)}
-
-/* El ganador ocupa la fila de arriba: foto grande y texto al lado. */
-.ed-tarjeta--destacada{
-  grid-column:1/-1;
-  display:grid;
-  grid-template-columns:minmax(0,2fr) minmax(0,1fr);
-  gap:var(--space-7);
-  align-items:end;
-}
-@media (max-width:900px){
-  .ed-tarjeta--destacada{grid-template-columns:1fr;gap:var(--space-5)}
-}
-
-.ed-tarjeta__media{
-  border-radius:var(--radius-card);
-  overflow:hidden;
-  background:var(--surface-inset);
-}
-.ed-tarjeta__media img{
-  display:block;
-  width:100%;
-  height:auto;
-  aspect-ratio:var(--ed-proporcion-tarjeta);
-  object-fit:cover;
-  transition:transform var(--dur-slow) var(--ease-standard);
-}
-.ed-tarjeta--destacada .ed-tarjeta__media img{aspect-ratio:var(--ed-proporcion-destacada)}
-.ed-tarjeta:hover .ed-tarjeta__media img{transform:scale(var(--ed-escala-hover))}
-
-.ed-tarjeta__texto{
-  display:flex;
-  flex-direction:column;
-  align-items:flex-start;
-  gap:var(--space-3);
-}
-.ed-tarjeta__titulo{
-  font:var(--weight-semibold) var(--size-title-3)/var(--leading-tight) var(--font-core);
-  letter-spacing:var(--tracking-title);
-}
-.ed-tarjeta--destacada .ed-tarjeta__titulo{
-  font:var(--weight-bold) var(--size-title-1)/var(--leading-title) var(--font-core);
-  margin-top:var(--space-2);
-}
-.ed-tarjeta__lema{
-  font:var(--weight-regular) var(--size-body-lg)/var(--leading-tight) var(--font-core);
-  color:var(--text-muted);
-}
-.ed-tarjeta__meta{
-  font:var(--weight-regular) var(--size-body-sm)/var(--leading-body) var(--font-core);
-  color:var(--text-muted);
-}
-.ed-tarjeta__ir{
-  display:inline-flex;
-  align-items:center;
-  gap:var(--space-2);
-  margin-top:var(--space-2);
-  font:var(--type-label);
-  text-transform:uppercase;
-  letter-spacing:var(--tracking-label);
-  color:var(--orange);
-}
-.ed-tarjeta__ir .hs-icon{transition:transform var(--dur-base) var(--ease-standard)}
-.ed-tarjeta:hover .ed-tarjeta__ir .hs-icon{transform:translateX(var(--space-1))}
+/* El carrusel va a todo el ancho, fuera de .page: una franja de tinta
+   entre el encabezado y el pie, que siguen sobre blanco. La franja
+   misma es el separador, así que el pie ya no lleva filete. */
+.ed-anteriores__escenario{margin-top:var(--space-7)}
 
 .ed-anteriores__pie{
   display:flex;
@@ -128,9 +52,7 @@
   align-items:center;
   justify-content:space-between;
   gap:var(--space-5);
-  margin-top:var(--space-8);
-  padding-top:var(--space-6);
-  border-top:1px solid var(--line-hairline);
+  margin-top:var(--space-6);
 }
 .ed-anteriores__pie .fine{margin:0}
 
@@ -269,7 +191,6 @@
 .ed-ficha--compacta .ed-ficha__relato .ed-ficha__entrada{
   font:var(--weight-regular) var(--size-body-lg)/var(--leading-body) var(--font-core);
 }
-.ed-ficha--compacta .ed-galeria{columns:4 var(--ed-columna-galeria-chica)}
 .ed-ficha--invertida .ed-ficha__principal{grid-template-columns:minmax(0,5fr) minmax(0,7fr)}
 .ed-ficha--invertida .ed-ficha__portada{order:2}
 .ed-ficha--invertida .ed-ficha__cuerpo{order:1}
@@ -432,47 +353,72 @@
 }
 
 /* ---------- galería ----------
-   Columnas de CSS en vez de grilla: cada imagen conserva su
-   proporción. Un corte de 3:1 recortado a 4:3 deja de ser un corte. */
+   Un visor en línea con la imagen entera y, debajo, el carrusel como
+   selector (carrusel.css). Los dos sobre la misma placa de tinta. */
 .ed-galeria{
-  columns:3 var(--ed-columna-galeria);
-  column-gap:var(--space-5);
   margin-top:var(--space-8);
+  border-radius:var(--radius-card);
+  overflow:hidden;
+  background:var(--ink);
+  color:var(--cream);
 }
-.ed-galeria__item{
-  display:block;
+.ed-galeria__visor{
+  margin:0;
+  padding:var(--space-6) var(--space-6) 0;
+}
+.ed-galeria__marco{
+  position:relative;
+  display:grid;
+  place-items:center;
   width:100%;
-  margin:0 0 var(--space-5);
+  height:var(--ed-alto-visor);
   padding:0;
   border:0;
   background:none;
-  color:var(--text-body);
+  color:inherit;
   font:inherit;
-  text-align:left;
   cursor:zoom-in;
-  break-inside:avoid;
 }
-.ed-galeria__marco{
+.ed-galeria__marco:focus-visible{outline-offset:calc(-1 * var(--space-1))}
+.ed-galeria__marco:hover .ed-ficha__ampliar{background:var(--orange);color:var(--white)}
+/* Entera y sin recortar: el alto del marco es fijo, así que cambiar de
+   imagen no mueve la página. */
+.ed-galeria__imagen{
   display:block;
-  border-radius:var(--radius-card);
-  overflow:hidden;
-  background:var(--surface-inset);
-}
-.ed-galeria__marco img{
-  display:block;
-  width:100%;
+  max-width:100%;
+  max-height:100%;
+  width:auto;
   height:auto;
-  transition:transform var(--dur-slow) var(--ease-standard);
+  object-fit:contain;
+  animation:ed-fundido var(--dur-base) var(--ease-standard);
 }
-.ed-galeria__item:hover .ed-galeria__marco img{transform:scale(var(--ed-escala-hover))}
+.ed-galeria__falta{
+  font:var(--type-label);
+  text-transform:uppercase;
+  letter-spacing:var(--tracking-label);
+  color:var(--white-72);
+}
 .ed-galeria__pie{
-  display:block;
-  margin-top:var(--space-3);
+  display:flex;
+  justify-content:space-between;
+  gap:var(--space-4);
+  padding:var(--space-4) 0 0;
   font:var(--type-label);
   text-transform:uppercase;
   letter-spacing:var(--tracking-label);
   line-height:var(--leading-tight);
-  color:var(--text-muted);
+  color:var(--white-72);
+}
+.ed-galeria__cuenta{flex:none;font-variant-numeric:tabular-nums}
+
+@keyframes ed-fundido{
+  from{opacity:0}
+  to{opacity:1}
+}
+
+@media (max-width:640px){
+  .ed-galeria__visor{padding:var(--space-4) var(--space-4) 0}
+  .ed-galeria__marco{height:var(--ed-alto-visor-movil)}
 }
 
 /* ==========================================================
@@ -709,8 +655,7 @@
    asegura además que las imágenes no se queden escaladas.
    ========================================================== */
 @media (prefers-reduced-motion:reduce){
-  .ed-tarjeta:hover .ed-tarjeta__media img,
-  .ed-ficha__portada:hover img,
-  .ed-galeria__item:hover .ed-galeria__marco img{transform:none}
-  .ed-tarjeta:hover .ed-tarjeta__ir .hs-icon{transform:none}
+  .ed-ficha__portada:hover img{transform:none}
+  /* pagina.css apaga las transiciones, no las animaciones. */
+  .ed-galeria__imagen{animation:none}
 }

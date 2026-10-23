@@ -29,6 +29,8 @@ function imagen(carpeta, archivo, ancho, alto, titulo, alt) {
     ancho,
     alto,
     anchoChico: ancho >= alto ? 600 : Math.round((600 * ancho) / alto),
+    // El nombre sin extensión: con él se eligen las de la landing (enLanding).
+    archivo,
     titulo,
     alt,
   }
@@ -105,6 +107,10 @@ export const EDICION_2025_I = {
         },
       ],
       cita: 'Habitar el tiempo antes que ocupar el espacio.',
+      /* Las tres imágenes de este proyecto en el carrusel de la landing,
+         por nombre de archivo. Renders y vistas: recortan bien en
+         vertical, cosa que un plano o un corte no hace. */
+      enLanding: ['vista-general', 'hub-social-atardecer', 'interior-refugio'],
       portada: imagen(
         TRES,
         'vista-general',
@@ -190,6 +196,7 @@ export const EDICION_2025_I = {
       ],
       claves: [],
       cita: null,
+      enLanding: ['area-de-fogata', 'interior-cabana', 'conjunto-de-noche'],
       portada: imagen(
         MOLDES,
         'conjunto-junto-al-lago',
@@ -298,6 +305,7 @@ export const EDICION_2025_I = {
       ],
       claves: [],
       cita: 'La arquitectura no domina el paisaje; se convierte en el lente a través del cual el ser humano contempla, comprende y protege la fragilidad de la vida silvestre de Villa Altagracia.',
+      enLanding: ['sendero-y-cabanas', 'vista-aerea', 'ilustracion-acceso'],
       portada: imagen(
         FEATHER,
         'vista-aerea',
@@ -378,3 +386,28 @@ export const EDICION_2025_I = {
 
 export const GANADOR = EDICION_2025_I.proyectos.find((p) => p.puesto === 1)
 export const FINALISTAS = EDICION_2025_I.proyectos.filter((p) => p.puesto !== 1)
+
+/* Todas las imágenes de un proyecto, en el orden en que se recorren:
+   portada, galería y la lámina completa al final. */
+export function imagenesDe(proyecto) {
+  return [proyecto.portada, ...proyecto.galeria, proyecto.lamina]
+}
+
+/* Un ítem del carrusel (Carrusel3D.jsx) a partir de una imagen de
+   imagenesDe(proyecto). El texto lo decide quien lo usa: la landing
+   muestra el proyecto y la ficha, el título de la imagen. */
+export function itemDeCarrusel(proyecto, indiceImagen, { categoria, titulo }) {
+  const im = imagenesDe(proyecto)[indiceImagen]
+  return {
+    src: im.src,
+    srcChico: im.srcChico,
+    ancho: im.ancho,
+    alto: im.alto,
+    anchoChico: im.anchoChico,
+    alt: im.alt,
+    categoria,
+    titulo,
+    proyectoId: proyecto.id,
+    indiceImagen,
+  }
+}

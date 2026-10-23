@@ -1,12 +1,25 @@
-import { Badge, Button, Icon, SectionHeader } from '../ds'
-import Foto from './Foto'
-import { EDICION_2025_I as EDICION, FINALISTAS, GANADOR } from './edicion-2025-i'
+import { Button, SectionHeader } from '../ds'
+import Carrusel3D from './Carrusel3D'
+import { EDICION_2025_I as EDICION, imagenesDe, itemDeCarrusel } from './edicion-2025-i'
 
 export const RUTA_ANTERIORES = '/concursos-anteriores'
 
-/* Sección de la landing: la 1ª edición en tres tarjetas, con el
-   ganador arriba y a lo ancho. Cada tarjeta lleva a su ficha en
-   /concursos-anteriores. */
+/* Los ítems del carrusel salen de los datos de la edición: las tres
+   imágenes de `enLanding` de cada proyecto, en el orden de los datos.
+   El ganador va primero, y su portada queda al centro al cargar.
+   Los finalistas no llevan puesto: el 2º y el 3º no se conocen. */
+const ITEMS = EDICION.proyectos.flatMap((p) => {
+  const imagenes = imagenesDe(p)
+  const categoria = `${p.puesto === 1 ? 'Ganador' : 'Finalista'} · ${EDICION.numero}`
+  return p.enLanding
+    .map((archivo) => imagenes.findIndex((im) => im.archivo === archivo))
+    .filter((i) => i >= 0)
+    .map((i) => itemDeCarrusel(p, i, { categoria, titulo: p.titulo }))
+})
+
+/* Sección de la landing: la 1ª edición en un carrusel a todo el ancho,
+   sobre tinta. La tarjeta central lleva a la ficha de su proyecto en
+   /concursos-anteriores; una lateral, al tocarla, pasa al centro. */
 export default function SeccionAnteriores() {
   return (
     <section className="sec" id="concursos-anteriores" data-screen-label="Concursos anteriores">
@@ -21,14 +34,18 @@ export default function SeccionAnteriores() {
           }
           text={`${EDICION.nombre}. Tres propuestas para un mismo reto: ${EDICION.reto}`}
         />
+      </div>
 
-        <div className="ed-anteriores">
-          <Tarjeta proyecto={GANADOR} destacada />
-          {FINALISTAS.map((p) => (
-            <Tarjeta key={p.id} proyecto={p} />
-          ))}
-        </div>
+      <Carrusel3D
+        className="ed-anteriores__escenario"
+        variante="landing"
+        items={ITEMS}
+        etiqueta={`Proyectos de la ${EDICION.numero}`}
+        instrucciones="Usa las flechas izquierda y derecha para recorrer las imágenes. Enter abre el proyecto de la imagen central."
+        onActivar={(i) => window.location.assign(`${RUTA_ANTERIORES}#${ITEMS[i].proyectoId}`)}
+      />
 
+      <div className="page">
         <div className="ed-anteriores__pie">
           <p className="fine">
             Descubre la memoria, la galería y la lámina completa de cada proyecto.
@@ -39,39 +56,5 @@ export default function SeccionAnteriores() {
         </div>
       </div>
     </section>
-  )
-}
-
-function Tarjeta({ proyecto, destacada = false }) {
-  return (
-    <a
-      href={`${RUTA_ANTERIORES}#${proyecto.id}`}
-      className={`ed-tarjeta ${destacada ? 'ed-tarjeta--destacada' : ''}`.trim()}
-    >
-      <div className="ed-tarjeta__media">
-        <Foto
-          imagen={proyecto.portada}
-          sizes={
-            destacada
-              ? '(max-width: 900px) 100vw, 800px'
-              : '(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 600px'
-          }
-        />
-      </div>
-
-      <div className="ed-tarjeta__texto">
-        <Badge tone={destacada ? 'brand' : 'outline'}>{proyecto.distincion}</Badge>
-        <h3 className="ed-tarjeta__titulo">{proyecto.titulo}</h3>
-        {destacada && <p className="ed-tarjeta__lema">{proyecto.lema}</p>}
-        <p className="ed-tarjeta__meta">
-          {proyecto.autores}
-          <br />
-          {proyecto.lugar}
-        </p>
-        <span className="ed-tarjeta__ir">
-          Ver el proyecto <Icon name="arrow-right" size={16} />
-        </span>
-      </div>
-    </a>
   )
 }

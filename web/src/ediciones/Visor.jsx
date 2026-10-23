@@ -14,7 +14,10 @@ import { Button, IconButton } from '../ds'
    puede arrastrar.
 
    Teclado: Esc cierra, ← → cambian de imagen, + − 0 acercan, alejan
-   y ajustan. El foco queda atrapado adentro y vuelve al cerrar. */
+   y ajustan. El foco queda atrapado adentro y vuelve al cerrar.
+
+   onCerrar recibe el índice de la imagen que se estaba viendo, para que
+   quien lo abrió pueda quedarse en esa. */
 
 const ZOOM_MIN = 1
 const ZOOM_MAX = 4
@@ -113,7 +116,7 @@ export default function Visor({ titulo, imagenes, inicial = 0, onCerrar }) {
 
     if (e.key === 'Escape') {
       e.preventDefault()
-      onCerrar()
+      onCerrar(indice)
     } else if (e.key === 'ArrowRight' && total > 1 && !lienzoEnfocado) {
       e.preventDefault()
       mover(1)
@@ -245,7 +248,7 @@ export default function Visor({ titulo, imagenes, inicial = 0, onCerrar }) {
             icon="close"
             label="Cerrar (Esc)"
             variant="on-brand"
-            onClick={onCerrar}
+            onClick={() => onCerrar(indice)}
           />
         </div>
       </div>

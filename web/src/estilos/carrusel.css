@@ -1,0 +1,238 @@
+/* ==========================================================
+   Carrusel 3D (ediciones/Carrusel3D.jsx)
+
+   Nuestro, como ediciones.css. La geometría y el movimiento viven en
+   CONFIG_CARRUSEL, en el componente; acá va lo que es identidad:
+   colores, tipografía, alturas y las capas sobre la imagen. Los
+   valores que no estaban en tokens.css tienen nombre acá abajo, con
+   prefijo --car-.
+
+   El JS escribe en el escenario --car-ancho y --car-alto-tarjeta
+   (el tamaño de la central, medido) y en cada tarjeta su transform,
+   filter, opacity y z-index.
+   ========================================================== */
+
+:root{
+  /* Alto del escenario. Va dentro de .escala (zoom .9): se ve al 90%.
+     En celular la tarjeta la limita el ancho, no el alto: el escenario
+     se achica para que no sobre tinta. */
+  --car-alto-landing:clamp(560px,100svh,1040px);
+  --car-alto-landing-movil:clamp(340px,56svh,480px);
+  --car-alto-selector:clamp(340px,52svh,540px);
+  --car-alto-selector-movil:clamp(260px,40svh,360px);
+
+  /* Radio chico: la tarjeta es una foto, no una placa. */
+  --car-radio-tarjeta:4px;
+  /* Lo que se ve si la imagen no carga: la tinta, aclarada. */
+  --car-fondo-tarjeta:color-mix(in srgb,var(--ink) 86%,var(--white));
+
+  /* La galería se funde con el fondo en los bordes. En una máscara solo
+     cuenta la opacidad: la tinta vale como «visible». */
+  --car-mascara:linear-gradient(to right,transparent 0%,var(--ink) 20%,var(--ink) 80%,transparent 100%);
+  --car-mascara-movil:linear-gradient(to right,transparent 0%,var(--ink) 8%,var(--ink) 92%,transparent 100%);
+
+  /* Las dos capas sobre la imagen, debajo del texto. */
+  --car-sombra:linear-gradient(to bottom,transparent 50%,color-mix(in srgb,var(--ink) 75%,transparent) 100%);
+  --car-vineta:radial-gradient(ellipse at 50% 50%,transparent 58%,color-mix(in srgb,var(--ink) 38%,transparent) 100%);
+
+  /* Texto. Crece con la tarjeta entre un mínimo y un máximo. */
+  --car-categoria-min:9px;
+  --car-categoria-max:11px;
+  --car-categoria-fluido:.025;
+  --car-titulo-min:17px;
+  --car-titulo-max:26px;
+  --car-titulo-fluido:.06;
+  --car-relleno-min:14px;
+  --car-relleno-max:26px;
+  --car-relleno-fluido:.06;
+  --car-titulo-movil:15px;
+  --car-chico-movil:8px;
+  --car-tracking-categoria:.2em;
+  --car-tracking-numero:.14em;
+  --car-interlineado-titulo:1.05;
+  --car-opacidad-categoria:.6;
+  --car-separacion-categoria:6px;
+
+  /* La tira simple (sin 3D): ancho de tarjeta y la misma proporción
+     3:4 que calcula el componente. */
+  --car-tira-tarjeta:clamp(180px,24vw,300px);
+  --car-proporcion:3/4;
+}
+
+/* ==========================================================
+   Escenario
+   ========================================================== */
+.car{
+  /* Valores de arranque hasta la primera medida. */
+  --car-ancho:300px;
+  --car-alto-tarjeta:400px;
+
+  position:relative;
+  height:var(--car-alto);
+  overflow:hidden;
+  background:var(--ink);
+  color:var(--cream);
+  /* El vertical sigue siendo de la página. */
+  touch-action:pan-y;
+  user-select:none;
+  cursor:grab;
+}
+.car--landing{--car-alto:var(--car-alto-landing)}
+.car--selector{--car-alto:var(--car-alto-selector)}
+.car--arrastrando{cursor:grabbing}
+/* Adentro: el escenario puede ir a todo el ancho y el foco no se corta. */
+.car:focus-visible{outline:2px solid var(--focus-ring);outline-offset:calc(-1 * var(--space-1))}
+
+/* La perspectiva va acá (el JS fija perspective-origin en la línea de
+   base). La máscara también: en la pista aplanaría el 3D. */
+.car__ventana{
+  position:absolute;
+  inset:0;
+  mask-image:var(--car-mascara);
+}
+.car__pista{
+  position:absolute;
+  inset:0;
+  transform-style:preserve-3d;
+}
+
+/* ==========================================================
+   Tarjeta
+   ========================================================== */
+/* Todas parten del centro del escenario; el transform las reparte. */
+.car__tarjeta{
+  position:absolute;
+  left:calc(50% - var(--car-ancho) / 2);
+  top:calc(50% - var(--car-alto-tarjeta) / 2);
+  width:var(--car-ancho);
+  height:var(--car-alto-tarjeta);
+  overflow:hidden;
+  border-radius:var(--car-radio-tarjeta);
+  background:var(--car-fondo-tarjeta);
+  will-change:transform,filter,opacity;
+}
+.car--landing .car__tarjeta--activa{cursor:pointer}
+.car--selector .car__tarjeta--activa{cursor:zoom-in}
+.car--arrastrando .car__tarjeta{cursor:grabbing}
+
+.car__imagen{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  pointer-events:none;
+}
+
+/* Viñeta en los bordes y sombra abajo, entre la imagen y el texto. */
+.car__tarjeta::before,
+.car__tarjeta::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+}
+.car__tarjeta::before{background:var(--car-vineta)}
+.car__tarjeta::after{background:var(--car-sombra)}
+
+.car__texto{
+  --car-relleno:clamp(var(--car-relleno-min),calc(var(--car-ancho) * var(--car-relleno-fluido)),var(--car-relleno-max));
+  --car-chico:clamp(var(--car-categoria-min),calc(var(--car-ancho) * var(--car-categoria-fluido)),var(--car-categoria-max));
+
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  padding:var(--car-relleno);
+  color:var(--cream);
+  text-align:left;
+  pointer-events:none;
+}
+.car__categoria{
+  font:var(--weight-regular) var(--car-chico)/var(--leading-tight) var(--font-core);
+  text-transform:uppercase;
+  letter-spacing:var(--car-tracking-categoria);
+  opacity:var(--car-opacidad-categoria);
+}
+.car__titulo{
+  margin-top:var(--car-separacion-categoria);
+  font:var(--weight-regular) clamp(var(--car-titulo-min),calc(var(--car-ancho) * var(--car-titulo-fluido)),var(--car-titulo-max))/var(--car-interlineado-titulo) var(--font-core);
+  letter-spacing:var(--tracking-display);
+  text-wrap:balance;
+}
+.car__numero{
+  align-self:flex-end;
+  margin-top:var(--space-3);
+  font:var(--weight-semibold) var(--car-chico)/1 var(--font-core);
+  font-variant-numeric:tabular-nums;
+  letter-spacing:var(--car-tracking-numero);
+}
+
+/* Si la imagen no cargó queda el fondo; la sombra sobra. */
+.car__tarjeta--sin-imagen::after{display:none}
+
+/* Para lectores de pantalla: instrucciones y el anuncio al asentarse. */
+.car__lector{
+  position:absolute;
+  width:1px;
+  height:1px;
+  margin:-1px;
+  padding:0;
+  overflow:hidden;
+  clip-path:inset(50%);
+  white-space:nowrap;
+  border:0;
+}
+
+/* ==========================================================
+   Celular
+   ========================================================== */
+@media (max-width:640px){
+  .car--landing{--car-alto:var(--car-alto-landing-movil)}
+  .car--selector{--car-alto:var(--car-alto-selector-movil)}
+  .car__ventana{mask-image:var(--car-mascara-movil)}
+  .car__texto{--car-chico:var(--car-chico-movil)}
+  .car__titulo{font-size:var(--car-titulo-movil)}
+}
+
+/* ==========================================================
+   Tira simple: sin transformaciones 3D
+   ========================================================== */
+.car-tira{
+  background:var(--ink);
+  color:var(--cream);
+}
+.car-tira__lista{
+  display:flex;
+  gap:var(--space-4);
+  margin:0;
+  padding:var(--space-7) var(--space-5);
+  list-style:none;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  scrollbar-width:thin;
+}
+.car-tira__lista li{flex:none;scroll-snap-align:center}
+.car-tira .car__tarjeta{
+  --car-ancho:var(--car-tira-tarjeta);
+  position:relative;
+  left:auto;
+  top:auto;
+  display:block;
+  height:auto;
+  aspect-ratio:var(--car-proporcion);
+  padding:0;
+  border:0;
+  font:inherit;
+  cursor:pointer;
+  opacity:var(--ed-opacidad-miniatura);
+  transition:opacity var(--dur-fast) var(--ease-standard);
+}
+.car-tira .car__tarjeta[aria-current]{opacity:1}

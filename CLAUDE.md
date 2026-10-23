@@ -65,7 +65,11 @@ migra a código y se aloja en este mismo proyecto de Railway.
 - **Concursos anteriores**: sección en la landing y página
   `/concursos-anteriores` con los tres proyectos de la 1ª edición (2025-I):
   el ganador, *Tres Horizontes*, y dos finalistas, con galería y visor de la
-  lámina con zoom. Todos los datos en `web/src/ediciones/edicion-2025-i.js`;
+  lámina con zoom. Las dos usan un carrusel 3D en bucle
+  (`web/src/ediciones/Carrusel3D.jsx`, 23/10): en la landing, nueve
+  imágenes sobre una franja de tinta, y la central lleva a la ficha; en
+  cada ficha, como selector debajo de un visor en línea con la imagen
+  entera. Todos los datos en `web/src/ediciones/edicion-2025-i.js`;
   lo que falta (fotos, universidades, jurado, cifras) figura ahí en `null`
   y se ve como «próximamente». El 2º y el 3º puesto no se conocen.
 - **Los correos llevan al panel y dicen el nombre nuevo** (9/10, Gonzalo):
@@ -113,6 +117,7 @@ habisite/
 │  │  ├─ Landing.jsx       la landing
 │  │  ├─ barra.js          la barra sobre el hero y los anclas, para landing y ediciones
 │  │  ├─ ediciones/        concursos anteriores: sección, página y visor
+│  │  │  ├─ Carrusel3D.jsx     el carrusel 3D de la landing y de cada ficha
 │  │  │  └─ edicion-2025-i.js  TODOS los datos de la 1ª edición
 │  │  ├─ jurado.js         el jurado de TODAS las ediciones, una vez por persona
 │  │  ├─ Inscripcion.jsx   el formulario, contra la API
@@ -131,7 +136,8 @@ habisite/
 │  │     ├─ pagina.css        estilos de la landing
 │  │     ├─ interacciones.css NUESTRAS modificaciones (ver §9)
 │  │     ├─ paneles.css       los paneles
-│  │     └─ ediciones.css     concursos anteriores y el visor
+│  │     ├─ ediciones.css     concursos anteriores y el visor
+│  │     └─ carrusel.css      el carrusel 3D
 │  ├─ public/ediciones/  imágenes de cada edición, en WebP
 │  ├─ public/jurado/     retratos del jurado: blanco y negro, 4:5, WebP
 │  └─ package.json
@@ -421,9 +427,10 @@ formulario de inscripción (ayudas y errores legibles sobre naranja, la fila
 del teléfono), y el color de texto en hover de los `Button` con `href`.
 
 Después de esos cuatro, con estilos nuevos y no modificaciones:
-`paneles.css` y `ediciones.css` (concursos anteriores y su visor). Los
-valores que `ediciones.css` necesitó y no estaban van con nombre `--ed-*`
-arriba del archivo.
+`paneles.css`, `ediciones.css` (concursos anteriores y su visor) y
+`carrusel.css` (el carrusel 3D; su geometría y movimiento están en el
+objeto de configuración de `Carrusel3D.jsx`). Los valores que necesitaron
+y no estaban van con nombre arriba de cada archivo: `--ed-*` y `--car-*`.
 
 ### Idioma
 
