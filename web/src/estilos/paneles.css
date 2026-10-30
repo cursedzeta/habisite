@@ -61,6 +61,29 @@
 /* Sin el :not, el «Entrar con Google» —un <a> con .hs-btn--primary— queda
    con texto naranja sobre fondo naranja: esta regla le gana en especificidad. */
 .ing a:not(.hs-btn){color:var(--orange);font-weight:var(--weight-semibold)}
+
+/* El entorno de prueba (sesion/prueba.js): al pie de la tarjeta,
+   separado del ingreso de verdad y plegado hasta que se pide. */
+.ing__prueba{
+  align-self:stretch;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:var(--space-3);
+  padding-top:var(--space-4);
+  border-top:1px solid var(--line-hairline);
+}
+.ing__prueba-abrir{
+  background:none;
+  border:0;
+  padding:0;
+  font:var(--weight-semibold) var(--size-body-sm)/1.4 var(--font-core);
+  color:var(--text-muted);
+  text-decoration:underline;
+  cursor:pointer;
+}
+.ing__prueba-abrir:hover{color:var(--text-body)}
+.ing__prueba-roles{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--space-2)}
 /* En un teléfono los botones del ingreso pueden partir el texto, y los
    márgenes se achican: si no, la tarjeta es más ancha que la pantalla. */
 .ing .hs-btn{white-space:normal;text-align:center}

@@ -7,6 +7,7 @@ import PanelConcursante from './paneles/PanelConcursante'
 import PanelJurado from './paneles/PanelJurado'
 import ConSesion from './sesion/ConSesion'
 import PaginaIngreso from './sesion/Ingreso'
+import { rolDePrueba, yoDePrueba } from './sesion/prueba'
 import { RUTA_PANEL } from './sesion/sesion'
 
 /* Enrutador minimo, sin libreria.
@@ -27,7 +28,12 @@ export default function App() {
   }
   if (ruta === '/ingresar') return <PaginaIngreso />
   if (ruta === RUTA_ANTERIORES) return <PaginaConcursosAnteriores />
-  if (ruta === RUTA_PANEL) return <ConSesion>{(yo) => <PanelSegunRol yo={yo} />}</ConSesion>
+  if (ruta === RUTA_PANEL) {
+    // Entorno de prueba (sesion/prueba.js): sin sesión ni API, a propósito.
+    const rol = rolDePrueba()
+    if (rol) return <PanelSegunRol key={rol} yo={yoDePrueba(rol)} />
+    return <ConSesion>{(yo) => <PanelSegunRol yo={yo} />}</ConSesion>
+  }
   return <Landing />
 }
 

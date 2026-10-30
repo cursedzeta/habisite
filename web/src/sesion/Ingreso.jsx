@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Button, Field, Input } from '../ds'
 import { pedir } from '../api'
+import { ROLES_DE_PRUEBA, urlDePrueba } from './prueba'
 import { destinoTrasEntrar, RUTA_PANEL, urlGoogle } from './sesion'
 
 /* ==========================================================
@@ -90,7 +91,42 @@ export function Ingreso({ retorno, aviso = null, titulo = 'Entrar a la plataform
         <p className="pnl-nota">
           ¿Todavía no te inscribiste? <a href="/#inscripcion">Inscríbete en la página del concurso</a>.
         </p>
+
+        <EntornoDePrueba />
       </div>
+    </div>
+  )
+}
+
+/* Para mostrar la plataforma sin cuenta (sesion/prueba.js). Plegado:
+   no compite con el ingreso de verdad. */
+function EntornoDePrueba() {
+  const [abierto, setAbierto] = useState(false)
+
+  return (
+    <div className="ing__prueba">
+      <button
+        type="button"
+        className="ing__prueba-abrir"
+        aria-expanded={abierto}
+        onClick={() => setAbierto((v) => !v)}
+      >
+        Entrar al entorno de prueba
+      </button>
+      {abierto && (
+        <>
+          <p className="pnl-nota">
+            Mira los paneles como cada rol, con datos de ejemplo. Nada de lo que hagas se guarda.
+          </p>
+          <div className="ing__prueba-roles">
+            {ROLES_DE_PRUEBA.map((r) => (
+              <Button key={r.rol} href={urlDePrueba(r.rol)} variant="outline" size="sm">
+                {r.texto}
+              </Button>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   )
 }

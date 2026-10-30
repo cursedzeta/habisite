@@ -23,8 +23,9 @@ export default function Shell({
       {/* Tu sesión ya es real; lo de adentro del panel todavía no. Se va
           cuando cada sección lea de la API. */}
       <div className="crm-cinta">
-        En construcción: tu cuenta es real, pero la propuesta, el equipo y las evaluaciones
-        todavía son de ejemplo.
+        {yo.prueba
+          ? 'Entorno de prueba: estás viendo el panel como otro rol, con datos de ejemplo. Nada se guarda.'
+          : 'En construcción: tu cuenta es real, pero la propuesta, el equipo y las evaluaciones todavía son de ejemplo.'}
       </div>
 
       <header className="crm-top">
@@ -58,7 +59,12 @@ export default function Shell({
             Volver a administración
           </button>
         )}
-        <button type="button" className="crm-top__salir" onClick={salir}>
+        {/* En el entorno de prueba no hay sesión que cerrar: vuelve al ingreso. */}
+        <button
+          type="button"
+          className="crm-top__salir"
+          onClick={yo.prueba ? () => window.location.assign('/panel') : salir}
+        >
           Salir
         </button>
       </header>

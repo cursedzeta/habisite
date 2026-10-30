@@ -94,6 +94,14 @@ migra a código y se aloja en este mismo proyecto de Railway.
   Con Google no sirven: Google devuelve `growthimbar@gmail.com` sin el
   alias, que es otra cuenta (participante). **Hay que bloquearlas antes de
   abrir la evaluación** (§8).
+- **Entorno de prueba** (30/10, para Sol, que no tiene la casilla del
+  equipo): en la pantalla de ingreso, «Entrar al entorno de prueba» deja
+  elegir un rol y lleva a `/panel?prueba=<rol>` (`participante`, `jurado`,
+  `admin`). **Es solo del front** (`web/src/sesion/prueba.js`): un `yo`
+  inventado, sin cookie ni API. Se decidió así para no abrir un «entrar
+  como admin» real sin verificar, que dejaría ver los datos de los
+  inscriptos. Cuando una sección del panel pase a leer de la API, con
+  `yo.prueba` tiene que seguir mostrando datos de ejemplo.
 - **Nadie se inscribió todavía** (19/10): no hay inscriptos reales que
   migrar si cambia el flujo.
 
@@ -136,7 +144,8 @@ habisite/
 │  │  ├─ Inscripcion.jsx   el formulario, contra la API
 │  │  ├─ api.js            dirección de la API y pedir()
 │  │  ├─ listas.js         países y tipos, compartidos por formulario y paneles
-│  │  ├─ sesion/           ingreso (Google o enlace) y la puerta de los paneles
+│  │  ├─ sesion/           ingreso (Google o enlace), la puerta de los paneles
+│  │  │                    y el entorno de prueba (prueba.js, sin API)
 │  │  ├─ paneles/          prototipo de los paneles (datos inventados)
 │  │  ├─ index.css         importa los 4 CSS en orden
 │  │  ├─ ds/               el sistema de diseño (13 componentes)
