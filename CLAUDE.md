@@ -81,6 +81,19 @@ migra a código y se aloja en este mismo proyecto de Railway.
   minutos. La base sigue siendo Postgres; la planilla es un espejo para el
   equipo. La dueña es `challenge@habisite.com`. Todo en
   `backendGonzalo/docs/13`.
+- **Cuentas de prueba, una por rol** (30/10, pedido de Sol; migración
+  `006`). Son alias de la cuenta del equipo y se entra con el **enlace por
+  correo** en `/panel`; el correo llega a `growthimbar@gmail.com`:
+
+  | Rol | Correo para pedir el enlace |
+  |---|---|
+  | Concursante | `growthimbar+concursante@gmail.com` |
+  | Jurado | `growthimbar+jurado@gmail.com` |
+  | Administración | `growthimbar+admin@gmail.com` |
+
+  Con Google no sirven: Google devuelve `growthimbar@gmail.com` sin el
+  alias, que es otra cuenta (participante). **Hay que bloquearlas antes de
+  abrir la evaluación** (§8).
 - **Nadie se inscribió todavía** (19/10): no hay inscriptos reales que
   migrar si cambia el flujo.
 
@@ -372,7 +385,12 @@ Las preguntas para cerrar esto se le mandaron a Jarod el 8/10.
 9. **Pasar el proyecto de Google a «En producción»** antes de abrir la
    inscripción: en modo *Testing* hay tope de 100 usuarios y las sesiones se
    caen a los 7 días.
-10. **¿La inscripción es paga?** Lo plantearon Sol y Edu el 16/10. El flujo
+10. **Bloquear las cuentas de prueba antes de abrir la evaluación.** El
+    jurado de prueba entra en el reparto y en el cálculo de resultados como
+    uno real, y el concursante figura entre los inscriptos y en la planilla:
+    `update perfiles set estado = 'bloqueado' where correo like
+    'growthimbar+%@gmail.com';` (ver `migraciones/006`).
+11. **¿La inscripción es paga?** Lo plantearon Sol y Edu el 16/10. El flujo
     sería formulario → pago → correo con el enlace al grupo, que hoy se da
     en el momento. Antes de programar falta saber: a qué cuenta y en qué
     país va la plata (define el medio de pago), cuánto y en qué moneda, si
@@ -538,6 +556,10 @@ participante y con un admin. El detalle está en
    `GOOGLE_SHEETS_CREDENCIALES` no se valida al arrancar a propósito (una
    clave mal pegada no tiene que tumbar la inscripción). Sin endpoints
    nuevos: el contrato no cambia.
+
+7. **Revisar `migraciones/006-cuentas-de-prueba.sql`** (30/10, Tomás): tres
+   perfiles de prueba, uno por rol, sobre alias `growthimbar+…@gmail.com`.
+   Solo datos, sin código. Ojo con el reparto: ver el aviso del archivo.
 
 ### Para Tomás — lo que cambió del lado tuyo (9/10, Gonzalo)
 
